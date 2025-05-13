@@ -1,194 +1,176 @@
-War Management System
+**War Management System**
 
 A comprehensive database and visualization tool designed to manage and analyze military resources, personnel, missions, and equipment, using historical World War II data for strategic insights and historical analysis.
 
-Table of Contents
+---
 
-Overview
+## Table of Contents
 
-Features
+1. [Overview](#overview)
+2. [Features](#features)
+3. [Database Schema](#database-schema)
+4. [Setup & Installation](#setup--installation)
 
-Database Schema
+   * [1. MySQL Database](#1-mysql-database)
+   * [2. Java Application](#2-java-application)
+   * [3. Python Visualization (Optional)](#3-python-visualization-optional)
+5. [Usage](#usage)
+6. [Contributing](#contributing)
+7. [License](#license)
 
-Setup & Installation
+---
 
-1. MySQL Database
-
-2. Java Application
-
-3. Python Visualization (Optional)
-
-Usage
-
-Contributing
-
-License
-
-Overview
+## Overview
 
 The War Management System allows you to:
 
-Track military personnel, units, missions, equipment, and supplies.
+* Track military **personnel**, **units**, **missions**, **equipment**, and **supplies**.
+* Visualize data through charts for better analysis of logistics and mission outcomes.
 
-Visualize data through charts for better analysis of logistics and mission outcomes.
+---
 
-Features
+## Features
 
-Personnel Management: View and update status (active, injured, MIA, KIA).
+* **Personnel Management**: View and update status (active, injured, MIA, KIA).
+* **Unit Management**: Organize by type (infantry, cavalry, artillery) and commander.
+* **Mission Management**: Log mission objectives, timelines, and statuses.
+* **Equipment Tracking**: Monitor operational status of weapons, vehicles, electronics.
+* **Supply Chain**: Manage inventory levels and deployments across locations.
+* **Data Visualization**: Generate bar charts and other plots for quick insights.
 
-Unit Management: Organize by type (infantry, cavalry, artillery) and commander.
+---
 
-Mission Management: Log mission objectives, timelines, and statuses.
+## Database Schema
 
-Equipment Tracking: Monitor operational status of weapons, vehicles, electronics.
+### Personnel
 
-Supply Chain: Manage inventory levels and deployments across locations.
+* `personnel_id` INT (PK)
+* `first_name`, `last_name` VARCHAR(50)
+* `post`, `role` VARCHAR(50)
+* `unit_id` INT
+* `status` ENUM('active', 'injured', 'MIA', 'KIA')
+* `contact_information` VARCHAR(100)
 
-Data Visualization: Generate bar charts and other plots for quick insights.
+### Locations
 
-Database Schema
+* `location_id` INT (PK)
+* `name`, `coordinates` VARCHAR(100)
 
-Personnel
+### Units
 
-personnel_id INT (PK)
+* `unit_id` INT (PK)
+* `unit_name` VARCHAR(50)
+* `unit_type` ENUM('infantry','cavalry','artillery')
+* `commander_id`, `location_id` INT
 
-first_name, last_name VARCHAR(50)
+### Missions
 
-post, role VARCHAR(50)
+* `mission_id` INT (PK)
+* `name` VARCHAR(100)
+* `objective` TEXT
+* `start_date`, `end_date` VARCHAR(20)
+* `status` ENUM('planned','ongoing','completed')
+* `location_id` INT
 
-unit_id INT
+### Equipment
 
-status ENUM('active', 'injured', 'MIA', 'KIA')
+* `equipment_id` INT (PK)
+* `name` VARCHAR(100)
+* `type` ENUM('Weapon','Vehicle','Electronic','Other')
+* `unit_id`, `location_id` INT
+* `status` ENUM('Operational','Maintenance','Decommissioned')
 
-contact_information VARCHAR(100)
+### Supplies
 
-Locations
+* `supply_id` INT (PK)
+* `name`, `type` VARCHAR(100)
+* `quantity` INT
+* `unit_id`, `location_id` INT
+* `status` ENUM('Available','In Use','Out of Stock')
 
-location_id INT (PK)
+---
 
-name, coordinates VARCHAR(100)
+## Setup & Installation
 
-Units
+### 1. MySQL Database
 
-unit_id INT (PK)
+1. Install MySQL and start the service.
+2. Create the database:
 
-unit_name VARCHAR(50)
+   ```sql
+   CREATE DATABASE war;
+   USE war;
+   ```
+3. Import schema and sample data:
 
-unit_type ENUM('infantry','cavalry','artillery')
+   ```bash
+   mysql -u USERNAME -p war < schema.sql
+   mysql -u USERNAME -p war < data.sql
+   ```
 
-commander_id, location_id INT
+### 2. Java Application
 
-Missions
+1. Open your IDE (e.g., Eclipse, IntelliJ).
+2. Import the project as a Maven/Gradle project (if applicable).
+3. Ensure the JDBC driver is on the classpath (`mysql-connector-java`).
+4. Update `DatabaseHelper.java` with your DB credentials.
+5. Run the main class (e.g., `BarChartExample`) to launch the application.
 
-mission_id INT (PK)
-
-name VARCHAR(100)
-
-objective TEXT
-
-start_date, end_date VARCHAR(20)
-
-status ENUM('planned','ongoing','completed')
-
-location_id INT
-
-Equipment
-
-equipment_id INT (PK)
-
-name VARCHAR(100)
-
-type ENUM('Weapon','Vehicle','Electronic','Other')
-
-unit_id, location_id INT
-
-status ENUM('Operational','Maintenance','Decommissioned')
-
-Supplies
-
-supply_id INT (PK)
-
-name, type VARCHAR(100)
-
-quantity INT
-
-unit_id, location_id INT
-
-status ENUM('Available','In Use','Out of Stock')
-
-Setup & Installation
-
-1. MySQL Database
-
-Install MySQL and start the service.
-
-Create the database:
-
-CREATE DATABASE war;
-USE war;
-
-Import schema and sample data:
-
-mysql -u USERNAME -p war < schema.sql
-mysql -u USERNAME -p war < data.sql
-
-2. Java Application
-
-Open your IDE (e.g., Eclipse, IntelliJ).
-
-Import the project as a Maven/Gradle project (if applicable).
-
-Ensure the JDBC driver is on the classpath (mysql-connector-java).
-
-Update DatabaseHelper.java with your DB credentials.
-
-Run the main class (e.g., BarChartExample) to launch the application.
-
-3. Python Visualization (Optional)
+### 3. Python Visualization (Optional)
 
 If you want advanced data analysis and interactive plots:
 
-Install Python (>=3.8) and pip.
+1. Install Python (>=3.8) and pip.
+2. Create a virtual environment:
 
-Create a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\\Scripts\\activate
+   ```
+3. Install dependencies:
 
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\\Scripts\\activate
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Run sample script:
 
-Install dependencies:
+   ```bash
+   python visualize_missions.py
+   ```
 
-pip install -r requirements.txt
+---
 
-Run sample script:
+## Usage
 
-python visualize_missions.py
+* **Java UI**: Use the GUI to browse and manage records.
+* **Python scripts**: Run analysis scripts in the `scripts/` folder.
 
-Usage
+---
 
-Java UI: Use the GUI to browse and manage records.
+## Contributing
 
-Python scripts: Run analysis scripts in the scripts/ folder.
+1. Fork the repo.
+2. Create a feature branch:
 
-Contributing
+   ```bash
+   git checkout -b improve-readme
+   ```
+3. Commit your changes:
 
-Fork the repo.
+   ```bash
+   git commit -m "Improve README with Table of Contents and setup guides"
+   ```
+4. Push to your fork:
 
-Create a feature branch:
+   ```bash
+   git push origin improve-readme
+   ```
+5. Open a Pull Request.
 
-git checkout -b improve-readme
+---
 
-Commit your changes:
+## License
 
-git commit -m "Improve README with Table of Contents and setup guides"
-
-Push to your fork:
-
-git push origin improve-readme
-
-Open a Pull Request.
-
-License
-
-This project is licensed under the Apache License 2.0. See LICENSE for details.
+This project is licensed under the **Apache License 2.0**. See `LICENSE` for details.
 
 i made some changes in requirements.txt now how to pus
