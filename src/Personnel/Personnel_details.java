@@ -115,7 +115,7 @@ public class Personnel_details extends JFrame {
     }
 
     private void loadPersonnelData() {
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/war", "root", "rayees@123");
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/war", "root", "SP1234sp()");
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM Personnel")) {
 

@@ -198,7 +198,7 @@ public class Units_Interface extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				String url = "jdbc:mysql://localhost:3306/war";
 		        String user = "root";
-		        String password = "rayees@123";
+		        String password = "SP1234sp()";
 
 		        String insertQuery = "INSERT INTO units (unit_id, unit_name, unit_type, commander_id, location_id) VALUES (?, ?, ?, ?, ?)";
 		        try (Connection conn = DriverManager.getConnection(url, user, password);
@@ -241,7 +241,7 @@ public class Units_Interface extends JFrame {
 
 			    String url = "jdbc:mysql://localhost:3306/war";
 			    String user = "root";
-			    String password = "rayees@123";
+			    String password = "SP1234sp()";
 
 			    String selectQuery = "SELECT * FROM units";
 
@@ -278,7 +278,7 @@ public class Units_Interface extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				 String url = "jdbc:mysql://localhost:3306/war";
 			        String user = "root";
-			        String password = "rayees@123";
+			        String password = "SP1234sp()";
 
 			        String updateQuery = "UPDATE units SET unit_name = ?, unit_type = ?, commander_id = ?, location_id = ? WHERE unit_id = ?";
 			        
@@ -322,7 +322,7 @@ public class Units_Interface extends JFrame {
 
 				    String url = "jdbc:mysql://localhost:3306/war";
 				    String user = "root";
-				    String password = "rayees@123";
+				    String password = "SP1234sp()";
 
 				    String selectQuery = "SELECT * FROM units";
 
@@ -361,7 +361,7 @@ public class Units_Interface extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				String url = "jdbc:mysql://localhost:3306/war";
 		        String user = "root";
-		        String password = "rayees@123";
+		        String password = "SP1234sp()";
 
 		        String deleteQuery = "DELETE FROM units WHERE unit_id = ?";
 		        
@@ -426,7 +426,7 @@ public class Units_Interface extends JFrame {
 
 	    String url = "jdbc:mysql://localhost:3306/war";
 	    String user = "root";
-	    String password = "rayees@123";
+	    String password = "SP1234sp()";
 
 	    String selectQuery = "SELECT * FROM units";
 

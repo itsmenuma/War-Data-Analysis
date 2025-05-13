@@ -6,8 +6,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import DataAnalysis.EquipmentBarChart;
-import DataAnalysis.Equipment_database;
+import util.DBUtil;
 import warManagement.WarManagement;
+import DataAnalysis.Equipment_database;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -27,9 +28,6 @@ public class Equipment_details extends JFrame {
     private JTable Equipment_table;
     private JComboBox<String> Status_txt;
     private JComboBox<String> equip_type_txt;
-    private static final String url = "jdbc:mysql://localhost:3306/war";
-    private static final String user = "root";
-    private static final String password = "rayees@123";
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -87,13 +85,6 @@ public class Equipment_details extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 refreshTextFields();
             }
-
-			private void refreshTextFields() {
-				 equip_ID_txt.setText("");
-			        equip_name_txt.setText("");
-			        Unit_ID_txt.setText("");
-			        location_ID_txt.setText("");
-			}
         });
         btnNewButton.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15));
         btnNewButton.setBackground(new Color(0, 0, 0));
@@ -119,79 +110,7 @@ public class Equipment_details extends JFrame {
         btnNewButton_2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 insertEquipment();
-                loadEquipmentData();
-                refreshTextFields();
             }
-
-			private void loadEquipmentData() {
-				DefaultTableModel model = (DefaultTableModel) Equipment_table.getModel();
-		          model.setRowCount(0); // Clear table
-
-		          try (Connection conn = DriverManager.getConnection(url, user, password)) {
-		              String query = "SELECT * FROM Equipment";
-		              PreparedStatement pstmt = conn.prepareStatement(query);
-		              ResultSet rs = pstmt.executeQuery();
-
-		              while (rs.next()) {
-		                  Vector<Object> row = new Vector<>();
-		                  row.add(rs.getInt("equipment_id"));
-		                  row.add(rs.getString("name"));
-		                  row.add(rs.getString("type"));
-		                  row.add(rs.getInt("unit_id"));
-		                  row.add(rs.getString("status"));
-		                  row.add(rs.getInt("location_id"));
-		                  model.addRow(row);
-		              }
-
-		          } catch (SQLException e) {
-		              e.printStackTrace();
-		          }
-			}
-
-			private void insertEquipment() {
-				 String insertQuery = "INSERT INTO Equipment (equipment_id, name, type, unit_id, status, location_id) VALUES (?, ?, ?, ?, ?, ?)";
-
-				    // Validate input fields
-				    if (equip_ID_txt.getText().isEmpty() || equip_name_txt.getText().isEmpty() || Unit_ID_txt.getText().isEmpty()
-				            || location_ID_txt.getText().isEmpty()) {
-				        JOptionPane.showMessageDialog(Equipment_details.this, "Please fill in all fields.", "Error", JOptionPane.ERROR_MESSAGE);
-				        return;
-				    }
-
-				    try (Connection conn = DriverManager.getConnection(url, user, password);
-				         PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
-
-				        pstmt.setInt(1, Integer.parseInt(equip_ID_txt.getText()));
-				        pstmt.setString(2, equip_name_txt.getText());
-				        pstmt.setString(3, (String) equip_type_txt.getSelectedItem());
-				        pstmt.setInt(4, Integer.parseInt(Unit_ID_txt.getText()));
-				        pstmt.setString(5, (String) Status_txt.getSelectedItem());
-				        pstmt.setInt(6, Integer.parseInt(location_ID_txt.getText()));
-
-				        int rowsAffected = pstmt.executeUpdate();
-
-				        if (rowsAffected > 0) {
-				            JOptionPane.showMessageDialog(Equipment_details.this, "Equipment inserted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-				            refreshTextFields();
-				            loadEquipmentData();
-				        } else {
-				            JOptionPane.showMessageDialog(Equipment_details.this, "Failed to insert equipment.", "Error", JOptionPane.ERROR_MESSAGE);
-				        }
-
-				    } catch (NumberFormatException e) {
-				        JOptionPane.showMessageDialog(Equipment_details.this, "Invalid number format in ID fields.", "Error", JOptionPane.ERROR_MESSAGE);
-				    } catch (SQLException e) {
-				        e.printStackTrace();
-				        JOptionPane.showMessageDialog(Equipment_details.this, "Database error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-				    }
-			}
-
-			private void refreshTextFields() {
-				 equip_ID_txt.setText("");
-			        equip_name_txt.setText("");
-			        Unit_ID_txt.setText("");
-			        location_ID_txt.setText("");
-			}
         });
         btnNewButton_2.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15));
         btnNewButton_2.setBackground(new Color(0, 0, 0));
@@ -246,79 +165,8 @@ public class Equipment_details extends JFrame {
         JButton btnNewButton_3 = new JButton("Delete");
         btnNewButton_3.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	deleteEquipment();
+                deleteEquipment();
             }
-
-			private void deleteEquipment() {
-				 String deleteQuery = "DELETE FROM Equipment WHERE equipment_id = ?";
-
-				    // Validate input fields
-				    if (equip_ID_txt.getText().isEmpty()) {
-				        JOptionPane.showMessageDialog(Equipment_details.this, "Please enter Equipment ID.", "Error", JOptionPane.ERROR_MESSAGE);
-				        return;
-				    }
-
-				    int confirm = JOptionPane.showConfirmDialog(Equipment_details.this, "Are you sure you want to delete this equipment?", "Confirm Deletion", JOptionPane.YES_NO_OPTION);
-				    if (confirm != JOptionPane.YES_OPTION) {
-				        return; // User canceled deletion
-				    }
-
-				    try (Connection conn = DriverManager.getConnection(url, user, password);
-				         PreparedStatement pstmt = conn.prepareStatement(deleteQuery)) {
-
-				        pstmt.setInt(1, Integer.parseInt(equip_ID_txt.getText()));
-
-				        int rowsAffected = pstmt.executeUpdate();
-
-				        if (rowsAffected > 0) {
-				            JOptionPane.showMessageDialog(Equipment_details.this, "Equipment deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-				            loadEquipmentData(); // Refresh table after deletion
-				            refreshTextFields();
-				        } else {
-				            JOptionPane.showMessageDialog(Equipment_details.this, "Failed to delete equipment.", "Error", JOptionPane.ERROR_MESSAGE);
-				        }
-
-				    } catch (NumberFormatException e) {
-				        JOptionPane.showMessageDialog(Equipment_details.this, "Invalid number format in ID field.", "Error", JOptionPane.ERROR_MESSAGE);
-				    } catch (SQLException e) {
-				        e.printStackTrace();
-				        JOptionPane.showMessageDialog(Equipment_details.this, "Database error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-				    }
-			}
-
-			private void refreshTextFields() {
-				 equip_ID_txt.setText("");
-			        equip_name_txt.setText("");
-			        Unit_ID_txt.setText("");
-			        location_ID_txt.setText("");
-			}
-
-			private void loadEquipmentData() {
-				  DefaultTableModel model = (DefaultTableModel) Equipment_table.getModel();
-			        model.setRowCount(0); // Clear table
-
-			        try (Connection conn = DriverManager.getConnection(url, user, password)) {
-			            String query = "SELECT * FROM Equipment";
-			            PreparedStatement pstmt = conn.prepareStatement(query);
-			            ResultSet rs = pstmt.executeQuery();
-
-			            while (rs.next()) {
-			                Vector<Object> row = new Vector<>();
-			                row.add(rs.getInt("equipment_id"));
-			                row.add(rs.getString("name"));
-			                row.add(rs.getString("type"));
-			                row.add(rs.getInt("unit_id"));
-			                row.add(rs.getString("status"));
-			                row.add(rs.getInt("location_id"));
-			                model.addRow(row);
-			            }
-
-			        } catch (SQLException e) {
-			            e.printStackTrace();
-			        }
-			}
-
-			
         });
         btnNewButton_3.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15));
         btnNewButton_3.setForeground(new Color(255, 255, 255));
@@ -329,83 +177,8 @@ public class Equipment_details extends JFrame {
         JButton btnNewButton_4 = new JButton("Update");
         btnNewButton_4.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	updateEquipment();
-            	
+                updateEquipment();
             }
-
-			private void updateEquipment() {
-				String updateQuery = "UPDATE Equipment SET name = ?, type = ?, unit_id = ?, status = ?, location_id = ? WHERE equipment_id = ?";
-
-		        // Validate input fields
-		        if (equip_ID_txt.getText().isEmpty() || equip_name_txt.getText().isEmpty() || Unit_ID_txt.getText().isEmpty()
-		                || location_ID_txt.getText().isEmpty()) {
-		            JOptionPane.showMessageDialog(Equipment_details.this, "Please fill in all fields.", "Error", JOptionPane.ERROR_MESSAGE);
-		            return;
-		        }
-
-		        try (Connection conn = DriverManager.getConnection(url, user, password);
-		             PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
-
-		            pstmt.setString(1, equip_name_txt.getText());
-		            pstmt.setString(2, (String) equip_type_txt.getSelectedItem());
-		            pstmt.setInt(3, Integer.parseInt(Unit_ID_txt.getText()));
-		            pstmt.setString(4, (String) Status_txt.getSelectedItem());
-		            pstmt.setInt(5, Integer.parseInt(location_ID_txt.getText()));
-		            pstmt.setInt(6, Integer.parseInt(equip_ID_txt.getText()));
-
-		            int rowsAffected = pstmt.executeUpdate();
-
-		            if (rowsAffected > 0) {
-		                JOptionPane.showMessageDialog(Equipment_details.this, "Equipment updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-		                refreshTextFields();
-		                loadEquipmentData();
-		                
-		            } else {
-		                JOptionPane.showMessageDialog(Equipment_details.this, "Failed to update equipment.", "Error", JOptionPane.ERROR_MESSAGE);
-		            }
-
-		        } catch (NumberFormatException e) {
-		            JOptionPane.showMessageDialog(Equipment_details.this, "Invalid number format in ID fields.", "Error", JOptionPane.ERROR_MESSAGE);
-		        } catch (SQLException e) {
-		            e.printStackTrace();
-		            JOptionPane.showMessageDialog(Equipment_details.this, "Database error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-		        }
-			}
-			 private void loadEquipmentData() {
-		    	  DefaultTableModel model = (DefaultTableModel) Equipment_table.getModel();
-		          model.setRowCount(0); // Clear table
-
-		          try (Connection conn = DriverManager.getConnection(url, user, password)) {
-		              String query = "SELECT * FROM Equipment";
-		              PreparedStatement pstmt = conn.prepareStatement(query);
-		              ResultSet rs = pstmt.executeQuery();
-
-		              while (rs.next()) {
-		                  Vector<Object> row = new Vector<>();
-		                  row.add(rs.getInt("equipment_id"));
-		                  row.add(rs.getString("name"));
-		                  row.add(rs.getString("type"));
-		                  row.add(rs.getInt("unit_id"));
-		                  row.add(rs.getString("status"));
-		                  row.add(rs.getInt("location_id"));
-		                  model.addRow(row);
-		              }
-
-		          } catch (SQLException e) {
-		              e.printStackTrace();
-		          }
-			}
-
-
-
-			private void refreshTextFields() {
-				 equip_ID_txt.setText("");
-			        equip_name_txt.setText("");
-			        Unit_ID_txt.setText("");
-			        location_ID_txt.setText("");
-			}
-
-			
         });
         btnNewButton_4.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15));
         btnNewButton_4.setForeground(new Color(255, 255, 255));
@@ -433,7 +206,8 @@ public class Equipment_details extends JFrame {
         JButton btnNewButton_5 = new JButton("Analyse");
         btnNewButton_5.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		Map<String, Integer> data = Equipment_database.getPersonnelStatusCount();
+                // Fetch equipment status counts
+                Map<String, Integer> data = Equipment_database.getPersonnelStatusCount();
                 // Create a new frame for the bar chart
                 JFrame chartFrame = new JFrame("Personnel Status Count");
                 chartFrame.setSize(800, 600);
@@ -450,5 +224,124 @@ public class Equipment_details extends JFrame {
         btnNewButton_5.setBounds(647, 410, 102, 72);
         contentPane.add(btnNewButton_5);
         
+        loadEquipmentData();
+    }
+
+    private void refreshTextFields() {
+        equip_ID_txt.setText("");
+        equip_name_txt.setText("");
+        Unit_ID_txt.setText("");
+        location_ID_txt.setText("");
+    }
+
+    private void loadEquipmentData() {
+        DefaultTableModel model = (DefaultTableModel) Equipment_table.getModel();
+        model.setRowCount(0);
+        try (Connection conn = DBUtil.getConnection()) {
+            String query = "SELECT * FROM Equipment";
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Vector<Object> row = new Vector<>();
+                row.add(rs.getInt("equipment_id"));
+                row.add(rs.getString("name"));
+                row.add(rs.getString("type"));
+                row.add(rs.getInt("unit_id"));
+                row.add(rs.getString("status"));
+                row.add(rs.getInt("location_id"));
+                model.addRow(row);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void insertEquipment() {
+        String insertQuery = "INSERT INTO Equipment (equipment_id, name, type, unit_id, status, location_id) VALUES (?, ?, ?, ?, ?, ?)";
+        if (equip_ID_txt.getText().isEmpty() || equip_name_txt.getText().isEmpty() ||
+            Unit_ID_txt.getText().isEmpty() || location_ID_txt.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
+            pstmt.setInt(1, Integer.parseInt(equip_ID_txt.getText()));
+            pstmt.setString(2, equip_name_txt.getText());
+            pstmt.setString(3, (String) equip_type_txt.getSelectedItem());
+            pstmt.setInt(4, Integer.parseInt(Unit_ID_txt.getText()));
+            pstmt.setString(5, (String) Status_txt.getSelectedItem());
+            pstmt.setInt(6, Integer.parseInt(location_ID_txt.getText()));
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(this, "Equipment inserted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                loadEquipmentData();
+                refreshTextFields();
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to insert equipment.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Invalid number format in ID fields.", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Database error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void deleteEquipment() {
+        String deleteQuery = "DELETE FROM Equipment WHERE equipment_id = ?";
+        if (equip_ID_txt.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter Equipment ID.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this equipment?", "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION) return;
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(deleteQuery)) {
+            pstmt.setInt(1, Integer.parseInt(equip_ID_txt.getText()));
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(this, "Equipment deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                loadEquipmentData();
+                refreshTextFields();
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to delete equipment.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Invalid number format in ID field.", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Database error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void updateEquipment() {
+        String updateQuery = "UPDATE Equipment SET name = ?, type = ?, unit_id = ?, status = ?, location_id = ? WHERE equipment_id = ?";
+        if (equip_ID_txt.getText().isEmpty() || equip_name_txt.getText().isEmpty() || Unit_ID_txt.getText().isEmpty()
+                || location_ID_txt.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
+            pstmt.setString(1, equip_name_txt.getText());
+            pstmt.setString(2, (String) equip_type_txt.getSelectedItem());
+            pstmt.setInt(3, Integer.parseInt(Unit_ID_txt.getText()));
+            pstmt.setString(4, (String) Status_txt.getSelectedItem());
+            pstmt.setInt(5, Integer.parseInt(location_ID_txt.getText()));
+            pstmt.setInt(6, Integer.parseInt(equip_ID_txt.getText()));
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                JOptionPane.showMessageDialog(this, "Equipment updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                refreshTextFields();
+                loadEquipmentData();
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to update equipment.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Invalid number format in ID fields.", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Database error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
