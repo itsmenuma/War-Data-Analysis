@@ -13,11 +13,7 @@ import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Map;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
@@ -28,6 +24,7 @@ import javax.swing.table.DefaultTableModel;
 import DataAnalysis.SuppliesBarChart;
 import DataAnalysis.SuppliesDataSet;
 import warManagement.WarManagement;
+import util.DBUtil;
 
 import javax.swing.JScrollPane;
 
@@ -44,10 +41,6 @@ public class Supply_details extends JFrame {
 	private JTable Supply_table;
 	private JComboBox<String>Status_txt;
 	
-	 private static final String url = "jdbc:mysql://localhost:3306/war";
-	    private static final String user = "root";
-	    private static final String password = "rayees@123";
-
 	/**
 	 * Launch the application.
 	 */
@@ -114,13 +107,7 @@ public class Supply_details extends JFrame {
 		
 		JButton btnNewButton = new JButton("Refresh");
 		btnNewButton.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15));
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				refreshTextFields();
-			}
-
-			
-		});
+		btnNewButton.addActionListener(e -> refreshTextFields());
 		btnNewButton.setBackground(new Color(0, 0, 0));
 		btnNewButton.setForeground(new Color(255, 255, 255));
 		btnNewButton.setBounds(183, 429, 82, 51);
@@ -141,11 +128,7 @@ public class Supply_details extends JFrame {
 		contentPane.add(btnNewButton_1);
 		
 		JButton btnNewButton_2 = new JButton("Delete");
-		btnNewButton_2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				deleteSupply();
-			}
-		});
+		btnNewButton_2.addActionListener(e -> deleteSupply());
 		btnNewButton_2.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15));
 		btnNewButton_2.setBackground(new Color(0, 0, 0));
 		btnNewButton_2.setForeground(new Color(255, 255, 255));
@@ -153,11 +136,7 @@ public class Supply_details extends JFrame {
 		contentPane.add(btnNewButton_2);
 		
 		JButton btnNewButton_3 = new JButton("Insert");
-		btnNewButton_3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				insertSupply();
-			}
-		});
+		btnNewButton_3.addActionListener(e -> insertSupply());
 		btnNewButton_3.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15));
 		btnNewButton_3.setForeground(new Color(255, 255, 255));
 		btnNewButton_3.setBackground(new Color(0, 0, 0));
@@ -268,7 +247,8 @@ public class Supply_details extends JFrame {
 		btnNewButton_4.setBounds(605, 428, 132, 53);
 		contentPane.add(btnNewButton_4);
 		
-		
+		// Initialize data table
+		loadSupplyData();
 	}
 
 	protected void updateSupply() {
@@ -280,7 +260,7 @@ public class Supply_details extends JFrame {
 
 	    String updateQuery = "UPDATE Supplies SET name = ?, type = ?, quantity = ?, unit_id = ?, location_id = ?, status = ? WHERE supply_id = ?";
 
-	    try (Connection conn = DriverManager.getConnection(url, user, password);
+	    try (Connection conn = DBUtil.getConnection();
 	         PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
 
 	        pstmt.setString(1, supply_name_txt.getText());
@@ -322,7 +302,7 @@ public class Supply_details extends JFrame {
 
 	    String deleteQuery = "DELETE FROM Supplies WHERE supply_id = ?";
 
-	    try (Connection conn = DriverManager.getConnection(url, user, password);
+	    try (Connection conn = DBUtil.getConnection();
 	         PreparedStatement pstmt = conn.prepareStatement(deleteQuery)) {
 
 	        pstmt.setInt(1, Integer.parseInt(supply_ID_txt.getText()));
@@ -348,7 +328,7 @@ public class Supply_details extends JFrame {
 	protected void insertSupply() {
 		 String insertQuery = "INSERT INTO Supplies (supply_id, name, type, quantity, unit_id, location_id, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-		    try (Connection conn = DriverManager.getConnection(url, user, password);
+		    try (Connection conn = DBUtil.getConnection();
 		         PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
 
 		        pstmt.setInt(1, Integer.parseInt(supply_ID_txt.getText()));
@@ -383,7 +363,7 @@ public class Supply_details extends JFrame {
 	private void loadSupplyData() {
 		 String query = "SELECT supply_id, name, type, quantity, unit_id, location_id, status FROM Supplies";
 	        
-	        try (Connection conn = DriverManager.getConnection(url, user, password);
+	        try (Connection conn = DBUtil.getConnection();
 	             PreparedStatement pstmt = conn.prepareStatement(query);
 	             ResultSet rs = pstmt.executeQuery()) {
 

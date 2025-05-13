@@ -210,7 +210,7 @@ public class Login extends JFrame {
 	    }
 
 	    private boolean checkCredentials(String personnelId, String firstName, String role) {
-	        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/war", "root", "rayees@123");
+	        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/war", "root", "SP1234sp()");
 	             Statement stmt = conn.createStatement();
 	             ResultSet rs = stmt.executeQuery("SELECT * FROM Personnel WHERE Personnel_id='" + personnelId + "' AND First_name='" + firstName + "' AND Role='" + role + "'")) {
 

@@ -229,7 +229,7 @@ public class Personnel_SignUp extends JFrame {
 
 			        String url = "jdbc:mysql://localhost:3306/war";
 			        String user = "root"; // Replace with your MySQL username
-			        String password = "rayees@123"; // Replace with your MySQL password
+			        String password = "SP1234sp()"; // Replace with your MySQL password
 
 			        String sql = "INSERT INTO Personnel (Personnel_id, First_name, Last_name, Post, Unit_Id, Role, Status, contact_information) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 

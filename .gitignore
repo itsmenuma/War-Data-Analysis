@@ -1,0 +1,5 @@
+bin/
+bin/*
+module-info.class
+
+.idea/

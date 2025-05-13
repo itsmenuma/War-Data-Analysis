@@ -6,7 +6,11 @@ import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionListener;
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.PreparedStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
+import util.DBUtil;
 import java.util.Map;
 import java.awt.event.ActionEvent;
 import javax.swing.table.DefaultTableModel;
@@ -28,8 +32,7 @@ public class Mission_details extends JFrame {
     private JTextField location_ID_txt;
     private JTextField mission_ID_txt;
     private JTable Missions_table;
-    @SuppressWarnings("unused")
-	private JComboBox<String> status_txt;
+    private JComboBox<String> status_txt;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -70,20 +73,7 @@ public class Mission_details extends JFrame {
         
         JButton btnNewButton = new JButton("Refresh");
         btnNewButton.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15));
-        btnNewButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                refreshTextFields();
-            }
-
-            private void refreshTextFields() {
-                mission_name_txt.setText("");
-                mission_ID_txt.setText("");
-                Objective_txt.setText("");
-                start_date_txt.setText("");
-                end_date_txt.setText("");
-                location_ID_txt.setText("");
-            }
-        });
+        btnNewButton.addActionListener(e -> refreshTextFields());
         btnNewButton.setBackground(new Color(0, 0, 0));
         btnNewButton.setForeground(new Color(255, 255, 255));
         btnNewButton.setBounds(218, 425, 105, 58);
@@ -110,82 +100,7 @@ public class Mission_details extends JFrame {
         contentPane.add(btnNewButton_1);
         
         JButton btnNewButton_2 = new JButton("Insert");
-        btnNewButton_2.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String url = "jdbc:mysql://localhost:3306/war";
-                String user = "root";
-                String password = "rayees@123";
-
-                String insertQuery = "INSERT INTO missions(mission_id, name, objective, start_date, end_date, status, location_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                try (Connection conn = DriverManager.getConnection(url, user, password);
-                     PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
-
-                    pstmt.setString(1, mission_ID_txt.getText());
-                    pstmt.setString(2, mission_name_txt.getText());
-                    pstmt.setString(3, Objective_txt.getText());
-                    pstmt.setString(4, start_date_txt.getText());
-                    pstmt.setString(5, end_date_txt.getText());
-                    pstmt.setString(6, (String) status_txt.getSelectedItem());
-                    pstmt.setString(7, location_ID_txt.getText());
-
-                    int rowsAffected = pstmt.executeUpdate();
-
-                    if (rowsAffected > 0) {
-                        JOptionPane.showMessageDialog(Mission_details.this, "Insert successful.");
-                        refreshTextFields();
-                        refreshTableData();
-                    } else {
-                        JOptionPane.showMessageDialog(Mission_details.this, "Insert failed.");
-                    }
-
-                } catch (SQLException e1) {
-                    e1.printStackTrace();
-                    JOptionPane.showMessageDialog(Mission_details.this, "Error: " + e1.getMessage());
-                }
-            }
-
-            private void refreshTextFields() {
-                mission_ID_txt.setText("");
-                mission_name_txt.setText("");
-                Objective_txt.setText("");
-                start_date_txt.setText("");
-                end_date_txt.setText("");
-                location_ID_txt.setText("");
-            }
-
-            private void refreshTableData() {
-                DefaultTableModel model = (DefaultTableModel) Missions_table.getModel();
-                model.setRowCount(0); // Clear existing data
-
-                String url = "jdbc:mysql://localhost:3306/war";
-                String user = "root";
-                String password = "rayees@123";
-
-                String selectQuery = "SELECT * FROM missions";
-
-                try (Connection conn = DriverManager.getConnection(url, user, password);
-                     PreparedStatement pstmt = conn.prepareStatement(selectQuery);
-                     ResultSet rs = pstmt.executeQuery()) {
-
-                    while (rs.next()) {
-                        Object[] row = {
-                            rs.getString("mission_id"),
-                            rs.getString("name"),
-                            rs.getString("objective"),
-                            rs.getString("start_date"),
-                            rs.getString("end_date"),
-                            rs.getString("status"),
-                            rs.getString("location_id")
-                        };
-                        model.addRow(row);
-                    }
-
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    JOptionPane.showMessageDialog(Mission_details.this, "Error: " + e.getMessage());
-                }
-            }
-        });
+        btnNewButton_2.addActionListener(e -> insertMission());
         btnNewButton_2.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15));
         btnNewButton_2.setBackground(new Color(0, 0, 0));
         btnNewButton_2.setForeground(new Color(255, 255, 255));
@@ -279,78 +194,7 @@ public class Mission_details extends JFrame {
         btnUpdate.setForeground(new Color(255, 255, 255));
         btnUpdate.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String url = "jdbc:mysql://localhost:3306/war";
-                String user = "root";
-                String password = "rayees@123";
-
-                String updateQuery = "UPDATE missions SET name = ?, objective = ?, start_date = ?, end_date = ?, status = ?, location_id = ? WHERE mission_id = ?";
-                try (Connection conn = DriverManager.getConnection(url, user, password);
-                     PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
-
-                    pstmt.setString(1, mission_name_txt.getText());
-                    pstmt.setString(2, Objective_txt.getText());
-                    pstmt.setString(3, start_date_txt.getText());
-                    pstmt.setString(4, end_date_txt.getText());
-                    pstmt.setString(5, (String) status_txt.getSelectedItem());
-                    pstmt.setString(6, location_ID_txt.getText());
-                    pstmt.setString(7, mission_ID_txt.getText());
-
-                    int rowsAffected = pstmt.executeUpdate();
-
-                    if (rowsAffected > 0) {
-                        JOptionPane.showMessageDialog(Mission_details.this, "Update successful.");
-                        refreshTextFields();
-                        refreshTableData();
-                    } else {
-                        JOptionPane.showMessageDialog(Mission_details.this, "Update failed.");
-                    }
-
-                } catch (SQLException e1) {
-                    e1.printStackTrace();
-                    JOptionPane.showMessageDialog(Mission_details.this, "Error: " + e1.getMessage());
-                }
-            }
-
-            private void refreshTextFields() {
-                mission_ID_txt.setText("");
-                mission_name_txt.setText("");
-                Objective_txt.setText("");
-                start_date_txt.setText("");
-                end_date_txt.setText("");
-                location_ID_txt.setText("");
-            }
-
-            private void refreshTableData() {
-                DefaultTableModel model = (DefaultTableModel) Missions_table.getModel();
-                model.setRowCount(0); // Clear existing data
-
-                String url = "jdbc:mysql://localhost:3306/war";
-                String user = "root";
-                String password = "rayees@123";
-
-                String selectQuery = "SELECT * FROM missions";
-
-                try (Connection conn = DriverManager.getConnection(url, user, password);
-                     PreparedStatement pstmt = conn.prepareStatement(selectQuery);
-                     ResultSet rs = pstmt.executeQuery()) {
-
-                    while (rs.next()) {
-                        Object[] row = {
-                            rs.getString("mission_id"),
-                            rs.getString("name"),
-                            rs.getString("objective"),
-                            rs.getString("start_date"),
-                            rs.getString("end_date"),
-                            rs.getString("status"),
-                            rs.getString("location_id")
-                        };
-                        model.addRow(row);
-                    }
-
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    JOptionPane.showMessageDialog(Mission_details.this, "Error: " + e.getMessage());
-                }
+                updateMission();
             }
         });
         btnUpdate.setBounds(429, 427, 86, 55);
@@ -362,72 +206,7 @@ public class Mission_details extends JFrame {
         btnDelete.setForeground(new Color(255, 255, 255));
         btnDelete.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String url = "jdbc:mysql://localhost:3306/war";
-                String user = "root";
-                String password = "rayees@123";
-
-                String deleteQuery = "DELETE FROM missions WHERE mission_id = ?";
-                try (Connection conn = DriverManager.getConnection(url, user, password);
-                     PreparedStatement pstmt = conn.prepareStatement(deleteQuery)) {
-
-                    pstmt.setString(1, mission_ID_txt.getText());
-
-                    int rowsAffected = pstmt.executeUpdate();
-
-                    if (rowsAffected > 0) {
-                        JOptionPane.showMessageDialog(Mission_details.this, "Delete successful.");
-                        refreshTextFields();
-                        refreshTableData();
-                    } else {
-                        JOptionPane.showMessageDialog(Mission_details.this, "Delete failed.");
-                    }
-
-                } catch (SQLException e1) {
-                    e1.printStackTrace();
-                    JOptionPane.showMessageDialog(Mission_details.this, "Error: " + e1.getMessage());
-                }
-            }
-
-            private void refreshTextFields() {
-                mission_ID_txt.setText("");
-                mission_name_txt.setText("");
-                Objective_txt.setText("");
-                start_date_txt.setText("");
-                end_date_txt.setText("");
-                location_ID_txt.setText("");
-            }
-
-            private void refreshTableData() {
-                DefaultTableModel model = (DefaultTableModel) Missions_table.getModel();
-                model.setRowCount(0); // Clear existing data
-
-                String url = "jdbc:mysql://localhost:3306/war";
-                String user = "root";
-                String password = "rayees@123";
-
-                String selectQuery = "SELECT * FROM missions";
-
-                try (Connection conn = DriverManager.getConnection(url, user, password);
-                     PreparedStatement pstmt = conn.prepareStatement(selectQuery);
-                     ResultSet rs = pstmt.executeQuery()) {
-
-                    while (rs.next()) {
-                        Object[] row = {
-                            rs.getString("mission_id"),
-                            rs.getString("name"),
-                            rs.getString("objective"),
-                            rs.getString("start_date"),
-                            rs.getString("end_date"),
-                            rs.getString("status"),
-                            rs.getString("location_id")
-                        };
-                        model.addRow(row);
-                    }
-
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    JOptionPane.showMessageDialog(Mission_details.this, "Error: " + e.getMessage());
-                }
+                deleteMission();
             }
         });
         btnDelete.setBounds(525, 425, 86, 58);
@@ -458,5 +237,64 @@ public class Mission_details extends JFrame {
         btnNewButton_3.setForeground(new Color(255, 255, 255));
         btnNewButton_3.setBounds(621, 425, 114, 58);
         contentPane.add(btnNewButton_3);
+
+        // Initialize data
+        loadMissionData();
+    }
+
+    // Common operations
+    private void refreshTextFields() {
+        mission_ID_txt.setText(""); mission_name_txt.setText(""); Objective_txt.setText("");
+        start_date_txt.setText(""); end_date_txt.setText(""); location_ID_txt.setText("");
+    }
+
+    private void loadMissionData() {
+        DefaultTableModel model = (DefaultTableModel) Missions_table.getModel();
+        model.setRowCount(0);
+        String query = "SELECT * FROM missions";
+        try (Connection conn = DBUtil.getConnection(); PreparedStatement pstmt = conn.prepareStatement(query); ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getString("mission_id"), rs.getString("name"), rs.getString("objective"),
+                    rs.getString("start_date"), rs.getString("end_date"), rs.getString("status"), rs.getString("location_id")
+                });
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+    }
+
+    private void insertMission() {
+        String insertQuery = "INSERT INTO missions(mission_id,name,objective,start_date,end_date,status,location_id) VALUES(?,?,?,?,?,?,?)";
+        if (mission_ID_txt.getText().isEmpty()) { JOptionPane.showMessageDialog(this,"Fill all fields.","Error",JOptionPane.ERROR_MESSAGE); return; }
+        try (Connection conn = DBUtil.getConnection(); PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
+            pstmt.setString(1, mission_ID_txt.getText()); pstmt.setString(2, mission_name_txt.getText());
+            pstmt.setString(3, Objective_txt.getText()); pstmt.setString(4, start_date_txt.getText());
+            pstmt.setString(5, end_date_txt.getText()); pstmt.setString(6, (String)status_txt.getSelectedItem());
+            pstmt.setString(7, location_ID_txt.getText());
+            if (pstmt.executeUpdate()>0) JOptionPane.showMessageDialog(this,"Inserted.","Success",JOptionPane.INFORMATION_MESSAGE);
+            loadMissionData(); refreshTextFields();
+        } catch (SQLException e) { e.printStackTrace(); JOptionPane.showMessageDialog(this,"Error: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE); }
+    }
+
+    private void updateMission() {
+        String updateQuery = "UPDATE missions SET name=?,objective=?,start_date=?,end_date=?,status=?,location_id=? WHERE mission_id=?";
+        if (mission_ID_txt.getText().isEmpty()) { JOptionPane.showMessageDialog(this,"Enter ID.","Error",JOptionPane.ERROR_MESSAGE); return; }
+        try (Connection conn = DBUtil.getConnection(); PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
+            pstmt.setString(1, mission_name_txt.getText()); pstmt.setString(2, Objective_txt.getText());
+            pstmt.setString(3, start_date_txt.getText()); pstmt.setString(4, end_date_txt.getText());
+            pstmt.setString(5, (String)status_txt.getSelectedItem()); pstmt.setString(6, location_ID_txt.getText());
+            pstmt.setString(7, mission_ID_txt.getText());
+            if (pstmt.executeUpdate()>0) JOptionPane.showMessageDialog(this,"Updated.","Success",JOptionPane.INFORMATION_MESSAGE);
+            loadMissionData(); refreshTextFields();
+        } catch (SQLException e) { e.printStackTrace(); JOptionPane.showMessageDialog(this,"Error: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE); }
+    }
+
+    private void deleteMission() {
+        String deleteQuery = "DELETE FROM missions WHERE mission_id=?";
+        if (mission_ID_txt.getText().isEmpty()) { JOptionPane.showMessageDialog(this,"Enter ID.","Error",JOptionPane.ERROR_MESSAGE); return; }
+        if (JOptionPane.showConfirmDialog(this,"Confirm deletion?","Delete",JOptionPane.YES_NO_OPTION)!=JOptionPane.YES_OPTION) return;
+        try (Connection conn = DBUtil.getConnection(); PreparedStatement pstmt = conn.prepareStatement(deleteQuery)) {
+            pstmt.setString(1, mission_ID_txt.getText()); if (pstmt.executeUpdate()>0) JOptionPane.showMessageDialog(this,"Deleted.","Success",JOptionPane.INFORMATION_MESSAGE);
+            loadMissionData(); refreshTextFields();
+        } catch(SQLException e) { e.printStackTrace(); JOptionPane.showMessageDialog(this,"Error: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE); }
     }
 }
