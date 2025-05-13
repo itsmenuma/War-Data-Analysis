@@ -1,0 +1,8 @@
+numpy==2.2.5          # For numerical operations and array handling
+pandas==2.2.3         # For data manipulation, analysis, and DataFrame structures
+matplotlib==3.10.3    # For static data visualization (plots, charts)
+seaborn==0.13.2       # For statistical data visualization on top of matplotlib
+plotly==6.0.1         # For interactive plotting and dynamic visualizations
+statsmodels==0.14.4   # For statistical modeling and hypothesis testing
+pmdarima==2.0.4       # For ARIMA-based time series forecasting (auto ARIMA)
+scikit-learn==1.6.1   # For machine learning models and preprocessing utilities
