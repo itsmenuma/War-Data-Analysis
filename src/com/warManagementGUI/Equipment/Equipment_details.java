@@ -25,7 +25,7 @@ public class Equipment_details extends JFrame {
     private JComboBox<String> equip_type_txt;
     private static final String url = "jdbc:mysql://localhost:3306/war";
     private static final String user = "root";
-    private static final String password = "rayees@123";
+    private static final String password = "PASSWORD";
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
