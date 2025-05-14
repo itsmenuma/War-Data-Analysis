@@ -147,7 +147,7 @@ public class Personnel_Remove_Details extends JFrame {
 
 		        String url = "jdbc:mysql://localhost:3306/war";
 		        String user = "root"; // Replace with your MySQL username
-		        String password = "rayees@123"; // Replace with your MySQL password
+		        String password = "PASSWORD"; // Replace with your MySQL password
 
 		        StringBuilder sql = new StringBuilder("DELETE FROM Personnel WHERE 1=1");
 		        if (!personnelId.isEmpty()) sql.append(" AND Personnel_id = ?");
