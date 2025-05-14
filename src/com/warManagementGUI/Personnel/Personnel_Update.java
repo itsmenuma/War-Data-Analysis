@@ -214,7 +214,7 @@ public class Personnel_Update extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				String url = "jdbc:mysql://localhost:3306/war";
 			    String user = "root";
-			    String password = "rayees@123";
+			    String password = "PASSWORD";
 
 			    String updateQuery = "UPDATE personnel SET first_Name=?, last_Name=?, post=?, unit_ID=?, role=?, status=?, contact_information=? WHERE personnel_id=?";
 
