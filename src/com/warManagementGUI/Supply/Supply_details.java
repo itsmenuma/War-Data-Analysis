@@ -43,7 +43,7 @@ public class Supply_details extends JFrame {
 	
 	 private static final String url = "jdbc:mysql://localhost:3306/war";
 	    private static final String user = "root";
-	    private static final String password = "rayees@123";
+	    private static final String password = "PASSWORD";
 
 	/**
 	 * Launch the application.
