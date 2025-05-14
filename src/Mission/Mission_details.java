@@ -114,7 +114,7 @@ public class Mission_details extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String url = "jdbc:mysql://localhost:3306/war";
                 String user = "root";
-                String password = "rayees@123";
+                String password = "PASSWORD";
 
                 String insertQuery = "INSERT INTO missions(mission_id, name, objective, start_date, end_date, status, location_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 try (Connection conn = DriverManager.getConnection(url, user, password);
@@ -159,7 +159,7 @@ public class Mission_details extends JFrame {
 
                 String url = "jdbc:mysql://localhost:3306/war";
                 String user = "root";
-                String password = "rayees@123";
+                String password = "PASSWORD";
 
                 String selectQuery = "SELECT * FROM missions";
 
@@ -281,7 +281,7 @@ public class Mission_details extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String url = "jdbc:mysql://localhost:3306/war";
                 String user = "root";
-                String password = "rayees@123";
+                String password = "PASSWORD";
 
                 String updateQuery = "UPDATE missions SET name = ?, objective = ?, start_date = ?, end_date = ?, status = ?, location_id = ? WHERE mission_id = ?";
                 try (Connection conn = DriverManager.getConnection(url, user, password);
@@ -326,7 +326,7 @@ public class Mission_details extends JFrame {
 
                 String url = "jdbc:mysql://localhost:3306/war";
                 String user = "root";
-                String password = "rayees@123";
+                String password = "PASSWORD";
 
                 String selectQuery = "SELECT * FROM missions";
 
@@ -364,7 +364,7 @@ public class Mission_details extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String url = "jdbc:mysql://localhost:3306/war";
                 String user = "root";
-                String password = "rayees@123";
+                String password = "PASSWORD";
 
                 String deleteQuery = "DELETE FROM missions WHERE mission_id = ?";
                 try (Connection conn = DriverManager.getConnection(url, user, password);
@@ -403,7 +403,7 @@ public class Mission_details extends JFrame {
 
                 String url = "jdbc:mysql://localhost:3306/war";
                 String user = "root";
-                String password = "rayees@123";
+                String password = "PASSWORD";
 
                 String selectQuery = "SELECT * FROM missions";
 
