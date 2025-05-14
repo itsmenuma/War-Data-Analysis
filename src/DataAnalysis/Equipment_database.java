@@ -6,7 +6,7 @@ import java.util.Map;
 public class Equipment_database {
     private static final String url = "jdbc:mysql://localhost:3306/war";
     private static final String user = "root";
-    private static final String password = "rayees@123";
+    private static final String password = "PASSWORD";
 
     public static Map<String, Integer> getPersonnelStatusCount() {
         Map<String, Integer> personnelStatusCount = new HashMap<>();
