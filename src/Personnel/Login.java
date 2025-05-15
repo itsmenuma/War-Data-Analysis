@@ -8,7 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import DataAnalysis.BarChartExample;
-import DataAnalysis.DatabaseHelper;
+import util.DBUtil;
 import warManagement.WarManagement;
 
 import java.awt.Color;
@@ -192,7 +192,7 @@ public class Login extends JFrame {
 	        JButton btnNewButton_5 = new JButton("Analyse");
 	        btnNewButton_5.addActionListener(new ActionListener() {
 	        	public void actionPerformed(ActionEvent e) {
-	        		 Map<String, Integer> data = DatabaseHelper.getPersonnelStatusCount();
+	        		 Map<String, Integer> data = DBUtil.getPersonnelStatusCount();
 	        		 JFrame chartFrame = new JFrame("Personnel Status Count");
 	                 chartFrame.setSize(800, 600);
 	                 chartFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -210,7 +210,7 @@ public class Login extends JFrame {
 	    }
 
 	    private boolean checkCredentials(String personnelId, String firstName, String role) {
-	        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/war", "root", "SP1234sp()");
+	        try (Connection conn = DBUtil.getConnection();
 	             Statement stmt = conn.createStatement();
 	             ResultSet rs = stmt.executeQuery("SELECT * FROM Personnel WHERE Personnel_id='" + personnelId + "' AND First_name='" + firstName + "' AND Role='" + role + "'")) {
 

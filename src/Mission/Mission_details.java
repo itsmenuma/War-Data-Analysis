@@ -16,7 +16,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.table.DefaultTableModel;
 
 import DataAnalysis.MissionsBarChart;
-import DataAnalysis.Missions_DataSet;
+import util.DBUtil;
 import warManagement.WarManagement;
 
 import javax.swing.JScrollPane;
@@ -221,7 +221,7 @@ public class Mission_details extends JFrame {
         JButton btnNewButton_3 = new JButton("Analyze");
         btnNewButton_3.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		Map<String, Integer> data =Missions_DataSet.getPersonnelStatusCount();
+        		Map<String, Integer> data = DBUtil.getMissionsStatusCount();
                 // Create a new frame for the bar chart
                 JFrame chartFrame = new JFrame("Mission Status Count");
                 chartFrame.setSize(800, 600);

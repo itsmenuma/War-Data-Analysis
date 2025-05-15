@@ -22,7 +22,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.table.DefaultTableModel;
 
 import DataAnalysis.SuppliesBarChart;
-import DataAnalysis.SuppliesDataSet;
 import warManagement.WarManagement;
 import util.DBUtil;
 
@@ -230,7 +229,7 @@ public class Supply_details extends JFrame {
 		JButton btnNewButton_4 = new JButton("Analyse");
 		btnNewButton_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Map<String, Integer> data = SuppliesDataSet.getPersonnelStatusCount();
+				Map<String, Integer> data = DBUtil.getSuppliesStatusCount();
                 // Create a new frame for the bar chart
                 JFrame chartFrame = new JFrame("Personnel Status Count");
                 chartFrame.setSize(800, 600);

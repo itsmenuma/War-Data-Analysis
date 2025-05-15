@@ -27,7 +27,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.table.DefaultTableModel;
 
 import DataAnalysis.UnitsBarChart;
-import DataAnalysis.Units_DataSet;
+import util.DBUtil;
 import warManagement.WarManagement;
 
 import javax.swing.JScrollPane;
@@ -196,12 +196,8 @@ public class Units_Interface extends JFrame {
 		JButton btnNewButton_3 = new JButton("Insert");
 		btnNewButton_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String url = "jdbc:mysql://localhost:3306/war";
-		        String user = "root";
-		        String password = "SP1234sp()";
-
 		        String insertQuery = "INSERT INTO units (unit_id, unit_name, unit_type, commander_id, location_id) VALUES (?, ?, ?, ?, ?)";
-		        try (Connection conn = DriverManager.getConnection(url, user, password);
+		        try (Connection conn = DBUtil.getConnection();
 		                PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
 
 		               pstmt.setString(1, unit_id_txt.getText());
@@ -245,7 +241,7 @@ public class Units_Interface extends JFrame {
 
 			    String selectQuery = "SELECT * FROM units";
 
-			    try (Connection conn = DriverManager.getConnection(url, user, password);
+			    try (Connection conn = DBUtil.getConnection();
 			         PreparedStatement pstmt = conn.prepareStatement(selectQuery);
 			         ResultSet rs = pstmt.executeQuery()) {
 
@@ -282,7 +278,7 @@ public class Units_Interface extends JFrame {
 
 			        String updateQuery = "UPDATE units SET unit_name = ?, unit_type = ?, commander_id = ?, location_id = ? WHERE unit_id = ?";
 			        
-			        try (Connection conn = DriverManager.getConnection(url, user, password);
+			        try (Connection conn = DBUtil.getConnection();
 			             PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
 
 			            pstmt.setString(1, unit_name_txt.getText());
@@ -326,7 +322,7 @@ public class Units_Interface extends JFrame {
 
 				    String selectQuery = "SELECT * FROM units";
 
-				    try (Connection conn = DriverManager.getConnection(url, user, password);
+				    try (Connection conn = DBUtil.getConnection();
 				         PreparedStatement pstmt = conn.prepareStatement(selectQuery);
 				         ResultSet rs = pstmt.executeQuery()) {
 
@@ -359,13 +355,9 @@ public class Units_Interface extends JFrame {
 		JButton btnNewButton_5 = new JButton("Delete");
 		btnNewButton_5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String url = "jdbc:mysql://localhost:3306/war";
-		        String user = "root";
-		        String password = "SP1234sp()";
-
 		        String deleteQuery = "DELETE FROM units WHERE unit_id = ?";
 		        
-		        try (Connection conn = DriverManager.getConnection(url, user, password);
+		        try (Connection conn = DBUtil.getConnection();
 		             PreparedStatement pstmt = conn.prepareStatement(deleteQuery)) {
 
 		            pstmt.setString(1, unit_id_txt.getText());
@@ -395,7 +387,7 @@ public class Units_Interface extends JFrame {
 		JButton btnNewButton_1 = new JButton("Analyse");
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Map<String, Integer> data = Units_DataSet.getPersonnelStatusCount();
+				Map<String, Integer> data = DBUtil.getUnitsByTypeCount();
                 // Create a new frame for the bar chart
                 JFrame chartFrame = new JFrame("Personnel Status Count");
                 chartFrame.setSize(800, 600);
@@ -430,7 +422,7 @@ public class Units_Interface extends JFrame {
 
 	    String selectQuery = "SELECT * FROM units";
 
-	    try (Connection conn = DriverManager.getConnection(url, user, password);
+	    try (Connection conn = DBUtil.getConnection();
 	         PreparedStatement pstmt = conn.prepareStatement(selectQuery);
 	         ResultSet rs = pstmt.executeQuery()) {
 

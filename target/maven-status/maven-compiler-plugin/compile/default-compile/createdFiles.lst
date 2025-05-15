@@ -1,3 +1,4 @@
+DataAnalysis\AbstractBarChart.class
 Equipment\Equipment_details$2.class
 Units\Units_Interface$7.class
 Personnel\Personnel_Remove_Details$3.class
@@ -11,7 +12,6 @@ Units\Units_Interface$3.class
 warManagement\WarManagement$6.class
 Personnel\Personnel_SignUp$2.class
 Mission\Mission_details$2.class
-DataAnalysis\Missions_DataSet.class
 Mission\Mission_details$5.class
 warManagement\WarManagement$3.class
 DataAnalysis\BarChartExample.class
@@ -31,7 +31,6 @@ Mission\Mission_details.class
 Units\Units_Interface$2.class
 Personnel\Login$2.class
 warManagement\WarManagement$2.class
-DataAnalysis\SuppliesDataSet.class
 Personnel\Personnel_SignUp$1.class
 Personnel\Login$6.class
 Personnel\Personnel_Update.class
@@ -48,11 +47,9 @@ Personnel\Login$3.class
 warManagement\WarManagement$1.class
 Personnel\Personnel_Remove_Details$1.class
 Equipment\Equipment_details$3.class
-DataAnalysis\Equipment_database.class
 warManagement\WarManagement$4.class
 Personnel\Personnel_SignUp.class
 Supply\Supply_details$4.class
-DataAnalysis\Units_DataSet.class
 Units\Units_Interface$1.class
 Personnel\Personnel_Update$2.class
 Equipment\Equipment_details$1.class

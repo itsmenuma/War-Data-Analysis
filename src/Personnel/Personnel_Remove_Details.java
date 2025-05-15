@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import warManagement.WarManagement;
+import util.DBUtil;
 
 import java.awt.Color;
 import javax.swing.JLabel;
@@ -17,7 +18,6 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.awt.event.ActionEvent;
@@ -146,16 +146,12 @@ public class Personnel_Remove_Details extends JFrame {
 		        String firstName = Fname_txt.getText();
 		        String unitId = Unit_ID_txt.getText();
 
-		        String url = "jdbc:mysql://localhost:3306/war";
-		        String user = "root"; // Replace with your MySQL username
-		        String password = "SP1234sp()"; // Replace with your MySQL password
-
 		        StringBuilder sql = new StringBuilder("DELETE FROM Personnel WHERE 1=1");
 		        if (!personnelId.isEmpty()) sql.append(" AND Personnel_id = ?");
 		        if (!firstName.isEmpty()) sql.append(" AND First_name = ?");
 		        if (!unitId.isEmpty()) sql.append(" AND Unit_Id = ?");
 
-		        try (Connection conn = DriverManager.getConnection(url, user, password);
+		        try (Connection conn = DBUtil.getConnection();
 		             PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
 
 		            int index = 1;
