@@ -22,6 +22,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
 import warManagement.WarManagement;
+import util.DBUtil;
 
 import javax.swing.JScrollPane;
 import javax.swing.border.SoftBevelBorder;
@@ -115,7 +116,7 @@ public class Personnel_details extends JFrame {
     }
 
     private void loadPersonnelData() {
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/war", "root", "SP1234sp()");
+        try (Connection conn = DBUtil.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM Personnel")) {
 

@@ -8,7 +8,6 @@ import javax.swing.table.DefaultTableModel;
 import DataAnalysis.EquipmentBarChart;
 import util.DBUtil;
 import warManagement.WarManagement;
-import DataAnalysis.Equipment_database;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -207,7 +206,7 @@ public class Equipment_details extends JFrame {
         btnNewButton_5.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
                 // Fetch equipment status counts
-                Map<String, Integer> data = Equipment_database.getPersonnelStatusCount();
+                Map<String, Integer> data = DBUtil.getEquipmentStatusCount();
                 // Create a new frame for the bar chart
                 JFrame chartFrame = new JFrame("Personnel Status Count");
                 chartFrame.setSize(800, 600);

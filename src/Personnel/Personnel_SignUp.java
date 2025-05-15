@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import warManagement.WarManagement;
+import util.DBUtil;
 
 import java.awt.Color;
 import javax.swing.JLabel;
@@ -227,13 +228,9 @@ public class Personnel_SignUp extends JFrame {
 			            return;
 			        }
 
-			        String url = "jdbc:mysql://localhost:3306/war";
-			        String user = "root"; // Replace with your MySQL username
-			        String password = "SP1234sp()"; // Replace with your MySQL password
-
 			        String sql = "INSERT INTO Personnel (Personnel_id, First_name, Last_name, Post, Unit_Id, Role, Status, contact_information) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-			        try (Connection conn = DriverManager.getConnection(url, user, password);
+			        try (Connection conn = DBUtil.getConnection();
 			             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
 			            pstmt.setString(1, personnelId);

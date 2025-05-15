@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import warManagement.WarManagement;
+import util.DBUtil;
 
 import java.awt.Color;
 import javax.swing.JLabel;
@@ -213,13 +214,9 @@ public class Personnel_Update extends JFrame {
 		JButton btnNewButton_3 = new JButton("Update");
 		btnNewButton_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String url = "jdbc:mysql://localhost:3306/war";
-			    String user = "root";
-			    String password = "SP1234sp()";
-
 			    String updateQuery = "UPDATE personnel SET first_Name=?, last_Name=?, post=?, unit_ID=?, role=?, status=?, contact_information=? WHERE personnel_id=?";
 
-			    try (Connection conn = DriverManager.getConnection(url, user, password);
+			    try (Connection conn = DBUtil.getConnection();
 			         PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
 
 			        pstmt.setString(1, FirstName_txt.getText());
