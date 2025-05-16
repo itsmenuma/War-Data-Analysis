@@ -60,7 +60,7 @@
         <configuration>
           <!-- run on classpath instead of module-path -->
           <classpathScope>compile</classpathScope>
-          <mainClass>warManagement.WarManagement</mainClass>
+          <mainClass>com.warManagementGUI.WarManagement</mainClass>
         </configuration>
       </plugin>
     </plugins>

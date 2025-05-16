@@ -1,197 +1,117 @@
 package com.warManagementGUI.Personnel;
 
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-
-import com.warManagementGUI.WarManagement;
 
 import java.awt.Color;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.ImageIcon;
 import java.awt.Font;
-import javax.swing.JTextField;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
+import java.io.Serial;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.awt.event.ActionEvent;
+import java.util.Map;
 
-public class Login extends JFrame {
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
+import com.warManagementGUI.DataAnalysis.BarChartExample;
+import com.warManagementGUI.WarManagement;
+import com.warManagementGUI.util.AbstractDetailsFrame;
+import com.warManagementGUI.util.DBUtil;
+
+public class Login extends AbstractDetailsFrame {
+
+	@Serial
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-	private JTextField Personnel_ID_txt;
-	private JTextField FirstName_txt;
-	private JTextField Role_txt;
+	private final JTextField Personnel_ID_txt;
+	private final JTextField FirstName_txt;
+	private final JTextField Role_txt;
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Login frame = new Login();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		try {
+			new Login().display();
+		} catch (Exception e) {
+			System.err.println("Database error: " + e.getMessage());
+			JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage(),
+                                         "Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	/**
 	 * Create the frame.
 	 */
 	public Login() {
-		setTitle("Personnel_Login");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 773, 529);
-		contentPane = new JPanel();
-		contentPane.setForeground(new Color(255, 255, 255));
-		contentPane.setBackground(new Color(0, 64, 64));
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		super("Personnel Login Page", 773, 529);
+		// ...existing UI setup code...
+         
+		createIconLabel("/pics/login.jpeg", 37, 82, 169, 265);
 
-		setContentPane(contentPane);
-		contentPane.setLayout(null);
-		
-		JLabel lblNewLabel = new JLabel("");
-		lblNewLabel.setIcon(new ImageIcon(Login.class.getResource("/pics/login.jpeg")));
-		lblNewLabel.setBounds(37, 82, 169, 265);
-		contentPane.add(lblNewLabel);
-		
-		JLabel lblNewLabel_1 = new JLabel("Personnel Login Page");
-		lblNewLabel_1.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 50));
-		lblNewLabel_1.setBackground(new Color(0, 0, 0));
-		lblNewLabel_1.setForeground(new Color(255, 255, 255));
-		lblNewLabel_1.setBounds(91, 24, 622, 41);
-		contentPane.add(lblNewLabel_1);
-		
-		JLabel lblNewLabel_2 = new JLabel("Personnel ID");
-		lblNewLabel_2.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-		lblNewLabel_2.setForeground(new Color(255, 255, 255));
-		lblNewLabel_2.setBounds(272, 137, 128, 53);
-		contentPane.add(lblNewLabel_2);
-		
-		JLabel lblNewLabel_3 = new JLabel("First  Name");
-		lblNewLabel_3.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-		lblNewLabel_3.setForeground(new Color(255, 255, 255));
-		lblNewLabel_3.setBounds(272, 201, 128, 53);
-		contentPane.add(lblNewLabel_3);
-		
-		JLabel lblNewLabel_4 = new JLabel("Role");
-		lblNewLabel_4.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-		lblNewLabel_4.setForeground(new Color(255, 255, 255));
-		lblNewLabel_4.setBounds(284, 265, 116, 53);
-		contentPane.add(lblNewLabel_4);
-		
-		Personnel_ID_txt = new JTextField();
-		Personnel_ID_txt.setBounds(473, 155, 150, 20);
-		contentPane.add(Personnel_ID_txt);
-		Personnel_ID_txt.setColumns(10);
-		
-		FirstName_txt = new JTextField();
-		FirstName_txt.setBounds(473, 219, 150, 20);
-		contentPane.add(FirstName_txt);
-		FirstName_txt.setColumns(10);
-		
-		Role_txt = new JTextField();
-		Role_txt.setBounds(473, 283, 155, 20);
-		contentPane.add(Role_txt);
-		Role_txt.setColumns(10);
-		
-		JButton btnNewButton_1 = new JButton("login");
-		btnNewButton_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				 String personnelId = Personnel_ID_txt.getText();
-	                String firstName = FirstName_txt.getText();
-	                String role = Role_txt.getText();
-	                
-	                if (checkCredentials(personnelId, firstName, role)) {
-	                    Personnel_details personnelDetails = new Personnel_details();
-	                    personnelDetails.setVisible(true);
-	                    dispose();
-	                } else {
-	                    JOptionPane.showMessageDialog(contentPane, "Invalid credentials. Please try again.");
-	                }
-				/*Personnel_details personnelDetails=new Personnel_details();
-				personnelDetails.setVisible(true);
-				dispose();*/
-			}
-		});
-		btnNewButton_1.setBackground(new Color(0, 0, 0));
-		btnNewButton_1.setForeground(new Color(255, 255, 255));
-		btnNewButton_1.setBounds(600, 420, 89, 41);
-		contentPane.add(btnNewButton_1);
-		
-		JButton btnNewButton_2 = new JButton("remove");
-		btnNewButton_2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Personnel_Remove_Details PersonnelRemove=new Personnel_Remove_Details();
-				PersonnelRemove.setVisible(true);
+		createLabel("Personnel Login Page", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 50), Color.WHITE, 91, 24, 622, 41);
+
+		createLabel("Personnel ID", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), Color.WHITE, 272, 137, 128, 53);
+
+		createLabel("First  Name", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), Color.WHITE, 272, 201, 128, 53);
+
+		createLabel("Role", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), Color.WHITE, 284, 265, 116, 53);
+
+		Personnel_ID_txt = createTextField(473, 155, 150, 20, 10);
+
+		FirstName_txt = createTextField(473, 219, 150, 20, 10);
+
+		Role_txt = createTextField(473, 283, 155, 20, 10);
+
+		createButton("login", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK,
+			572, 420, 89, 41,
+			e -> {
+				String personnelId = Personnel_ID_txt.getText();
+				String firstName = FirstName_txt.getText();
+				String role = Role_txt.getText();
+				if (checkCredentials(personnelId, firstName, role)) {
+					new Personnel_details().display();
+					dispose();
+				} else {
+					JOptionPane.showMessageDialog(contentPane, "Invalid credentials. Please try again.");
+				}
+			});
+
+		createButton("remove", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK,
+			325, 420, 119, 41,
+			e -> { new Personnel_Remove_Details().display(); dispose(); });
+
+		createButton("update", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK,
+			454, 420, 108, 41,
+			e -> { new Personnel_Update().display(); dispose(); });
+
+		createButton("Back to Dashboard", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK,
+			10, 420, 177, 41,
+			e -> { new WarManagement().display(); dispose(); });
+
+		createButton("Sign Up", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK,
+			197, 420, 118, 41,
+			e -> { new Personnel_SignUp().display(); dispose(); });
+
+		createButton("Analyse", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK,
+			671, 420, 85, 41,
+			e -> {
+				Map<String, Integer> data = DBUtil.getPersonnelStatusCount();
+				BarChartExample.showBarChart("Personnel Status Count", data);
 				dispose();
-			}
-		});
-		btnNewButton_2.setForeground(new Color(255, 255, 255));
-		btnNewButton_2.setBackground(new Color(0, 0, 0));
-		btnNewButton_2.setBounds(355, 420, 89, 41);
-		contentPane.add(btnNewButton_2);
-		
-		JButton btnNewButton_3 = new JButton("update");
-		btnNewButton_3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Personnel_Update personnelUpdate=new Personnel_Update();
-				personnelUpdate.setVisible(true);
-				dispose();
-			}
-		});
-		btnNewButton_3.setBackground(new Color(0, 0, 0));
-		btnNewButton_3.setForeground(new Color(255, 255, 255));
-		btnNewButton_3.setBounds(473, 420, 89, 41);
-		contentPane.add(btnNewButton_3);
-		
-		JButton btnNewButton_4 = new JButton("Back to Dashboard");
-		btnNewButton_4.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				WarManagement dashboard=new WarManagement();
-				dashboard.setVisible(true);
-				dispose();
-			}
-		});
-		btnNewButton_4.setForeground(new Color(255, 255, 255));
-		btnNewButton_4.setBackground(new Color(0, 0, 0));
-		btnNewButton_4.setBounds(37, 420, 150, 41);
-		contentPane.add(btnNewButton_4);
-		
-		 JButton btnNewButton = new JButton("Sign Up");
-	        btnNewButton.addActionListener(e -> {
-	            Personnel_SignUp personnelSignUp = new Personnel_SignUp();
-	            personnelSignUp.setVisible(true);
-	            dispose();
-	        });
-	        btnNewButton.setBackground(new Color(0, 0, 0));
-	        btnNewButton.setForeground(new Color(255, 255, 255));
-	        btnNewButton.setBounds(211, 420, 104, 41);
-	        contentPane.add(btnNewButton);
-	    }
-
-	    private boolean checkCredentials(String personnelId, String firstName, String role) {
-	        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/war", "root", "rayees@123");
-	             Statement stmt = conn.createStatement();
-	             ResultSet rs = stmt.executeQuery("SELECT * FROM Personnel WHERE Personnel_id='" + personnelId + "' AND First_name='" + firstName + "' AND Role='" + role + "'")) {
-
-	            return rs.next(); // If there's a result, credentials are valid
-
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
-	        }
-	        return false;
-	    }
+			});
 	}
+
+	private boolean checkCredentials(String personnelId, String firstName, String role) {
+		try (Connection conn = DBUtil.getConnection();
+			 Statement stmt = conn.createStatement();
+			 ResultSet rs = stmt.executeQuery("SELECT * FROM Personnel WHERE Personnel_id='" + personnelId + "' AND First_name='" + firstName + "' AND Role='" + role + "'")) {
+
+			return rs.next(); // If there's a result, credentials are valid
+
+		} catch (Exception e) {
+			System.err.println("Database error: " + e.getMessage());
+			JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage(), 
+                                         "Error", JOptionPane.ERROR_MESSAGE);
+		}
+		return false;
+	}
+}
