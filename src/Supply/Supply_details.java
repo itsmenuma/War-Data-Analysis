@@ -34,6 +34,13 @@ public class Supply_details extends AbstractDetailsFrame {
 	private final JTable Supply_table;
 	private final JComboBox<String>Status_txt;
 	
+<<<<<<< HEAD
+=======
+	 private static final String url = "jdbc:mysql://localhost:3306/war";
+	    private static final String user = "root";
+	    private static final String password = "PASSWORD";
+
+>>>>>>> upstream/main
 	/**
 	 * Launch the application.
 	 */
