@@ -2,6 +2,8 @@ package com.warManagementGUI.DataAnalysis;
 
 import java.util.Map;
 
+import javax.swing.JFrame;
+
 import com.warManagementGUI.util.DBUtil;
 
 public class MissionsBarChart extends AbstractBarChart {
@@ -11,13 +13,13 @@ public class MissionsBarChart extends AbstractBarChart {
         super(data, "Missions Analysis");
     }
     
-    public static void showMissionStatusChart() {
+    public static JFrame showMissionStatusChart() {
         Map<String, Integer> statusCount = DBUtil.getStatusCount("missions");
-        showBarChart("Missions by Status", statusCount);
+        return showBarChart("Missions by Status", statusCount);
     }
     
-    public static void showMissionTypeChart() {
+    public static JFrame showMissionTypeChart() {
         Map<String, Integer> typeCount = DBUtil.getGroupCount("missions", "mission_type");
-        showBarChart("Missions by Type", typeCount);
+        return showBarChart("Missions by Type", typeCount);
     }
 }

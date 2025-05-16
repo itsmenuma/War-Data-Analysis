@@ -2,6 +2,8 @@ package com.warManagementGUI.Units;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,6 +11,7 @@ import java.sql.SQLException;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -89,24 +92,47 @@ public class Units_Interface extends AbstractDetailsFrame {
         unitTypeComboBox.setBounds(174, 235, 86, 22);
         contentPane.add(unitTypeComboBox);
     }
+private void setupTable() {
+    Units_table = new JTable();
+    Units_table.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 10));
+    Units_table.setForeground(new Color(0, 0, 0));
+    Units_table.setBackground(new Color(255, 255, 255));
     
-    private void setupTable() {
-        Units_table = new JTable();
-        Units_table.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 10));
-        Units_table.setForeground(new Color(0, 0, 0));
-        Units_table.setBackground(new Color(255, 255, 255));
-        
-        JScrollPane scrollPane = new JScrollPane(Units_table);
-        scrollPane.setBounds(324, 81, 404, 330);
-        contentPane.add(scrollPane);
-        
-        Units_table.setModel(new DefaultTableModel(
-            new Object[][] {},
-            new String[] {
-                "Unit ID", "Unit Name", "Unit Type", "Commander ID", "Location"
-            }
-        ));
-    }
+    JScrollPane scrollPane = new JScrollPane(Units_table);
+    scrollPane.setBounds(324, 81, 404, 330);
+    contentPane.add(scrollPane);
+    
+    Units_table.setModel(new DefaultTableModel(
+        new Object[][] {},
+        new String[] {
+            "Unit ID", "Unit Name", "Unit Type", "Commander ID", "Location"
+        }
+    ));
+    
+   // Add row selection listener
+   Units_table.getSelectionModel().addListSelectionListener(e -> {
+       if (!e.getValueIsAdjusting()) {
+           int selectedRow = Units_table.getSelectedRow();
+           if (selectedRow >= 0) {
+               DefaultTableModel model = (DefaultTableModel) Units_table.getModel();
+               unit_id_txt.setText(model.getValueAt(selectedRow, 0).toString());
+               unit_name_txt.setText(model.getValueAt(selectedRow, 1).toString());
+               
+               // Set unit type combo box
+               String unitType = model.getValueAt(selectedRow, 2).toString();
+               for (int i = 0; i < unitTypeComboBox.getItemCount(); i++) {
+                   if (unitTypeComboBox.getItemAt(i).equals(unitType)) {
+                       unitTypeComboBox.setSelectedIndex(i);
+                       break;
+                   }
+               }
+               
+               commander_ID_txt.setText(model.getValueAt(selectedRow, 3).toString());
+               Location_ID_txt.setText(model.getValueAt(selectedRow, 4).toString());
+           }
+       }
+   });
+}
     
     private void setupButtons() {
         createButton("Add", 50, 418, 89, 44, e -> addUnit());
@@ -130,14 +156,13 @@ public class Units_Interface extends AbstractDetailsFrame {
              ResultSet rs = stmt.executeQuery()) {
             
             while (rs.next()) {
-                model.addRow(new Object[]{
-                    rs.getString("unit_id"),
-                    rs.getString("unit_name"),
-                    rs.getString("unit_type"),
-                    rs.getString("commander_id"),
-                    rs.getString("location_id")
-                    // rs.getString("status")
-                });
+model.addRow(new Object[]{
+    rs.getString("unit_id"),
+    rs.getString("unit_name"),
+    rs.getString("unit_type"),
+    rs.getString("commander_id"),
+    rs.getString("location_id")
+});
             }
         } catch (SQLException ex) {
             handleDatabaseError(ex, "Error refreshing table data");
@@ -165,7 +190,7 @@ public class Units_Interface extends AbstractDetailsFrame {
                 return;
             }
             
-            String query = "INSERT INTO units (unit_id, unit_name, unit_type, commander_id, location, status) VALUES (?, ?, ?, ?, ?, 'Active')";
+            String query = "INSERT INTO units (unit_id, unit_name, unit_type, commander_id, location_id, status) VALUES (?, ?, ?, ?, ?, 'Active')";
             
             try (Connection conn = DBUtil.getConnection();
                  PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -204,7 +229,7 @@ public class Units_Interface extends AbstractDetailsFrame {
                 return;
             }
             
-            String query = "UPDATE units SET unit_name = ?, unit_type = ?, commander_id = ?, location = ? WHERE unit_id = ?";
+            String query = "UPDATE units SET unit_name = ?, unit_type = ?, commander_id = ?, location_id = ? WHERE unit_id = ?";
             
             try (Connection conn = DBUtil.getConnection();
                  PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -229,45 +254,52 @@ public class Units_Interface extends AbstractDetailsFrame {
             handleDatabaseError(ex, "Error updating unit");
         }
     }
+private void deleteUnit() {
+    String unitId = unit_id_txt.getText();
     
-    private void deleteUnit() {
-        try {
-            String unitId = unit_id_txt.getText();
-            
-            if (unitId.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please select a unit to delete", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            
-            int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this unit?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
-            
-            if (confirm == JOptionPane.YES_OPTION) {
-                String query = "DELETE FROM units WHERE unit_id = ?";
-                
-                try (Connection conn = DBUtil.getConnection();
-                     PreparedStatement pstmt = conn.prepareStatement(query)) {
-                    
-                    pstmt.setString(1, unitId);
-                    
-                    int rowsAffected = pstmt.executeUpdate();
-                    
-                    if (rowsAffected > 0) {
-                        JOptionPane.showMessageDialog(this, "Unit deleted successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        refreshTableData();
-                        clearFields();
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Failed to delete unit", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            }
-        } catch (SQLException ex) {
-            handleDatabaseError(ex, "Error deleting unit");
-        }
+    if (unitId.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please select a unit to delete", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
     }
     
-    private void showAnalysis() {
-        UnitsBarChart.showUnitTypeChart();
+    int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this unit?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+    
+    if (confirm != JOptionPane.YES_OPTION) {
+       return; // User canceled, exit early
+   }
+    
+   String query = "DELETE FROM units WHERE unit_id = ?";
+   
+   try (Connection conn = DBUtil.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(query)) {
+       
+       pstmt.setString(1, unitId);
+       
+       int rowsAffected = pstmt.executeUpdate();
+       
+       if (rowsAffected > 0) {
+           JOptionPane.showMessageDialog(this, "Unit deleted successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+           refreshTableData();
+           clearFields();
+       } else {
+           JOptionPane.showMessageDialog(this, "Failed to delete unit", "Error", JOptionPane.ERROR_MESSAGE);
+       }
+   }	catch (SQLException ex) {
+        handleDatabaseError(ex, "Error deleting unit");
     }
+}
+    
+	private void showAnalysis() {
+	   JFrame chartFrame = UnitsBarChart.showUnitTypeChart();
+	
+	   // Optional: Add a listener to handle the chart window closing
+	   chartFrame.addWindowListener(new WindowAdapter() {
+	       @Override
+	       public void windowClosing(WindowEvent e) {
+	           refreshTableData();
+	       }
+	   });
+	}
     
     private void goBack() {
         WarManagement dashboard = new WarManagement();

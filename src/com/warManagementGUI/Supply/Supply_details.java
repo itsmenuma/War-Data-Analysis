@@ -2,6 +2,8 @@ package com.warManagementGUI.Supply;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.Serial;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -272,8 +275,15 @@ public class Supply_details extends AbstractDetailsFrame {
 		loc_ID_txt.setText("");
 	}
 
-    protected void analyseSupply() {
-        SuppliesBarChart.showSupplyStatusChart();
-        dispose();
-    }
+	private void analyseSupply() {
+	   JFrame chartFrame = SuppliesBarChart.showSupplyStatusChart();
+	
+	   // Optional: Add a listener to handle the chart window closing
+	   chartFrame.addWindowListener(new WindowAdapter() {
+	       @Override
+	       public void windowClosing(WindowEvent e) {
+	        //    refreshTableData();
+	       }
+	   });
+	}
 }

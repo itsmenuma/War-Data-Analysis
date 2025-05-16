@@ -2,6 +2,8 @@ package com.warManagementGUI.DataAnalysis;
 
 import java.util.Map;
 
+import javax.swing.JFrame;
+
 import com.warManagementGUI.util.DBUtil;
 
 public class EquipmentBarChart extends AbstractBarChart {
@@ -11,13 +13,13 @@ public class EquipmentBarChart extends AbstractBarChart {
         super(data, "Equipment Analysis");
     }
     
-    public static void showEquipmentStatusChart() {
+    public static JFrame showEquipmentStatusChart() {
         Map<String, Integer> statusCount = DBUtil.getStatusCount("equipment");
-        showBarChart("Equipment by Status", statusCount);
+        return showBarChart("Equipment by Status", statusCount);
     }
     
-    public static void showEquipmentTypeChart() {
+    public static JFrame showEquipmentTypeChart() {
         Map<String, Integer> typeCount = DBUtil.getGroupCount("equipment", "equipment_type");
-        showBarChart("Equipment by Type", typeCount);
+        return showBarChart("Equipment by Type", typeCount);
     }
 }
