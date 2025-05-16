@@ -1,95 +1,44 @@
 package com.warManagementGUI.Personnel;
 
-import java.awt.EventQueue;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import java.awt.Color;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import java.awt.Font;
-import javax.swing.JButton;
-//import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-//import java.awt.event.ActionEvent;
+
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.SoftBevelBorder;
 import javax.swing.table.DefaultTableModel;
 
 import com.warManagementGUI.WarManagement;
+import com.warManagementGUI.util.AbstractDetailsFrame;
+import com.warManagementGUI.util.DBUtil;
 
-import javax.swing.JScrollPane;
-import javax.swing.border.SoftBevelBorder;
-import javax.swing.border.BevelBorder;
-
-public class Personnel_details extends JFrame {
+public class Personnel_details extends AbstractDetailsFrame {
 
     private static final long serialVersionUID = 1L;
-    private JPanel contentPane;
-    private JTable personnelTable;
-    private DefaultTableModel model;
+    private final JTable personnelTable;
+    private final DefaultTableModel model;
 
-    /**
-     * Launch the application.
-     */
     public static void main(String[] args) {
-        EventQueue.invokeLater(() -> {
-            try {
-                Personnel_details frame = new Personnel_details();
-                frame.setVisible(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        try {
+            new Personnel_details().display();
+        } catch (Exception e) {
+            System.err.println("Database error: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage(),
+                                         "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
-    /**
-     * Create the frame.
-     */
     public Personnel_details() {
-        setTitle("Personnel Details");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 773, 529);
-        contentPane = new JPanel();
-        contentPane.setBackground(new Color(0, 64, 64));
-        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-
-        setContentPane(contentPane);
-        contentPane.setLayout(null);
-
-        JLabel lblNewLabel = new JLabel("Personnel Details");
-        lblNewLabel.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 50));
-        lblNewLabel.setForeground(new Color(255, 255, 255));
-        lblNewLabel.setBounds(29, 11, 394, 58);
-        contentPane.add(lblNewLabel);
-
-        JButton btnNewButton = new JButton("Back to Dashboard");
-        btnNewButton.addActionListener(e -> {
-            WarManagement dashboard = new WarManagement();
-            dashboard.setVisible(true);
-            dispose();
-        });
-        btnNewButton.setBackground(new Color(0, 0, 0));
-        btnNewButton.setForeground(new Color(255, 255, 255));
-        btnNewButton.setBounds(33, 383, 202, 73);
-        contentPane.add(btnNewButton);
-
-        JButton btnNewButton_1 = new JButton("Log out");
-        btnNewButton_1.setHorizontalAlignment(SwingConstants.LEFT);
-        btnNewButton_1.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-        btnNewButton_1.addActionListener(e -> {
-            Login login = new Login();
-            login.setVisible(true);
-            dispose();
-        });
-        btnNewButton_1.setBackground(new Color(0, 0, 0));
-        btnNewButton_1.setForeground(new Color(255, 255, 255));
-        btnNewButton_1.setBounds(590, 385, 134, 64);
-        contentPane.add(btnNewButton_1);
+        super("Personnel Details", 773, 529);
+        createLabel("Personnel Details", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 50), Color.WHITE, 29, 11, 394, 58);
+        createButton("Back to Dashboard", BUTTON_FONT, TEXT_COLOR, BG_COLOR, 33, 383, 202, 73, e -> { new WarManagement().display(); dispose(); });
+        createButton("Log out", BUTTON_FONT, TEXT_COLOR, BG_COLOR, 590, 385, 134, 64, e -> { new Login().display(); dispose(); });
 
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setBounds(39, 79, 697, 274);
@@ -98,12 +47,10 @@ public class Personnel_details extends JFrame {
         personnelTable = new JTable();
         personnelTable.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
         scrollPane.setViewportView(personnelTable);
-        
+
         model = new DefaultTableModel(
             new Object[][] {},
-            new String[] {
-                "Personnel ID", "First Name", "Last Name", "Post", "Unit ID", "Role", "Status", "contact_information"
-            }
+            new String[] {"Personnel ID","First Name","Last Name","Post","Unit ID","Role","Status","contact_information"}
         );
         personnelTable.setModel(model);
         personnelTable.setForeground(new Color(255, 255, 255));
@@ -114,7 +61,7 @@ public class Personnel_details extends JFrame {
     }
 
     private void loadPersonnelData() {
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/war", "root", "rayees@123");
+        try (Connection conn = DBUtil.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM Personnel")) {
 
@@ -132,8 +79,9 @@ public class Personnel_details extends JFrame {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            handleDatabaseError(e, "Database error");
         }
     }
+
+    // use inherited createLabel and createButton
 }

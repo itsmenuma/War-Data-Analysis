@@ -1,430 +1,309 @@
 package com.warManagementGUI.Units;
 
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import java.awt.Color;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-
 import java.awt.Font;
-import javax.swing.JTextField;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.awt.event.ActionEvent;
-import javax.swing.JTable;
-import javax.swing.JComboBox;
+
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
+import com.warManagementGUI.DataAnalysis.UnitsBarChart;
 import com.warManagementGUI.WarManagement;
+import com.warManagementGUI.util.AbstractDetailsFrame;
+import com.warManagementGUI.util.DBUtil;
 
-import javax.swing.JScrollPane;
+public class Units_Interface extends AbstractDetailsFrame {
 
-public class Units_Interface extends JFrame {
+    private static final long serialVersionUID = 1L;
+    private JTextField unit_id_txt;
+    private JTextField unit_name_txt;
+    private JTextField commander_ID_txt;
+    private JTextField Location_ID_txt;
+    private JTable Units_table;
+    private JComboBox<String> unitTypeComboBox;
+    
+    /**
+     * Launch the application.
+     */
+    public static void main(String[] args) {
+        try {
+            new Units_Interface().display();
+        } catch (Exception e) {
+            System.err.println("Error launching application: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error launching application: " + e.getMessage(), 
+                                        "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
-	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-	private JTextField unit_id_txt;
-	private JTextField unit_name_txt;
-	private JTextField commander_ID_txt;
-	private JTextField Location_ID_txt;
-	private JTable Units_table;
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Units_Interface() {
+        super("Units", 773, 529);
+        
+        // Setup UI components
+        setupLabels();
+        setupTextFields();
+        setupComboBox();
+        setupTable();
+        setupButtons();
+        
+        // Load initial data
+        initializeTableData();
+    }
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Units_Interface frame = new Units_Interface();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+    private void setupLabels() {
+        createLabel("Units Information", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 50), 30, 11, 390, 103);
+        createLabel("Unit ID", 30, 124, 96, 25);
+        createLabel("Unit Name", 30, 175, 96, 25);
+        createLabel("Unit Type", 30, 233, 96, 25);
+        createLabel("Commander ID", 30, 276, 133, 34);
+        createLabel("Location ID", 30, 343, 111, 25);
+    }
+    
+    private void setupTextFields() {
+        unit_id_txt = createTextField(174, 124, 86, 20);
+        unit_id_txt.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 10));
+        
+        unit_name_txt = createTextField(174, 180, 86, 20);
+        unit_name_txt.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 10));
+        
+        commander_ID_txt = createTextField(174, 286, 96, 19);
+        commander_ID_txt.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 10));
+        
+        Location_ID_txt = createTextField(174, 352, 96, 19);
+        Location_ID_txt.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 10));
+    }
+    
+    private void setupComboBox() {
+        unitTypeComboBox = new JComboBox<>();
+        unitTypeComboBox.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 10));
+        unitTypeComboBox.setBackground(Color.WHITE);
+        unitTypeComboBox.setModel(new DefaultComboBoxModel(new String[] {"Infantry", "Cavalry", "Artillery", "Armored", "Air Force", "Naval"}));
+        unitTypeComboBox.setBounds(174, 235, 86, 22);
+        contentPane.add(unitTypeComboBox);
+    }
+private void setupTable() {
+    Units_table = new JTable();
+    Units_table.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 10));
+    Units_table.setForeground(new Color(0, 0, 0));
+    Units_table.setBackground(new Color(255, 255, 255));
+    
+    JScrollPane scrollPane = new JScrollPane(Units_table);
+    scrollPane.setBounds(324, 81, 404, 330);
+    contentPane.add(scrollPane);
+    
+    Units_table.setModel(new DefaultTableModel(
+        new Object[][] {},
+        new String[] {
+            "Unit ID", "Unit Name", "Unit Type", "Commander ID", "Location"
+        }
+    ));
+    
+   // Add row selection listener
+   Units_table.getSelectionModel().addListSelectionListener(e -> {
+       if (!e.getValueIsAdjusting()) {
+           int selectedRow = Units_table.getSelectedRow();
+           if (selectedRow >= 0) {
+               DefaultTableModel model = (DefaultTableModel) Units_table.getModel();
+               unit_id_txt.setText(model.getValueAt(selectedRow, 0).toString());
+               unit_name_txt.setText(model.getValueAt(selectedRow, 1).toString());
+               
+               // Set unit type combo box
+               String unitType = model.getValueAt(selectedRow, 2).toString();
+               for (int i = 0; i < unitTypeComboBox.getItemCount(); i++) {
+                   if (unitTypeComboBox.getItemAt(i).equals(unitType)) {
+                       unitTypeComboBox.setSelectedIndex(i);
+                       break;
+                   }
+               }
+               
+               commander_ID_txt.setText(model.getValueAt(selectedRow, 3).toString());
+               Location_ID_txt.setText(model.getValueAt(selectedRow, 4).toString());
+           }
+       }
+   });
+}
+    
+    private void setupButtons() {
+        createButton("Add", 50, 418, 89, 44, e -> addUnit());
+        createButton("Update", 149, 418, 89, 44, e -> updateUnit());
+        createButton("Delete", 248, 418, 89, 44, e -> deleteUnit());
+        createButton("Clear", 347, 418, 89, 44, e -> clearFields());
+        createButton("Analysis", 446, 418, 89, 44, e -> showAnalysis());
+        createButton("Back", 545, 418, 89, 44, e -> goBack());
+    }
+    
+    private void initializeTableData() {
+        refreshTableData();
+    }
+    
+    private void refreshTableData() {
+        DefaultTableModel model = (DefaultTableModel) Units_table.getModel();
+        model.setRowCount(0);
+        
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM units");
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+model.addRow(new Object[]{
+    rs.getString("unit_id"),
+    rs.getString("unit_name"),
+    rs.getString("unit_type"),
+    rs.getString("commander_id"),
+    rs.getString("location_id")
+});
+            }
+        } catch (SQLException ex) {
+            handleDatabaseError(ex, "Error refreshing table data");
+        }
+    }
+    
+    private void clearFields() {
+        unit_id_txt.setText("");
+        unit_name_txt.setText("");
+        unitTypeComboBox.setSelectedIndex(0);
+        commander_ID_txt.setText("");
+        Location_ID_txt.setText("");
+    }
+    
+    private void addUnit() {
+        try {
+            String unitId = unit_id_txt.getText();
+            String unitName = unit_name_txt.getText();
+            String unitType = unitTypeComboBox.getSelectedItem().toString();
+            String commanderId = commander_ID_txt.getText();
+            String location = Location_ID_txt.getText();
+            
+            if (unitId.isEmpty() || unitName.isEmpty() || commanderId.isEmpty() || location.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please fill all fields", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            String query = "INSERT INTO units (unit_id, unit_name, unit_type, commander_id, location_id, status) VALUES (?, ?, ?, ?, ?, 'Active')";
+            
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(query)) {
+                
+                pstmt.setString(1, unitId);
+                pstmt.setString(2, unitName);
+                pstmt.setString(3, unitType);
+                pstmt.setString(4, commanderId);
+                pstmt.setString(5, location);
+                
+                int rowsAffected = pstmt.executeUpdate();
+                
+                if (rowsAffected > 0) {
+                    JOptionPane.showMessageDialog(this, "Unit added successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    refreshTableData();
+                    clearFields();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to add unit", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } catch (SQLException ex) {
+            handleDatabaseError(ex, "Error adding unit");
+        }
+    }
+    
+    private void updateUnit() {
+        try {
+            String unitId = unit_id_txt.getText();
+            String unitName = unit_name_txt.getText();
+            String unitType = unitTypeComboBox.getSelectedItem().toString();
+            String commanderId = commander_ID_txt.getText();
+            String location = Location_ID_txt.getText();
+            
+            if (unitId.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please select a unit to update", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            String query = "UPDATE units SET unit_name = ?, unit_type = ?, commander_id = ?, location_id = ? WHERE unit_id = ?";
+            
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(query)) {
+                
+                pstmt.setString(1, unitName);
+                pstmt.setString(2, unitType);
+                pstmt.setString(3, commanderId);
+                pstmt.setString(4, location);
+                pstmt.setString(5, unitId);
+                
+                int rowsAffected = pstmt.executeUpdate();
+                
+                if (rowsAffected > 0) {
+                    JOptionPane.showMessageDialog(this, "Unit updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    refreshTableData();
+                    clearFields();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to update unit", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } catch (SQLException ex) {
+            handleDatabaseError(ex, "Error updating unit");
+        }
+    }
+private void deleteUnit() {
+    String unitId = unit_id_txt.getText();
+    
+    if (unitId.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please select a unit to delete", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this unit?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+    
+    if (confirm != JOptionPane.YES_OPTION) {
+       return; // User canceled, exit early
+   }
+    
+   String query = "DELETE FROM units WHERE unit_id = ?";
+   
+   try (Connection conn = DBUtil.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(query)) {
+       
+       pstmt.setString(1, unitId);
+       
+       int rowsAffected = pstmt.executeUpdate();
+       
+       if (rowsAffected > 0) {
+           JOptionPane.showMessageDialog(this, "Unit deleted successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+           refreshTableData();
+           clearFields();
+       } else {
+           JOptionPane.showMessageDialog(this, "Failed to delete unit", "Error", JOptionPane.ERROR_MESSAGE);
+       }
+   }	catch (SQLException ex) {
+        handleDatabaseError(ex, "Error deleting unit");
+    }
+}
+    
+	private void showAnalysis() {
+	   JFrame chartFrame = UnitsBarChart.showUnitTypeChart();
+	
+	   // Optional: Add a listener to handle the chart window closing
+	   chartFrame.addWindowListener(new WindowAdapter() {
+	       @Override
+	       public void windowClosing(WindowEvent e) {
+	           refreshTableData();
+	       }
+	   });
 	}
-
-	/**
-	 * Create the frame.
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Units_Interface() {
-		setTitle("Units");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 773, 529);
-		contentPane = new JPanel();
-		contentPane.setForeground(new Color(255, 255, 255));
-		contentPane.setBackground(new Color(0, 64, 64));
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-
-		setContentPane(contentPane);
-		contentPane.setLayout(null);
-		
-		JLabel lblNewLabel = new JLabel("Units Information");
-		lblNewLabel.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 50));
-		lblNewLabel.setForeground(new Color(255, 255, 255));
-		lblNewLabel.setBounds(30, 11, 390, 103);
-		contentPane.add(lblNewLabel);
-		
-		JLabel lblNewLabel_1 = new JLabel("Unit ID");
-		lblNewLabel_1.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-		lblNewLabel_1.setForeground(new Color(255, 255, 255));
-		lblNewLabel_1.setBounds(30, 124, 96, 25);
-		contentPane.add(lblNewLabel_1);
-		
-		JLabel lblNewLabel_2 = new JLabel("Unit Name");
-		lblNewLabel_2.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-		lblNewLabel_2.setForeground(new Color(255, 255, 255));
-		lblNewLabel_2.setBounds(30, 175, 96, 25);
-		contentPane.add(lblNewLabel_2);
-		
-		unit_id_txt = new JTextField();
-		unit_id_txt.setBounds(174, 124, 86, 20);
-		contentPane.add(unit_id_txt);
-		unit_id_txt.setColumns(10);
-		
-		unit_name_txt = new JTextField();
-		unit_name_txt.setBounds(174, 180, 86, 20);
-		contentPane.add(unit_name_txt);
-		unit_name_txt.setColumns(10);
-		
-		JButton btnNewButton = new JButton("Back to Dashboard");
-		btnNewButton.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-		btnNewButton.setBackground(new Color(0, 0, 0));
-		btnNewButton.setForeground(new Color(255, 255, 255));
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				WarManagement dashboard=new WarManagement();
-				dashboard.setVisible(true);
-				dispose();
-			}
-		});
-		btnNewButton.setBounds(10, 418, 207, 44);
-		contentPane.add(btnNewButton);
-		
-		JButton btnNewButton_2 = new JButton("Refresh");
-		btnNewButton_2.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-		btnNewButton_2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				refreshTextFields();
-			}
-
-			private void refreshTextFields() {
-				unit_id_txt.setText("");
-				unit_name_txt.setText("");
-				commander_ID_txt.setText("");
-				Location_ID_txt.setText("");
-				
-				
-			}
-		});
-		btnNewButton_2.setBackground(new Color(0, 0, 0));
-		btnNewButton_2.setForeground(new Color(255, 255, 255));
-		btnNewButton_2.setBounds(238, 418, 104, 44);
-		contentPane.add(btnNewButton_2);
-		
-		JLabel lblNewLabel_3 = new JLabel("Unit Type");
-		lblNewLabel_3.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-		lblNewLabel_3.setForeground(new Color(255, 255, 255));
-		lblNewLabel_3.setBackground(new Color(0, 0, 0));
-		lblNewLabel_3.setBounds(30, 233, 96, 25);
-		contentPane.add(lblNewLabel_3);
-		
-		JLabel lblNewLabel_4 = new JLabel("Commander ID");
-		lblNewLabel_4.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-		lblNewLabel_4.setForeground(new Color(255, 255, 255));
-		lblNewLabel_4.setBackground(new Color(0, 0, 0));
-		lblNewLabel_4.setBounds(30, 276, 133, 34);
-		contentPane.add(lblNewLabel_4);
-		
-		JLabel lblNewLabel_5 = new JLabel("Location ID");
-		lblNewLabel_5.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-		lblNewLabel_5.setForeground(new Color(255, 255, 255));
-		lblNewLabel_5.setBackground(new Color(0, 0, 0));
-		lblNewLabel_5.setBounds(30, 343, 111, 25);
-		contentPane.add(lblNewLabel_5);
-		
-		commander_ID_txt = new JTextField();
-		commander_ID_txt.setBounds(174, 286, 96, 19);
-		contentPane.add(commander_ID_txt);
-		commander_ID_txt.setColumns(10);
-		
-		Location_ID_txt = new JTextField();
-		Location_ID_txt.setBounds(174, 352, 96, 19);
-		contentPane.add(Location_ID_txt);
-		Location_ID_txt.setColumns(10);
-		
-		JComboBox comboBox = new JComboBox();
-		comboBox.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 10));
-		comboBox.setBackground(new Color(255, 255, 255));
-		comboBox.setForeground(new Color(0, 0, 0));
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"infantry", "cavalry", "artillery"}));
-		comboBox.setBounds(174, 237, 86, 21);
-		contentPane.add(comboBox);
-		
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(297, 110, 452, 258);
-		contentPane.add(scrollPane);
-		
-		Units_table = new JTable();
-		scrollPane.setViewportView(Units_table);
-		Units_table.setBackground(new Color(0, 0, 0));
-		Units_table.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 10));
-		Units_table.setForeground(new Color(255, 255, 255));
-		Units_table.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"Unit_ID", "Unit_Name", "Unit_type", "Commander_id", "location_id"
-			}
-		));
-		
-		JButton btnNewButton_3 = new JButton("Insert");
-		btnNewButton_3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String url = "jdbc:mysql://localhost:3306/war";
-		        String user = "root";
-		        String password = "PASSWORD";
-
-		        String insertQuery = "INSERT INTO units (unit_id, unit_name, unit_type, commander_id, location_id) VALUES (?, ?, ?, ?, ?)";
-		        try (Connection conn = DriverManager.getConnection(url, user, password);
-		                PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
-
-		               pstmt.setString(1, unit_id_txt.getText());
-		               pstmt.setString(2, unit_name_txt.getText());
-		               pstmt.setString(3, (String) comboBox.getSelectedItem());
-		               pstmt.setString(4, commander_ID_txt.getText());
-		               pstmt.setString(5, Location_ID_txt.getText());
-
-		               int rowsAffected = pstmt.executeUpdate();
-
-		               if (rowsAffected > 0) {
-		                   JOptionPane.showMessageDialog(Units_Interface.this, "Insert successful.");
-		                   refreshTextFields();
-		                   refreshTableData();
-		                   // Optionally refresh the table or display updated data
-		               } else {
-		                   JOptionPane.showMessageDialog(Units_Interface.this, "Insert failed.");
-		               }
-
-		           } catch (SQLException e1) {
-		               e1.printStackTrace();
-		               JOptionPane.showMessageDialog(Units_Interface.this, "Error: " + e1.getMessage());
-		           }
-		        
-			}
-			private void refreshTextFields() {
-				unit_id_txt.setText("");
-				unit_name_txt.setText("");
-				commander_ID_txt.setText("");
-				Location_ID_txt.setText("");
-				
-				
-			}
-			private void refreshTableData() {
-			    DefaultTableModel model = (DefaultTableModel) Units_table.getModel();
-			    model.setRowCount(0); // Clear existing data
-
-			    String url = "jdbc:mysql://localhost:3306/war";
-			    String user = "root";
-			    String password = "PASSWORD";
-
-			    String selectQuery = "SELECT * FROM units";
-
-			    try (Connection conn = DriverManager.getConnection(url, user, password);
-			         PreparedStatement pstmt = conn.prepareStatement(selectQuery);
-			         ResultSet rs = pstmt.executeQuery()) {
-
-			        while (rs.next()) {
-			            Object[] row = {
-			                rs.getString("unit_id"),
-			                rs.getString("unit_name"),
-			                rs.getString("unit_type"),
-			                rs.getString("commander_id"),
-			                rs.getString("location_id")
-			            };
-			            model.addRow(row);
-			        }
-
-			    } catch (SQLException e) {
-			        e.printStackTrace();
-			        JOptionPane.showMessageDialog(Units_Interface.this, "Error: " + e.getMessage());
-			    }
-			}
-		});
-		
-		btnNewButton_3.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-		btnNewButton_3.setBackground(new Color(0, 0, 0));
-		btnNewButton_3.setForeground(new Color(255, 255, 255));
-		btnNewButton_3.setBounds(365, 418, 85, 44);
-		contentPane.add(btnNewButton_3);
-		
-		JButton btnNewButton_4 = new JButton("Update");
-		btnNewButton_4.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				 String url = "jdbc:mysql://localhost:3306/war";
-			        String user = "root";
-			        String password = "PASSWORD";
-
-			        String updateQuery = "UPDATE units SET unit_name = ?, unit_type = ?, commander_id = ?, location_id = ? WHERE unit_id = ?";
-			        
-			        try (Connection conn = DriverManager.getConnection(url, user, password);
-			             PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
-
-			            pstmt.setString(1, unit_name_txt.getText());
-			            pstmt.setString(2, (String) comboBox.getSelectedItem());
-			            pstmt.setString(3, commander_ID_txt.getText());
-			            pstmt.setString(4, Location_ID_txt.getText());
-			            pstmt.setString(5, unit_id_txt.getText());
-
-			            int rowsAffected = pstmt.executeUpdate();
-
-			            if (rowsAffected > 0) {
-			                JOptionPane.showMessageDialog(Units_Interface.this, "Update successful.");
-			                refreshTextFields();
-			                refreshTableData(); // Refresh the table data to show updates
-			            } else {
-			                JOptionPane.showMessageDialog(Units_Interface.this, "Update failed.");
-			            }
-
-			        } catch (SQLException e1) {
-			            e1.printStackTrace();
-			            JOptionPane.showMessageDialog(Units_Interface.this, "Error: " + e1.getMessage());
-			        }
-			        
-			}
-
-			private void refreshTextFields() {
-				unit_id_txt.setText("");
-				unit_name_txt.setText("");
-				commander_ID_txt.setText("");
-				Location_ID_txt.setText("");
-				
-			}
-
-			private void refreshTableData() {
-				 DefaultTableModel model = (DefaultTableModel) Units_table.getModel();
-				    model.setRowCount(0); // Clear existing data
-
-				    String url = "jdbc:mysql://localhost:3306/war";
-				    String user = "root";
-				    String password = "PASSWORD";
-
-				    String selectQuery = "SELECT * FROM units";
-
-				    try (Connection conn = DriverManager.getConnection(url, user, password);
-				         PreparedStatement pstmt = conn.prepareStatement(selectQuery);
-				         ResultSet rs = pstmt.executeQuery()) {
-
-				        while (rs.next()) {
-				            Object[] row = {
-				                rs.getString("unit_id"),
-				                rs.getString("unit_name"),
-				                rs.getString("unit_type"),
-				                rs.getString("commander_id"),
-				                rs.getString("location_id")
-				            };
-				            model.addRow(row);
-				        }
-
-				    } catch (SQLException e) {
-				        e.printStackTrace();
-				        JOptionPane.showMessageDialog(Units_Interface.this, "Error: " + e.getMessage());
-				    }
-				
-			}
-			
-			
-		});
-		btnNewButton_4.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-		btnNewButton_4.setBackground(new Color(0, 0, 0));
-		btnNewButton_4.setForeground(new Color(255, 255, 255));
-		btnNewButton_4.setBounds(477, 418, 117, 44);
-		contentPane.add(btnNewButton_4);
-		
-		JButton btnNewButton_5 = new JButton("Delete");
-		btnNewButton_5.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String url = "jdbc:mysql://localhost:3306/war";
-		        String user = "root";
-		        String password = "PASSWORD";
-
-		        String deleteQuery = "DELETE FROM units WHERE unit_id = ?";
-		        
-		        try (Connection conn = DriverManager.getConnection(url, user, password);
-		             PreparedStatement pstmt = conn.prepareStatement(deleteQuery)) {
-
-		            pstmt.setString(1, unit_id_txt.getText());
-
-		            int rowsAffected = pstmt.executeUpdate();
-
-		            if (rowsAffected > 0) {
-		                JOptionPane.showMessageDialog(Units_Interface.this, "Delete successful.");
-		                refreshTextFields();
-		                refreshTableData(); // Refresh the table data to show deletions
-		            } else {
-		                JOptionPane.showMessageDialog(Units_Interface.this, "Delete failed.");
-		            }
-
-		        } catch (SQLException e1) {
-		            e1.printStackTrace();
-		            JOptionPane.showMessageDialog(Units_Interface.this, "Error: " + e1.getMessage());
-		        }
-			}
-		});
-		btnNewButton_5.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-		btnNewButton_5.setBackground(new Color(0, 0, 0));
-		btnNewButton_5.setForeground(new Color(255, 255, 255));
-		btnNewButton_5.setBounds(616, 418, 133, 44);
-		contentPane.add(btnNewButton_5);
-	}
-
-	protected void refreshTableData() {
-		unit_id_txt.setText("");
-		unit_name_txt.setText("");
-		commander_ID_txt.setText("");
-		Location_ID_txt.setText("");
-	}
-
-	protected void refreshTextFields() {
-		DefaultTableModel model = (DefaultTableModel) Units_table.getModel();
-	    model.setRowCount(0); // Clear existing data
-
-	    String url = "jdbc:mysql://localhost:3306/war";
-	    String user = "root";
-	    String password = "PASSWORD";
-
-	    String selectQuery = "SELECT * FROM units";
-
-	    try (Connection conn = DriverManager.getConnection(url, user, password);
-	         PreparedStatement pstmt = conn.prepareStatement(selectQuery);
-	         ResultSet rs = pstmt.executeQuery()) {
-
-	        while (rs.next()) {
-	            Object[] row = {
-	                rs.getString("unit_id"),
-	                rs.getString("unit_name"),
-	                rs.getString("unit_type"),
-	                rs.getString("commander_id"),
-	                rs.getString("location_id")
-	            };
-	            model.addRow(row);
-	        }
-
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        JOptionPane.showMessageDialog(Units_Interface.this, "Error: " + e.getMessage());
-	    }
-		
-	}
+    
+    private void goBack() {
+        WarManagement dashboard = new WarManagement();
+        dashboard.setVisible(true);
+        dispose();
+    }
 }
