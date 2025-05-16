@@ -1,9 +1,7 @@
 package Mission;
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,65 +9,40 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import DataAnalysis.MissionsBarChart;
+import util.AbstractDetailsFrame;
 import util.DBUtil;
 import warManagement.WarManagement;
 
-public class Mission_details extends JFrame {
+public class Mission_details extends AbstractDetailsFrame {
     private static final long serialVersionUID = 1L;
-    // constants for UI
-    private static final Font LABEL_FONT = new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20);
-    private static final Font BUTTON_FONT = new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15);
-    private static final Color TEXT_COLOR = Color.WHITE;
-    private static final Color BG_COLOR = new Color(0, 64, 64);
-
-    private JPanel contentPane;
     private JTextField mission_ID_txt, mission_name_txt, Objective_txt, start_date_txt, end_date_txt, location_ID_txt;
     private JComboBox<String> statusComboBox;
     private JTable Missions_table;
 
     public static void main(String[] args) {
-        EventQueue.invokeLater(() -> {
-            try {
-                new Mission_details().setVisible(true);
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Error launching application: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
+        try {
+            new Mission_details().display();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error launching application: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public Mission_details() {
-        initializeFrame();
+        super("Mission", 773, 529);
         setupLabels();
         setupTextFields();
         setupComboBox();
         setupTable();
         setupButtons();
         refreshTableData();
-    }
-
-    private void initializeFrame() {
-        setTitle("Mission");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 773, 529);
-        contentPane = new JPanel();
-        contentPane.setBackground(BG_COLOR);
-        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-        contentPane.setLayout(null);
-        setContentPane(contentPane);
     }
 
     private void setupLabels() {
@@ -127,41 +100,9 @@ public class Mission_details extends JFrame {
         createButton("Analyze", 621, 425, 114, 58, e -> analyzeMissions());
     }
 
-    private JLabel createLabel(String text, Font font, int x, int y, int w, int h) {
-        JLabel label = new JLabel(text);
-        label.setFont(font);
-        label.setForeground(TEXT_COLOR);
-        label.setBounds(x, y, w, h);
-        contentPane.add(label);
-        return label;
-    }
-
-    private JTextField createTextField(int x, int y, int w, int h) {
-        JTextField tf = new JTextField();
-        tf.setBounds(x, y, w, h);
-        tf.setColumns(10);
-        contentPane.add(tf);
-        return tf;
-    }
-
-    private JButton createButton(String text, int x, int y, int w, int h, ActionListener listener) {
-        JButton btn = new JButton(text);
-        btn.setFont(BUTTON_FONT);
-        btn.setBackground(Color.BLACK);
-        btn.setForeground(TEXT_COLOR);
-        btn.setBounds(x, y, w, h);
-        btn.addActionListener(listener);
-        contentPane.add(btn);
-        return btn;
-    }
-
     private void analyzeMissions() {
         Map<String, Integer> data = DBUtil.getMissionsStatusCount();
-        JFrame chartFrame = new JFrame("Mission Status Count");
-        chartFrame.setSize(800, 600);
-        chartFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        chartFrame.getContentPane().add(new MissionsBarChart(data, "Mission Status Count"));
-        chartFrame.setVisible(true);
+        new MissionsBarChart(data, "Mission Status Count").display();
         dispose();
     }
 
@@ -239,10 +180,5 @@ public class Mission_details extends JFrame {
         } catch (SQLException e) {
             handleDatabaseError(e, "Error deleting mission");
         }
-    }
-
-    private void handleDatabaseError(SQLException e, String message) {
-        System.err.println(message + ": " + e.getMessage());
-        JOptionPane.showMessageDialog(this, message + ": " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
     }
 }

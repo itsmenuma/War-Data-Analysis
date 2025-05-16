@@ -2,9 +2,7 @@ package Units;
 
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,60 +10,43 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import DataAnalysis.UnitsBarChart;
+import util.AbstractDetailsFrame;
 import util.DBUtil;
 import warManagement.WarManagement;
 
-public class Units_Interface extends JFrame {
+public class Units_Interface extends AbstractDetailsFrame {
 
     private static final long serialVersionUID = 1L;
-    private JPanel contentPane;
     private JTextField unit_id_txt;
     private JTextField unit_name_txt;
     private JTextField commander_ID_txt;
     private JTextField Location_ID_txt;
     private JTable Units_table;
     private JComboBox<String> unitTypeComboBox;
-    private static final Font LABEL_FONT = new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20);
-    private static final Font BUTTON_FONT = new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15);
-    private static final Color TEXT_COLOR = Color.WHITE;
-    private static final Color BG_COLOR = Color.BLACK;
-
     /**
      * Launch the application.
      */
     public static void main(String[] args) {
-        EventQueue.invokeLater(() -> {
-            try {
-                Units_Interface frame = new Units_Interface();
-                frame.setVisible(true);
-            } catch (Exception e) {
-                System.err.println("Error launching application: " + e.getMessage());
-                JOptionPane.showMessageDialog(null, "Error launching application: " + e.getMessage(), 
-                                            "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
+        try {
+            new Units_Interface().display();
+        } catch (Exception e) {
+            System.err.println("Error launching application: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error launching application: " + e.getMessage(), 
+                                        "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
-    /**
-     * Create the frame.
-     */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Units_Interface() {
-        // Initialize the frame
-        initializeFrame();
+        super("Units", 773, 529);
         
         // Setup UI components
         setupLabels();
@@ -77,19 +58,7 @@ public class Units_Interface extends JFrame {
         // Load initial data
         initializeTableData();
     }
-    
-    private void initializeFrame() {
-        setTitle("Units");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 773, 529);
-        contentPane = new JPanel();
-        contentPane.setForeground(TEXT_COLOR);
-        contentPane.setBackground(new Color(0, 64, 64));
-        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-        setContentPane(contentPane);
-        contentPane.setLayout(null);
-    }
-    
+
     private void setupLabels() {
         createLabel("Units Information", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 50), 30, 11, 390, 103);
         createLabel("Unit ID", LABEL_FONT, 30, 124, 96, 25);
@@ -141,34 +110,6 @@ public class Units_Interface extends JFrame {
         createButton("Analyse", 664, 418, 85, 44, e -> analyzeUnits());
     }
     
-    private JLabel createLabel(String text, Font font, int x, int y, int width, int height) {
-        JLabel label = new JLabel(text);
-        label.setFont(font);
-        label.setForeground(TEXT_COLOR);
-        label.setBounds(x, y, width, height);
-        contentPane.add(label);
-        return label;
-    }
-    
-    private JTextField createTextField(int x, int y, int width, int height, int columns) {
-        JTextField textField = new JTextField();
-        textField.setBounds(x, y, width, height);
-        textField.setColumns(columns);
-        contentPane.add(textField);
-        return textField;
-    }
-    
-    private JButton createButton(String text, int x, int y, int width, int height, ActionListener listener) {
-        JButton button = new JButton(text);
-        button.setFont(BUTTON_FONT);
-        button.setBackground(BG_COLOR);
-        button.setForeground(TEXT_COLOR);
-        button.setBounds(x, y, width, height);
-        button.addActionListener(listener);
-        contentPane.add(button);
-        return button;
-    }
-    
     private void navigateToDashboard() {
         new WarManagement().setVisible(true);
         dispose();
@@ -176,11 +117,7 @@ public class Units_Interface extends JFrame {
     
     private void analyzeUnits() {
         Map<String, Integer> data = DBUtil.getUnitsByTypeCount();
-        JFrame chartFrame = new JFrame("Units by Type");
-        chartFrame.setSize(800, 600);
-        chartFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        chartFrame.getContentPane().add(new UnitsBarChart(data, "Units by Type Count"));
-        chartFrame.setVisible(true);
+        new UnitsBarChart(data, "Units by Type Count").display();
         dispose();
     }
     

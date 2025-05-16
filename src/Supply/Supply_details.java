@@ -1,9 +1,7 @@
 package Supply;
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.event.ActionListener;
 import java.io.Serial;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,27 +9,22 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import DataAnalysis.SuppliesBarChart;
+import util.AbstractDetailsFrame;
 import util.DBUtil;
 import warManagement.WarManagement;
 
-public class Supply_details extends JFrame {
+public class Supply_details extends AbstractDetailsFrame {
 
 	@Serial
 	private static final long serialVersionUID = 1L;
-	private final JPanel contentPane;
     private final JTextField supply_ID_txt;
 	private final JTextField supply_name_txt;
 	private final JTextField Name_txt;
@@ -45,38 +38,28 @@ public class Supply_details extends JFrame {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		EventQueue.invokeLater(() -> {
-                    try {
-                        Supply_details frame = new Supply_details();
-                        frame.setVisible(true);
-                    } catch (Exception e) {
-                        System.err.println("Database error: " + e.getMessage());
-                		JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage(), 
+        try {
+            new Supply_details().display();
+        } catch (Exception e) {
+            System.err.println("Database error: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage(),
                                          "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                });
-	}
+        }
+    }
 
 	/**
 	 * Create the frame.
 	 */
 
 	public Supply_details() {
-		setTitle("Supplies");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 773, 529);
-        contentPane = new JPanel();
-		contentPane.setBackground(new Color(0, 64, 64));
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        super("Supplies", 773, 529);
+         
+        // ...existing UI setup code...
+        createLabel("Supply Details", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 35), 10, 11, 222, 51);
 
-		setContentPane(contentPane);
-		contentPane.setLayout(null);
-		
-		createLabel("Supply Details", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 35), Color.WHITE, 10, 11, 222, 51);
+		createLabel("Supply ID", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), 10, 72, 112, 44);
 
-		createLabel("Supply ID", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), Color.WHITE, 10, 72, 112, 44);
-
-		createLabel("Supply type", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), Color.WHITE, 10, 164, 112, 44);
+		createLabel("Supply type", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), 10, 164, 112, 44);
 
 		supply_ID_txt = createTextField(152, 87, 96, 19, 10);
 
@@ -84,32 +67,32 @@ public class Supply_details extends JFrame {
 
 		Status_txt = createComboBox(new String[]{"Available", "In Use", "Out of Stock"}, 152, 364, 96, 21);
 
-		createButton("Refresh", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK, 183, 429, 82, 51, e -> refreshTextFields());
+		createButton("Refresh", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), 183, 429, 82, 51, e -> refreshTextFields());
 
-		createButton("Back to Dashboard", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK, 10, 429, 163, 51, e -> {
+		createButton("Back to Dashboard", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), 10, 429, 163, 51, e -> {
 			new WarManagement().setVisible(true);
 			dispose();
 		});
 
-		createButton("Delete", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK, 486, 429, 101, 51, e -> deleteSupply());
+		createButton("Delete", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), 486, 429, 101, 51, e -> deleteSupply());
 
-		createButton("Insert", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK, 275, 429, 82, 51, e -> insertSupply());
+		createButton("Insert", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), 275, 429, 82, 51, e -> insertSupply());
 
-		createButton("Update", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK, 367, 429, 96, 51, e -> updateSupply());
+		createButton("Update", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), 367, 429, 96, 51, e -> updateSupply());
 
-		createLabel("Name", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), Color.WHITE, 10, 130, 112, 13);
+		createLabel("Name", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), 10, 130, 112, 13);
 
 		Name_txt = createTextField(152, 129, 96, 19, 10);
 
-		createLabel("Quantity", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), Color.WHITE, 10, 218, 82, 31);
+		createLabel("Quantity", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), 10, 218, 82, 31);
 
 		Quantity_txt = createTextField(152, 226, 96, 19, 10);
 
-		createLabel("Unit ID", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), Color.WHITE, 10, 259, 89, 33);
+		createLabel("Unit ID", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), 10, 259, 89, 33);
 
-		createLabel("Location ID", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), Color.WHITE, 10, 316, 110, 31);
+		createLabel("Location ID", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), 10, 316, 110, 31);
 
-		createLabel("Status", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), Color.WHITE, 10, 357, 89, 31);
+		createLabel("Status", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), 10, 357, 89, 31);
 
 		Unit_ID_txt = createTextField(152, 268, 96, 19, 10);
 
@@ -132,7 +115,7 @@ public class Supply_details extends JFrame {
 		Supply_table.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 10));
 		Supply_table.setBackground(new Color(0, 0, 0));
 
-		createButton("Analyse", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK, 605, 428, 132, 53, e -> analyseSupply());
+		createButton("Analyse", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), 605, 428, 132, 53, e -> analyseSupply());
 		loadSupplyData();
 	}
 
@@ -290,47 +273,9 @@ public class Supply_details extends JFrame {
 		loc_ID_txt.setText("");
 	}
 
-	// Helper for labels
-	private void createLabel(String text, Font font, Color fg, int x, int y, int width, int height) {
-		JLabel label = new JLabel(text);
-		label.setFont(font);
-		label.setForeground(fg);
-		label.setBounds(x, y, width, height);
-		contentPane.add(label);
-	}
-	// Helper for text fields
-	private JTextField createTextField(int x, int y, int width, int height, int cols) {
-		JTextField tf = new JTextField();
-		tf.setBounds(x, y, width, height);
-		tf.setColumns(cols);
-		contentPane.add(tf);
-		return tf;
-	}
-	// Helper for combo boxes
-	private JComboBox<String> createComboBox(String[] items, int x, int y, int width, int height) {
-		JComboBox<String> combo = new JComboBox<>(items);
-		combo.setBounds(x, y, width, height);
-		contentPane.add(combo);
-		return combo;
-	}
-	// Helper for buttons
-	private void createButton(String text, Font font, Color fg, Color bg, int x, int y, int width, int height, ActionListener al) {
-		JButton btn = new JButton(text);
-		btn.setFont(font);
-		btn.setForeground(fg);
-		btn.setBackground(bg);
-		btn.setBounds(x, y, width, height);
-		btn.addActionListener(al);
-		contentPane.add(btn);
-	}
-
-	private void analyseSupply(){
-		Map<String, Integer> data = DBUtil.getSuppliesStatusCount();
-		JFrame chartFrame = new JFrame("Personnel Status Count");
-		chartFrame.setSize(800, 600);
-		chartFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		chartFrame.getContentPane().add(new SuppliesBarChart(data, "Supplies Status Count"));
-		chartFrame.setVisible(true);
-		Supply_details.this.dispose();
-	}
+    protected void analyseSupply() {
+        Map<String, Integer> data = DBUtil.getSuppliesStatusCount();
+        new SuppliesBarChart(data, "Supplies Status Count").display();
+        dispose();
+    }
 }

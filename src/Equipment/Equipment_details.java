@@ -1,73 +1,48 @@
 package Equipment;
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import DataAnalysis.EquipmentBarChart;
+import util.AbstractDetailsFrame;
 import util.DBUtil;
 import warManagement.WarManagement;
 
-public class Equipment_details extends JFrame {
+public class Equipment_details extends AbstractDetailsFrame {
     private static final long serialVersionUID = 1L;
-    // constants for UI
-    private static final Font LABEL_FONT = new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20);
-    private static final Font BUTTON_FONT = new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15);
-    private static final Color TEXT_COLOR = Color.WHITE;
-    private static final Color BG_COLOR = new Color(0, 64, 64);
 
-    private JPanel contentPane;
     private JTextField equip_ID_txt, equip_name_txt, Unit_ID_txt, location_ID_txt;
     private JComboBox<String> equip_type_txt, Status_txt;
     private JTable Equipment_table;
 
     public static void main(String[] args) {
-        EventQueue.invokeLater(() -> {
-            try {
-                new Equipment_details().setVisible(true);
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Error launching application: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
+        try {
+            new Equipment_details().display();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error launching application: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public Equipment_details() {
-        initializeFrame();
+        super("Equipment", 773, 529);
         setupLabels();
         setupTextFields();
         setupComboBox();
         setupTable();
         setupButtons();
         refreshTableData();
-    }
-
-    private void initializeFrame() {
-        setTitle("Equipment");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 773, 529);
-        contentPane = new JPanel();
-        contentPane.setBackground(BG_COLOR);
-        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-        contentPane.setLayout(null);
-        setContentPane(contentPane);
     }
 
     private void setupLabels() {
@@ -116,34 +91,6 @@ public class Equipment_details extends JFrame {
         createButton("Update", 425, 411, 86, 70, e -> updateEquipment());
         createButton("Insert", 533, 413, 86, 67, e -> insertEquipment());
         createButton("Analyse", 647, 410, 102, 72, e -> analyzeEquipment());
-    }
-
-    private JLabel createLabel(String text, Font font, int x, int y, int w, int h) {
-        JLabel lbl = new JLabel(text);
-        lbl.setFont(font);
-        lbl.setForeground(TEXT_COLOR);
-        lbl.setBounds(x, y, w, h);
-        contentPane.add(lbl);
-        return lbl;
-    }
-
-    private JTextField createTextField(int x, int y, int w, int h) {
-        JTextField tf = new JTextField();
-        tf.setBounds(x, y, w, h);
-        tf.setColumns(10);
-        contentPane.add(tf);
-        return tf;
-    }
-
-    private JButton createButton(String text, int x, int y, int w, int h, ActionListener l) {
-        JButton btn = new JButton(text);
-        btn.setFont(BUTTON_FONT);
-        btn.setBackground(Color.BLACK);
-        btn.setForeground(TEXT_COLOR);
-        btn.setBounds(x, y, w, h);
-        btn.addActionListener(l);
-        contentPane.add(btn);
-        return btn;
     }
 
     private void refreshTextFields() {
@@ -204,13 +151,8 @@ public class Equipment_details extends JFrame {
     }
 
     private void analyzeEquipment() {
-        Map<String,Integer> data=DBUtil.getEquipmentStatusCount();
-        JFrame f=new JFrame("Equipment Status Count");f.setSize(800,600);f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        f.getContentPane().add(new EquipmentBarChart(data,"Equipment Status Count"));f.setVisible(true);dispose();
-    }
-
-    private void handleDatabaseError(Exception e, String msg) {
-        System.err.println(msg+": "+e.getMessage());
-        JOptionPane.showMessageDialog(this,msg+": "+e.getMessage(),"Database Error",JOptionPane.ERROR_MESSAGE);
+        Map<String,Integer> data =DBUtil.getEquipmentStatusCount();
+        new EquipmentBarChart(data, "Supplies Status Count").display();
+        dispose();
     }
 }
