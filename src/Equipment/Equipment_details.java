@@ -1,7 +1,24 @@
 package Equipment;
 
+import java.awt.Color;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Map;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
@@ -9,338 +26,191 @@ import DataAnalysis.EquipmentBarChart;
 import util.DBUtil;
 import warManagement.WarManagement;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.sql.*;
-import java.util.Map;
-import java.util.Vector;
-
 public class Equipment_details extends JFrame {
-
     private static final long serialVersionUID = 1L;
+    // constants for UI
+    private static final Font LABEL_FONT = new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20);
+    private static final Font BUTTON_FONT = new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15);
+    private static final Color TEXT_COLOR = Color.WHITE;
+    private static final Color BG_COLOR = new Color(0, 64, 64);
+
     private JPanel contentPane;
-    private JTextField equip_ID_txt;
-    private JTextField equip_name_txt;
-    private JTextField Unit_ID_txt;
-    private JTextField location_ID_txt;
+    private JTextField equip_ID_txt, equip_name_txt, Unit_ID_txt, location_ID_txt;
+    private JComboBox<String> equip_type_txt, Status_txt;
     private JTable Equipment_table;
-    private JComboBox<String> Status_txt;
-    private JComboBox<String> equip_type_txt;
 
     public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    Equipment_details frame = new Equipment_details();
-                    frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        EventQueue.invokeLater(() -> {
+            try {
+                new Equipment_details().setVisible(true);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Error launching application: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
     }
 
     public Equipment_details() {
+        initializeFrame();
+        setupLabels();
+        setupTextFields();
+        setupComboBox();
+        setupTable();
+        setupButtons();
+        refreshTableData();
+    }
+
+    private void initializeFrame() {
         setTitle("Equipment");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 773, 529);
         contentPane = new JPanel();
-        contentPane.setBackground(new Color(0, 64, 64));
+        contentPane.setBackground(BG_COLOR);
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-        setContentPane(contentPane);
         contentPane.setLayout(null);
+        setContentPane(contentPane);
+    }
 
-        JLabel lblNewLabel = new JLabel("Equipment Details");
-        lblNewLabel.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 35));
-        lblNewLabel.setForeground(new Color(255, 255, 255));
-        lblNewLabel.setBounds(27, 10, 275, 83);
-        contentPane.add(lblNewLabel);
+    private void setupLabels() {
+        createLabel("Equipment Details", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 35), 27, 10, 275, 83);
+        createLabel("Equipment ID", LABEL_FONT, 27, 90, 155, 25);
+        createLabel("Name", LABEL_FONT, 27, 132, 69, 28);
+        createLabel("Type", LABEL_FONT, 27, 186, 69, 25);
+        createLabel("Unit ID", LABEL_FONT, 27, 223, 86, 30);
+        createLabel("Status", LABEL_FONT, 27, 274, 75, 28);
+        createLabel("Location Id", LABEL_FONT, 27, 321, 127, 28);
+    }
 
-        JLabel lblNewLabel_1 = new JLabel("Equipment ID");
-        lblNewLabel_1.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-        lblNewLabel_1.setForeground(new Color(255, 255, 255));
-        lblNewLabel_1.setBounds(27, 90, 155, 20);
-        contentPane.add(lblNewLabel_1);
+    private void setupTextFields() {
+        equip_ID_txt = createTextField(192, 93, 86, 20);
+        equip_name_txt = createTextField(192, 132, 86, 20);
+        Unit_ID_txt = createTextField(192, 231, 86, 20);
+        location_ID_txt = createTextField(192, 328, 96, 20);
+    }
 
-        JLabel lblNewLabel_2 = new JLabel("Name");
-        lblNewLabel_2.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-        lblNewLabel_2.setForeground(new Color(255, 255, 255));
-        lblNewLabel_2.setBounds(27, 132, 69, 28);
-        contentPane.add(lblNewLabel_2);
-
-        equip_ID_txt = new JTextField();
-        equip_ID_txt.setBounds(192, 93, 86, 20);
-        contentPane.add(equip_ID_txt);
-        equip_ID_txt.setColumns(10);
-
-        equip_name_txt = new JTextField();
-        equip_name_txt.setBounds(192, 132, 86, 20);
-        contentPane.add(equip_name_txt);
-        equip_name_txt.setColumns(10);
-
-        JButton btnNewButton = new JButton("Refresh");
-        btnNewButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                refreshTextFields();
-            }
-        });
-        btnNewButton.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15));
-        btnNewButton.setBackground(new Color(0, 0, 0));
-        btnNewButton.setForeground(new Color(255, 255, 255));
-        btnNewButton.setBounds(192, 410, 96, 72);
-        contentPane.add(btnNewButton);
-
-        JButton btnNewButton_1 = new JButton("Back to Dashboard");
-        btnNewButton_1.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                WarManagement dashboard = new WarManagement();
-                dashboard.setVisible(true);
-                dispose();
-            }
-        });
-        btnNewButton_1.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15));
-        btnNewButton_1.setBackground(new Color(0, 0, 0));
-        btnNewButton_1.setForeground(new Color(255, 255, 255));
-        btnNewButton_1.setBounds(10, 410, 161, 72);
-        contentPane.add(btnNewButton_1);
-
-        JButton btnNewButton_2 = new JButton("Insert");
-        btnNewButton_2.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                insertEquipment();
-            }
-        });
-        btnNewButton_2.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15));
-        btnNewButton_2.setBackground(new Color(0, 0, 0));
-        btnNewButton_2.setForeground(new Color(255, 255, 255));
-        btnNewButton_2.setBounds(533, 413, 86, 67);
-        contentPane.add(btnNewButton_2);
-
-        JLabel lblNewLabel_3 = new JLabel("Type");
-        lblNewLabel_3.setForeground(new Color(255, 255, 255));
-        lblNewLabel_3.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-        lblNewLabel_3.setBounds(27, 186, 69, 21);
-        contentPane.add(lblNewLabel_3);
-
-        JLabel lblNewLabel_4 = new JLabel("Unit ID");
-        lblNewLabel_4.setForeground(new Color(255, 255, 255));
-        lblNewLabel_4.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-        lblNewLabel_4.setBounds(27, 223, 86, 30);
-        contentPane.add(lblNewLabel_4);
-
-        JLabel lblNewLabel_5 = new JLabel("Status");
-        lblNewLabel_5.setForeground(new Color(255, 255, 255));
-        lblNewLabel_5.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-        lblNewLabel_5.setBounds(27, 274, 75, 28);
-        contentPane.add(lblNewLabel_5);
-
-        JLabel lblNewLabel_6 = new JLabel("Location Id");
-        lblNewLabel_6.setForeground(new Color(255, 255, 255));
-        lblNewLabel_6.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-        lblNewLabel_6.setBounds(27, 321, 127, 28);
-        contentPane.add(lblNewLabel_6);
-
-        equip_type_txt = new JComboBox<String>();
-        equip_type_txt.setModel(new DefaultComboBoxModel<String>(new String[] {"Weapon", "Vehicle", "Electronic", "Other"}));
-        equip_type_txt.setBounds(192, 186, 86, 21);
+    private void setupComboBox() {
+        equip_type_txt = new JComboBox<>(new String[]{"Weapon","Vehicle","Electronic","Other"});
+        equip_type_txt.setBounds(192,186,86,21);
         contentPane.add(equip_type_txt);
-
-        Unit_ID_txt = new JTextField();
-        Unit_ID_txt.setBounds(192, 231, 86, 19);
-        contentPane.add(Unit_ID_txt);
-        Unit_ID_txt.setColumns(10);
-
-        location_ID_txt = new JTextField();
-        location_ID_txt.setBounds(192, 328, 96, 19);
-        contentPane.add(location_ID_txt);
-        location_ID_txt.setColumns(10);
-
-        Status_txt = new JComboBox<String>();
-        Status_txt.setModel(new DefaultComboBoxModel<String>(new String[] {"Operational", "Maintenance", "Decommissioned"}));
-        Status_txt.setBounds(192, 280, 86, 21);
+        Status_txt = new JComboBox<>(new String[]{"Operational","Maintenance","Decommissioned"});
+        Status_txt.setBounds(192,280,86,21);
         contentPane.add(Status_txt);
+    }
 
-        JButton btnNewButton_3 = new JButton("Delete");
-        btnNewButton_3.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                deleteEquipment();
-            }
-        });
-        btnNewButton_3.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15));
-        btnNewButton_3.setForeground(new Color(255, 255, 255));
-        btnNewButton_3.setBackground(new Color(0, 0, 0));
-        btnNewButton_3.setBounds(310, 410, 86, 72);
-        contentPane.add(btnNewButton_3);
-
-        JButton btnNewButton_4 = new JButton("Update");
-        btnNewButton_4.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                updateEquipment();
-            }
-        });
-        btnNewButton_4.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15));
-        btnNewButton_4.setForeground(new Color(255, 255, 255));
-        btnNewButton_4.setBackground(new Color(0, 0, 0));
-        btnNewButton_4.setBounds(425, 411, 86, 70);
-        contentPane.add(btnNewButton_4);
-
+    private void setupTable() {
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setBounds(298, 64, 451, 322);
         contentPane.add(scrollPane);
 
         Equipment_table = new JTable();
-        scrollPane.setViewportView(Equipment_table);
-        Equipment_table.setModel(new DefaultTableModel(
-                new Object[][] {
-                },
-                new String[] {
-                        "Equipment_ID", "Name", "Type", "Unit ID", "Status", "Location_ID"
-                }
-        ));
+        Equipment_table.setModel(new DefaultTableModel(new Object[][]{}, new String[]{"Equipment_ID","Name","Type","Unit ID","Status","Location_ID"}));
         Equipment_table.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 10));
-        Equipment_table.setForeground(new Color(255, 255, 255));
-        Equipment_table.setBackground(new Color(0, 0, 0));
-        
-        JButton btnNewButton_5 = new JButton("Analyse");
-        btnNewButton_5.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-                // Fetch equipment status counts
-                Map<String, Integer> data = DBUtil.getEquipmentStatusCount();
-                // Create a new frame for the bar chart
-                JFrame chartFrame = new JFrame("Personnel Status Count");
-                chartFrame.setSize(800, 600);
-                chartFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                chartFrame.getContentPane().add(new EquipmentBarChart(data, "Equipment Status Count"));
-                chartFrame.setVisible(true);
-                // Dispose the current frame
-               Equipment_details.this.dispose();
-        	}
-        });
-        btnNewButton_5.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15));
-        btnNewButton_5.setBackground(new Color(0, 0, 0));
-        btnNewButton_5.setForeground(new Color(255, 255, 255));
-        btnNewButton_5.setBounds(647, 410, 102, 72);
-        contentPane.add(btnNewButton_5);
-        
-        loadEquipmentData();
+        Equipment_table.setForeground(TEXT_COLOR);
+        Equipment_table.setBackground(Color.BLACK);
+        scrollPane.setViewportView(Equipment_table);
+    }
+
+    private void setupButtons() {
+        createButton("Back to Dashboard", 10, 410, 161, 72, e -> { new WarManagement().setVisible(true); dispose(); });
+        createButton("Refresh", 192, 410, 96, 72, e -> refreshTextFields());
+        createButton("Delete", 310, 410, 86, 72, e -> deleteEquipment());
+        createButton("Update", 425, 411, 86, 70, e -> updateEquipment());
+        createButton("Insert", 533, 413, 86, 67, e -> insertEquipment());
+        createButton("Analyse", 647, 410, 102, 72, e -> analyzeEquipment());
+    }
+
+    private JLabel createLabel(String text, Font font, int x, int y, int w, int h) {
+        JLabel lbl = new JLabel(text);
+        lbl.setFont(font);
+        lbl.setForeground(TEXT_COLOR);
+        lbl.setBounds(x, y, w, h);
+        contentPane.add(lbl);
+        return lbl;
+    }
+
+    private JTextField createTextField(int x, int y, int w, int h) {
+        JTextField tf = new JTextField();
+        tf.setBounds(x, y, w, h);
+        tf.setColumns(10);
+        contentPane.add(tf);
+        return tf;
+    }
+
+    private JButton createButton(String text, int x, int y, int w, int h, ActionListener l) {
+        JButton btn = new JButton(text);
+        btn.setFont(BUTTON_FONT);
+        btn.setBackground(Color.BLACK);
+        btn.setForeground(TEXT_COLOR);
+        btn.setBounds(x, y, w, h);
+        btn.addActionListener(l);
+        contentPane.add(btn);
+        return btn;
     }
 
     private void refreshTextFields() {
-        equip_ID_txt.setText("");
-        equip_name_txt.setText("");
-        Unit_ID_txt.setText("");
-        location_ID_txt.setText("");
+        equip_ID_txt.setText(""); equip_name_txt.setText(""); Unit_ID_txt.setText(""); location_ID_txt.setText("");
     }
 
-    private void loadEquipmentData() {
-        DefaultTableModel model = (DefaultTableModel) Equipment_table.getModel();
-        model.setRowCount(0);
-        try (Connection conn = DBUtil.getConnection()) {
-            String query = "SELECT * FROM Equipment";
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                Vector<Object> row = new Vector<>();
-                row.add(rs.getInt("equipment_id"));
-                row.add(rs.getString("name"));
-                row.add(rs.getString("type"));
-                row.add(rs.getInt("unit_id"));
-                row.add(rs.getString("status"));
-                row.add(rs.getInt("location_id"));
-                model.addRow(row);
+    private void refreshTableData() {
+        DefaultTableModel model = (DefaultTableModel)Equipment_table.getModel(); model.setRowCount(0);
+        String sql = "SELECT * FROM Equipment";
+        try(Connection conn = DBUtil.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()){
+            while(rs.next()) {
+                model.addRow(new Object[]{rs.getInt("equipment_id"), rs.getString("name"), rs.getString("type"), rs.getInt("unit_id"), rs.getString("status"), rs.getInt("location_id")});
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch(SQLException e) {
+            handleDatabaseError(e, "Error retrieving equipment data");
         }
     }
 
     private void insertEquipment() {
-        String insertQuery = "INSERT INTO Equipment (equipment_id, name, type, unit_id, status, location_id) VALUES (?, ?, ?, ?, ?, ?)";
-        if (equip_ID_txt.getText().isEmpty() || equip_name_txt.getText().isEmpty() ||
-            Unit_ID_txt.getText().isEmpty() || location_ID_txt.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+        if(equip_ID_txt.getText().isEmpty()||equip_name_txt.getText().isEmpty()||Unit_ID_txt.getText().isEmpty()||location_ID_txt.getText().isEmpty()){
+            JOptionPane.showMessageDialog(this,"Please fill in all fields","Validation Error",JOptionPane.WARNING_MESSAGE);return;
         }
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
-            pstmt.setInt(1, Integer.parseInt(equip_ID_txt.getText()));
-            pstmt.setString(2, equip_name_txt.getText());
-            pstmt.setString(3, (String) equip_type_txt.getSelectedItem());
-            pstmt.setInt(4, Integer.parseInt(Unit_ID_txt.getText()));
-            pstmt.setString(5, (String) Status_txt.getSelectedItem());
-            pstmt.setInt(6, Integer.parseInt(location_ID_txt.getText()));
-            int rowsAffected = pstmt.executeUpdate();
-            if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(this, "Equipment inserted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadEquipmentData();
-                refreshTextFields();
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to insert equipment.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Invalid number format in ID fields.", "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Database error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void deleteEquipment() {
-        String deleteQuery = "DELETE FROM Equipment WHERE equipment_id = ?";
-        if (equip_ID_txt.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter Equipment ID.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this equipment?", "Confirm Deletion", JOptionPane.YES_NO_OPTION);
-        if (confirm != JOptionPane.YES_OPTION) return;
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(deleteQuery)) {
-            pstmt.setInt(1, Integer.parseInt(equip_ID_txt.getText()));
-            int rowsAffected = pstmt.executeUpdate();
-            if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(this, "Equipment deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadEquipmentData();
-                refreshTextFields();
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to delete equipment.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Invalid number format in ID field.", "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Database error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        String sql="INSERT INTO Equipment(equipment_id,name,type,unit_id,status,location_id) VALUES(?,?,?,?,?,?)";
+        try(Connection conn=DBUtil.getConnection(); PreparedStatement p=conn.prepareStatement(sql)){
+            p.setInt(1,Integer.parseInt(equip_ID_txt.getText()));p.setString(2,equip_name_txt.getText());
+            p.setString(3,(String)equip_type_txt.getSelectedItem());p.setInt(4,Integer.parseInt(Unit_ID_txt.getText()));
+            p.setString(5,(String)Status_txt.getSelectedItem());p.setInt(6,Integer.parseInt(location_ID_txt.getText()));
+            if(p.executeUpdate()>0) JOptionPane.showMessageDialog(this,"Equipment inserted successfully.");
+            refreshTextFields();refreshTableData();
+        } catch(NumberFormatException e){handleDatabaseError(e,"Invalid number format");}
+          catch(SQLException e){handleDatabaseError(e,"Error inserting equipment");}
     }
 
     private void updateEquipment() {
-        String updateQuery = "UPDATE Equipment SET name = ?, type = ?, unit_id = ?, status = ?, location_id = ? WHERE equipment_id = ?";
-        if (equip_ID_txt.getText().isEmpty() || equip_name_txt.getText().isEmpty() || Unit_ID_txt.getText().isEmpty()
-                || location_ID_txt.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+        if(equip_ID_txt.getText().isEmpty()||equip_name_txt.getText().isEmpty()||Unit_ID_txt.getText().isEmpty()||location_ID_txt.getText().isEmpty()){
+            JOptionPane.showMessageDialog(this,"Please fill in all fields","Validation Error",JOptionPane.WARNING_MESSAGE);return;
         }
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
-            pstmt.setString(1, equip_name_txt.getText());
-            pstmt.setString(2, (String) equip_type_txt.getSelectedItem());
-            pstmt.setInt(3, Integer.parseInt(Unit_ID_txt.getText()));
-            pstmt.setString(4, (String) Status_txt.getSelectedItem());
-            pstmt.setInt(5, Integer.parseInt(location_ID_txt.getText()));
-            pstmt.setInt(6, Integer.parseInt(equip_ID_txt.getText()));
-            int rowsAffected = pstmt.executeUpdate();
-            if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(this, "Equipment updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                refreshTextFields();
-                loadEquipmentData();
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to update equipment.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Invalid number format in ID fields.", "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Database error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        String sql="UPDATE Equipment SET name=?,type=?,unit_id=?,status=?,location_id=? WHERE equipment_id=?";
+        try(Connection conn=DBUtil.getConnection(); PreparedStatement p=conn.prepareStatement(sql)){
+            p.setString(1,equip_name_txt.getText());p.setString(2,(String)equip_type_txt.getSelectedItem());
+            p.setInt(3,Integer.parseInt(Unit_ID_txt.getText()));p.setString(4,(String)Status_txt.getSelectedItem());
+            p.setInt(5,Integer.parseInt(location_ID_txt.getText()));p.setInt(6,Integer.parseInt(equip_ID_txt.getText()));
+            if(p.executeUpdate()>0) JOptionPane.showMessageDialog(this,"Equipment updated successfully.");
+            refreshTextFields();refreshTableData();
+        } catch(NumberFormatException e){handleDatabaseError(e,"Invalid number format");}
+          catch(SQLException e){handleDatabaseError(e,"Error updating equipment");}
+    }
+
+    private void deleteEquipment() {
+        if(equip_ID_txt.getText().isEmpty()){JOptionPane.showMessageDialog(this,"Please enter Equipment ID","Validation Error",JOptionPane.WARNING_MESSAGE);return;}
+        if(JOptionPane.showConfirmDialog(this,"Confirm deletion?","Delete Equipment",JOptionPane.YES_NO_OPTION)!=JOptionPane.YES_OPTION) return;
+        String sql="DELETE FROM Equipment WHERE equipment_id=?";
+        try(Connection conn=DBUtil.getConnection(); PreparedStatement p=conn.prepareStatement(sql)){
+            p.setInt(1,Integer.parseInt(equip_ID_txt.getText()));if(p.executeUpdate()>0) JOptionPane.showMessageDialog(this,"Equipment deleted successfully.");
+            refreshTextFields();refreshTableData();
+        } catch(NumberFormatException e){handleDatabaseError(e,"Invalid number format");}
+          catch(SQLException e){handleDatabaseError(e,"Error deleting equipment");}
+    }
+
+    private void analyzeEquipment() {
+        Map<String,Integer> data=DBUtil.getEquipmentStatusCount();
+        JFrame f=new JFrame("Equipment Status Count");f.setSize(800,600);f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        f.getContentPane().add(new EquipmentBarChart(data,"Equipment Status Count"));f.setVisible(true);dispose();
+    }
+
+    private void handleDatabaseError(Exception e, String msg) {
+        System.err.println(msg+": "+e.getMessage());
+        JOptionPane.showMessageDialog(this,msg+": "+e.getMessage(),"Database Error",JOptionPane.ERROR_MESSAGE);
     }
 }

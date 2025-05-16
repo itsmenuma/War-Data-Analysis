@@ -1,39 +1,36 @@
 package Personnel;
 
 
-import java.awt.EventQueue;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import java.awt.Color;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+import java.awt.EventQueue;
 import java.awt.Font;
-import javax.swing.JButton;
-//import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-//import java.awt.event.ActionEvent;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.SoftBevelBorder;
 import javax.swing.table.DefaultTableModel;
 
-import warManagement.WarManagement;
 import util.DBUtil;
-
-import javax.swing.JScrollPane;
-import javax.swing.border.SoftBevelBorder;
-import javax.swing.border.BevelBorder;
+import warManagement.WarManagement;
 
 public class Personnel_details extends JFrame {
 
     private static final long serialVersionUID = 1L;
-    private JPanel contentPane;
-    private JTable personnelTable;
-    private DefaultTableModel model;
+    private final JPanel contentPane;
+    private final JTable personnelTable;
+    private final DefaultTableModel model;
 
     /**
      * Launch the application.
@@ -44,7 +41,9 @@ public class Personnel_details extends JFrame {
                 Personnel_details frame = new Personnel_details();
                 frame.setVisible(true);
             } catch (Exception e) {
-                e.printStackTrace();
+                System.err.println("Database error: " + e.getMessage());
+                JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage(), 
+                                         "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
     }
@@ -63,35 +62,14 @@ public class Personnel_details extends JFrame {
         setContentPane(contentPane);
         contentPane.setLayout(null);
 
-        JLabel lblNewLabel = new JLabel("Personnel Details");
-        lblNewLabel.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 50));
-        lblNewLabel.setForeground(new Color(255, 255, 255));
-        lblNewLabel.setBounds(29, 11, 394, 58);
-        contentPane.add(lblNewLabel);
+        createLabel("Personnel Details", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 50), Color.WHITE, 29, 11, 394, 58);
 
-        JButton btnNewButton = new JButton("Back to Dashboard");
-        btnNewButton.addActionListener(e -> {
-            WarManagement dashboard = new WarManagement();
-            dashboard.setVisible(true);
-            dispose();
-        });
-        btnNewButton.setBackground(new Color(0, 0, 0));
-        btnNewButton.setForeground(new Color(255, 255, 255));
-        btnNewButton.setBounds(33, 383, 202, 73);
-        contentPane.add(btnNewButton);
+        createButton("Back to Dashboard", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK, 33, 383, 202, 73,
+            e -> { new WarManagement().setVisible(true); dispose(); });
 
-        JButton btnNewButton_1 = new JButton("Log out");
-        btnNewButton_1.setHorizontalAlignment(SwingConstants.LEFT);
-        btnNewButton_1.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-        btnNewButton_1.addActionListener(e -> {
-            Login login = new Login();
-            login.setVisible(true);
-            dispose();
-        });
-        btnNewButton_1.setBackground(new Color(0, 0, 0));
-        btnNewButton_1.setForeground(new Color(255, 255, 255));
-        btnNewButton_1.setBounds(590, 385, 134, 64);
-        contentPane.add(btnNewButton_1);
+        JButton logoutBtn = createButton("Log out", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), Color.WHITE, Color.BLACK, 590, 385, 134, 64,
+            e -> { new Login().setVisible(true); dispose(); });
+        logoutBtn.setHorizontalAlignment(SwingConstants.LEFT);
 
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setBounds(39, 79, 697, 274);
@@ -134,8 +112,33 @@ public class Personnel_details extends JFrame {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            System.err.println("Database error: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage(), 
+                                         "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    // Helper to create labels
+    private JLabel createLabel(String text, Font font, Color fg, int x, int y, int w, int h) {
+        JLabel lbl = new JLabel(text);
+        lbl.setFont(font);
+        lbl.setForeground(fg);
+        lbl.setBounds(x, y, w, h);
+        contentPane.add(lbl);
+        return lbl;
+    }
+
+    // Helper to create buttons
+    private JButton createButton(String text, Font font, Color fg, Color bg,
+                                  int x, int y, int w, int h,
+                                  java.awt.event.ActionListener al) {
+        JButton btn = new JButton(text);
+        btn.setFont(font);
+        btn.setForeground(fg);
+        btn.setBackground(bg);
+        btn.setBounds(x, y, w, h);
+        btn.addActionListener(al);
+        contentPane.add(btn);
+        return btn;
     }
 }
