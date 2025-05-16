@@ -5,6 +5,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.jfree.data.category.DefaultCategoryDataset;
+
+import com.warManagementGUI.util.DBUtil;
+
 public class PersonnelDataDAO {
 
     public DefaultCategoryDataset getPersonnelData() throws SQLException {
@@ -12,7 +15,7 @@ public class PersonnelDataDAO {
 
         String query = "SELECT status, COUNT(Personnel_ID) as count FROM Personnel GROUP BY ASC";
 
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query);
              ResultSet rs = pstmt.executeQuery()) {
 
