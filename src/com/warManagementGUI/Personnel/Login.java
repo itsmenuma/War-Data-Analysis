@@ -3,16 +3,17 @@ package com.warManagementGUI.Personnel;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.WindowAdapter;
 import java.io.Serial;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.Map;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import com.warManagementGUI.DataAnalysis.BarChartExample;
+import com.warManagementGUI.DataAnalysis.PersonnelBarChart;
 import com.warManagementGUI.WarManagement;
 import com.warManagementGUI.util.AbstractDetailsFrame;
 import com.warManagementGUI.util.DBUtil;
@@ -93,19 +94,17 @@ public class Login extends AbstractDetailsFrame {
 
 		createButton("Analyse", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK,
 			671, 420, 85, 41,
-			e -> {
-				Map<String, Integer> data = DBUtil.getPersonnelStatusCount();
-				BarChartExample.showBarChart("Personnel Status Count", data);
-				dispose();
-			});
+			e -> showAnalysis());
 	}
-
+	
 	private boolean checkCredentials(String personnelId, String firstName, String role) {
-		try (Connection conn = DBUtil.getConnection();
-			 Statement stmt = conn.createStatement();
-			 ResultSet rs = stmt.executeQuery("SELECT * FROM Personnel WHERE Personnel_id='" + personnelId + "' AND First_name='" + firstName + "' AND Role='" + role + "'")) {
-
-			return rs.next(); // If there's a result, credentials are valid
+        try (Connection conn = DBUtil.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM Personnel WHERE Personnel_id=? AND First_name=? AND Role=?")) {
+            pstmt.setString(1, personnelId);
+            pstmt.setString(2, firstName);
+            pstmt.setString(3, role);
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next(); // If there's a result, credentials are valid
 
 		} catch (Exception e) {
 			System.err.println("Database error: " + e.getMessage());
@@ -113,5 +112,17 @@ public class Login extends AbstractDetailsFrame {
                                          "Error", JOptionPane.ERROR_MESSAGE);
 		}
 		return false;
+	}
+
+	private void showAnalysis() {
+	   JFrame chartFrame = PersonnelBarChart.showPersonnelStatusChart();
+	
+	   // Optional: Add a listener to handle the chart window closing
+	   chartFrame.addWindowListener(new WindowAdapter() {
+	    //    @Override
+	    //    public void windowClosing(WindowEvent e) {
+	    //        refreshTableData();
+	    //    }
+	   });
 	}
 }

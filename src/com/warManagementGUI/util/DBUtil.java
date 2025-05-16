@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,15 +18,27 @@ public class DBUtil {
 
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
+    }    
+    
+    // Helper method to validate table names
+    private static boolean isValidTableName(String tableName) {
+        // Simple validation - only allow alphanumeric and underscore
+        return tableName != null && tableName.matches("^[a-zA-Z0-9_]+$");
     }
-
+    
     public static Map<String, Integer> getStatusCount(String tableName) {
         Map<String, Integer> statusCount = new HashMap<>();
-        String query = String.format("SELECT status, COUNT(*) AS count FROM %s GROUP BY status", tableName);
+        // Sanitize table name to prevent SQL injection (basic implementation)
+        if (!isValidTableName(tableName)) {
+            System.err.println("Invalid table name: " + tableName);
+            return statusCount;
+        }
+        
+        String query = "SELECT status, COUNT(*) AS count FROM " + tableName + " GROUP BY status";
 
         try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 String status = rs.getString("status");
@@ -41,14 +52,20 @@ public class DBUtil {
         }
 
         return statusCount;
-    }
-
-    public static Map<String, Integer> getGroupCount(String tableName, String columnName) {
+    }    public static Map<String, Integer> getGroupCount(String tableName, String columnName) {
         Map<String, Integer> countMap = new HashMap<>();
-        String query = String.format("SELECT %s AS label, COUNT(*) AS count FROM %s GROUP BY %s", columnName, tableName, columnName);
+        
+        // Basic validation
+        if (!isValidTableName(tableName) || !columnName.matches("^[a-zA-Z0-9_]+$")) {
+            System.err.println("Invalid table or column name: " + tableName + "." + columnName);
+            return countMap;
+        }
+        
+        String query = "SELECT " + columnName + " AS label, COUNT(*) AS count FROM " + tableName + " GROUP BY " + columnName;
+        
         try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 String label = rs.getString("label");
@@ -76,7 +93,10 @@ public class DBUtil {
         }
     }
     
-    public static ResultSet executeQuery(String query, Object... params) throws SQLException {
+    /**
+     * Executes a query and returns a Query object that handles resource management
+     */
+    public static Query executeQuery(String query, Object... params) throws SQLException {
         Connection conn = getConnection();
         PreparedStatement pstmt = conn.prepareStatement(query);
         
@@ -84,7 +104,34 @@ public class DBUtil {
             pstmt.setObject(i + 1, params[i]);
         }
         
-        return pstmt.executeQuery();
+        ResultSet rs = pstmt.executeQuery();
+        return new Query(conn, pstmt, rs);
+    }
+    
+    /**
+     * Wrapper class for query results that handles resource management
+     */
+    public static class Query implements AutoCloseable {
+        private final Connection conn;
+        private final PreparedStatement pstmt;
+        private final ResultSet rs;
+        
+        public Query(Connection conn, PreparedStatement pstmt, ResultSet rs) {
+            this.conn = conn;
+            this.pstmt = pstmt;
+            this.rs = rs;
+        }
+        
+        public ResultSet getResultSet() {
+            return rs;
+        }
+        
+        @Override
+        public void close() throws Exception {
+            if (rs != null) rs.close();
+            if (pstmt != null) pstmt.close();
+            if (conn != null) conn.close();
+        }
     }
 
     public static Map<String, Integer> getPersonnelStatusCount() {

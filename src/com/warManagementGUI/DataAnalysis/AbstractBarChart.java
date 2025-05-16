@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.BorderLayout;
 import java.util.Map;
 
 import javax.swing.JFrame;
@@ -26,7 +27,21 @@ public class AbstractBarChart extends JPanel {
         setLayout(null);
         this.values = data.values().stream().mapToInt(Integer::intValue).toArray();
         this.labels = data.keySet().toArray(String[]::new);
-        this.colors = new Color[]{Color.red, Color.blue, Color.green, Color.yellow, Color.orange};
+        setLayout(new BorderLayout());
+
+        // Create a more diverse color palette or use a color generation algorithm
+        this.colors = new Color[]{
+            new Color(31, 119, 180),  // blue
+            new Color(255, 127, 14),  // orange
+            new Color(44, 160, 44),   // green
+            new Color(214, 39, 40),   // red
+            new Color(148, 103, 189), // purple
+            new Color(140, 86, 75),   // brown
+            new Color(227, 119, 194), // pink
+            new Color(127, 127, 127), // gray
+            new Color(188, 189, 34),  // olive
+            new Color(23, 190, 207)   // teal
+        };
         this.title = title;
     }
 
@@ -58,8 +73,16 @@ public class AbstractBarChart extends JPanel {
 
         int top = titleFontMetrics.getHeight();
         int bottom = labelFontMetrics.getHeight();
-        if (maxValue == 0) maxValue = 1;
-        double scale = (panelHeight - top - bottom) / maxValue;
+        // Handle case when all values are 0
+        if (maxValue == 0 && minValue == 0) maxValue = 1;
+        
+        // Calculate scale based on the range between min and max
+        // Handle case when all values are 0
+        if (maxValue == 0 && minValue == 0) maxValue = 1;
+        
+        // Calculate scale based on the range between min and max
+        double valueRange = maxValue - minValue;
+        double scale = (panelHeight - top - bottom) / valueRange;
 
         y = panelHeight - labelFontMetrics.getDescent();
         g.setFont(labelFont);
@@ -85,12 +108,22 @@ public class AbstractBarChart extends JPanel {
             g.drawString(labels[i], x, y);
         }
     }
-
-    public static void showBarChart(String title, Map<String, Integer> data) {
-        JFrame frame = new JFrame(title);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(600, 400);
-        frame.getContentPane().add(new AbstractBarChart(data, title));
-        frame.setVisible(true);
+    
+    public static JFrame showBarChart(String title, Map<String, Integer> data) {
+         JFrame frame = new JFrame(title);
+         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+         frame.setSize(600, 400);
+         frame.getContentPane().add(new SimpleBarChart(data, title));
+         frame.setVisible(true);
+         return frame;
+     }
+     
+    // Concrete implementation for the static utility method
+    private static class SimpleBarChart extends AbstractBarChart {
+        private static final long serialVersionUID = 1L;
+        
+        public SimpleBarChart(Map<String, Integer> data, String title) {
+            super(data, title);
+        }
     }
 }

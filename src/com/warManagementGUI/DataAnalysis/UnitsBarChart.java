@@ -2,6 +2,8 @@ package com.warManagementGUI.DataAnalysis;
 
 import java.util.Map;
 
+import javax.swing.JFrame;
+
 import com.warManagementGUI.util.DBUtil;
 
 public class UnitsBarChart extends AbstractBarChart {
@@ -16,8 +18,8 @@ public class UnitsBarChart extends AbstractBarChart {
         showBarChart("Units by Status", statusCount);
     }
     
-    public static void showUnitTypeChart() {
+    public static JFrame showUnitTypeChart() {
         Map<String, Integer> typeCount = DBUtil.getGroupCount("units", "unit_type");
-        showBarChart("Units by Type", typeCount);
+        return showBarChart("Units by Type", typeCount);
     }
 }

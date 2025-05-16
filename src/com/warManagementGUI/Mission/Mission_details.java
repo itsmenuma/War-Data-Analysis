@@ -2,6 +2,8 @@ package com.warManagementGUI.Mission;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,6 +11,7 @@ import java.sql.SQLException;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -100,8 +103,15 @@ public class Mission_details extends AbstractDetailsFrame {
     }
 
     private void analyzeMissions() {
-        MissionsBarChart.showMissionStatusChart();
-        dispose();
+	   JFrame chartFrame = MissionsBarChart.showMissionTypeChart();
+	
+	   // Optional: Add a listener to handle the chart window closing
+	   chartFrame.addWindowListener(new WindowAdapter() {
+	       @Override
+	       public void windowClosing(WindowEvent e) {
+	           refreshTableData();
+	       }
+	   });
     }
 
     private void refreshTextFields() {

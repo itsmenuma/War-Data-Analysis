@@ -13,7 +13,8 @@ public class PersonnelDataDAO {
     public DefaultCategoryDataset getPersonnelData() throws SQLException {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-        String query = "SELECT status, COUNT(Personnel_ID) as count FROM Personnel GROUP BY ASC";
+        String query = "SELECT status, COUNT(Personnel_ID) AS count " +
+               "FROM Personnel GROUP BY status ORDER BY status ASC";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query);
