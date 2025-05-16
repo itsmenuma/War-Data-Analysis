@@ -7,6 +7,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.util.Map;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.SoftBevelBorder;
@@ -85,5 +86,13 @@ public class AbstractBarChart extends JPanel {
             x = i * barWidth + (barWidth - labelWidth) / 2;
             g.drawString(labels[i], x, y);
         }
+    }
+
+    public void display() {
+        JFrame frame = new JFrame();
+        frame.getContentPane().add(this);
+        frame.setSize(800, 600);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
     }
 }

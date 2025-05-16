@@ -1,59 +1,39 @@
 package Personnel;
 
-import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
 
+import util.AbstractDetailsFrame;
 import util.DBUtil;
 import warManagement.WarManagement;
 
-public class Personnel_SignUp extends JFrame {
+public class Personnel_SignUp extends AbstractDetailsFrame {
     private static final long serialVersionUID = 1L;
-    // UI constants
     private static final Font TITLE_FONT = new Font("Times New Roman", Font.BOLD | Font.ITALIC, 50);
-    private static final Font LABEL_FONT = new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20);
-    private static final Font BUTTON_FONT = new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20);
-    private static final Color TEXT_COLOR = Color.WHITE;
-    private static final Color BG_COLOR = new Color(0, 64, 64);
-
-    private JPanel contentPane;
+    // Use inherited LABEL_FONT, BUTTON_FONT, TEXT_COLOR, BG_COLOR
     private JTextField Personnel_ID_txt, Fname_txt, Lname_txt, Post_txt, Unit_ID_txt, Role_txt, Contact_details_txt;
     private JComboBox<String> Status_txt;
 
     public static void main(String[] args) {
-        EventQueue.invokeLater(() -> new Personnel_SignUp().setVisible(true));
+        try {
+            new Personnel_SignUp().display();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error launching application: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public Personnel_SignUp() {
-        initializeFrame();
+        super("Personnel Sign Up", 773, 529);
         setupLabels();
         setupTextFields();
         setupComboBox();
         setupButtons();
-    }
-
-    private void initializeFrame() {
-        setTitle("Personnel Sign Up");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 773, 529);
-        contentPane = new JPanel();
-        contentPane.setBackground(BG_COLOR);
-        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-        contentPane.setLayout(null);
-        setContentPane(contentPane);
     }
 
     private void setupLabels() {
@@ -69,13 +49,13 @@ public class Personnel_SignUp extends JFrame {
     }
 
     private void setupTextFields() {
-        Personnel_ID_txt = createTextField(201, 117, 96, 19);
-        Fname_txt = createTextField(201, 177, 96, 19);
-        Lname_txt = createTextField(201, 240, 96, 19);
-        Post_txt = createTextField(201, 300, 96, 19);
-        Unit_ID_txt = createTextField(565, 125, 96, 19);
-        Role_txt = createTextField(565, 177, 96, 19);
-        Contact_details_txt = createTextField(565, 300, 96, 19);
+        Personnel_ID_txt = createTextField(201, 117, 96, 19, 10);
+        Fname_txt = createTextField(201, 177, 96, 19, 10);
+        Lname_txt = createTextField(201, 240, 96, 19, 10);
+        Post_txt = createTextField(201, 300, 96, 19, 10);
+        Unit_ID_txt = createTextField(565, 125, 96, 19, 10);
+        Role_txt = createTextField(565, 177, 96, 19, 10);
+        Contact_details_txt = createTextField(565, 300, 96, 19, 10);
     }
 
     private void setupComboBox() {
@@ -83,49 +63,13 @@ public class Personnel_SignUp extends JFrame {
     }
 
     private void setupButtons() {
-        createButton("Back to Dashboard", 10, 380, 228, 47, e -> navigateToDashboard());
-        createButton("Reset", 313, 380, 145, 47, e -> refreshTextFields());
-        createButton("Sign Up", 549, 380, 145, 47, e -> insertPersonnel());
-    }
-
-    private JLabel createLabel(String text, Font font, int x, int y, int w, int h) {
-        JLabel lbl = new JLabel(text);
-        lbl.setFont(font);
-        lbl.setForeground(TEXT_COLOR);
-        lbl.setBounds(x, y, w, h);
-        contentPane.add(lbl);
-        return lbl;
-    }
-
-    private JTextField createTextField(int x, int y, int w, int h) {
-        JTextField tf = new JTextField();
-        tf.setBounds(x, y, w, h);
-        tf.setColumns(10);
-        contentPane.add(tf);
-        return tf;
-    }
-
-    private JComboBox<String> createComboBox(String[] items, int x, int y, int w, int h) {
-        JComboBox<String> cb = new JComboBox<>(items);
-        cb.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
-        cb.setBounds(x, y, w, h);
-        contentPane.add(cb);
-        return cb;
-    }
-
-    private JButton createButton(String text, int x, int y, int w, int h, ActionListener listener) {
-        JButton btn = new JButton(text);
-        btn.setFont(BUTTON_FONT);
-        btn.setBackground(Color.BLACK);
-        btn.setForeground(TEXT_COLOR);
-        btn.setBounds(x, y, w, h);
-        btn.addActionListener(listener);
-        contentPane.add(btn);
-        return btn;
+        createButton("Back to Dashboard", BUTTON_FONT, TEXT_COLOR, BG_COLOR, 10, 380, 228, 47, e -> navigateToDashboard());
+        createButton("Reset", BUTTON_FONT, TEXT_COLOR, BG_COLOR, 313, 380, 145, 47, e -> refreshTextFields());
+        createButton("Sign Up", BUTTON_FONT, TEXT_COLOR, BG_COLOR, 549, 380, 145, 47, e -> insertPersonnel());
     }
 
     private void navigateToDashboard() {
-        new WarManagement().setVisible(true);
+        new WarManagement().display();
         dispose();
     }
 
@@ -168,7 +112,7 @@ public class Personnel_SignUp extends JFrame {
             int rows = pstmt.executeUpdate();
             if (rows > 0) {
                 JOptionPane.showMessageDialog(this, "Personnel details inserted successfully.");
-                new Personnel_details().setVisible(true);
+                new Personnel_details().display();
                 dispose();
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to insert personnel details.", "Error", JOptionPane.ERROR_MESSAGE);

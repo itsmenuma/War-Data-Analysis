@@ -1,28 +1,21 @@
 package Personnel;
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
 
+import util.AbstractDetailsFrame;
 import util.DBUtil;
 import warManagement.WarManagement;
 
-public class Personnel_Remove_Details extends JFrame {
+public class Personnel_Remove_Details extends AbstractDetailsFrame {
 
     private static final long serialVersionUID = 1L;
-    private final JPanel contentPane = new JPanel();
     private JTextField Personnel_ID_txt;
     private JTextField Fname_txt;
     private JTextField Unit_ID_txt;
@@ -31,39 +24,22 @@ public class Personnel_Remove_Details extends JFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        EventQueue.invokeLater(() -> {
-            try {
-                Personnel_Remove_Details frame = new Personnel_Remove_Details();
-                frame.setVisible(true);
-            } catch (Exception e) {
-                System.err.println("Error launching application: " + e.getMessage());
-                JOptionPane.showMessageDialog(null, "Error launching application: " + e.getMessage(), 
-                                            "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
+        try {
+            new Personnel_Remove_Details().display();
+        } catch (Exception e) {
+            System.err.println("Error launching application: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error launching application: " + e.getMessage(),
+                                        "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
-    /**
-     * Create the frame.
-     */
     public Personnel_Remove_Details() {
-        initializeFrame();
+        super("Remove Personnel", 773, 529);
         setupLabels();
         setupTextFields();
         setupButtons();
     }
-    
-    // Initialize the frame
-    private void initializeFrame() {
-        setTitle("Remove Personnel");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 773, 529);
-        contentPane.setBackground(new Color(0, 64, 64));
-        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-        setContentPane(contentPane);
-        contentPane.setLayout(null);
-    }
-    
+
     // Setup labels
     private void setupLabels() {
         createLabel("Remove Personnel Details", 
@@ -108,50 +84,19 @@ public class Personnel_Remove_Details extends JFrame {
                      e -> removeDetails());
     }
 
-    // Helper method for creating labels
-    private JLabel createLabel(String text, Font font, Color color, int x, int y, int width, int height) {
-        JLabel label = new JLabel(text);
-        label.setFont(font);
-        label.setForeground(color);
-        label.setBounds(x, y, width, height);
-        contentPane.add(label);
-        return label;
-    }
-    
-    // Helper method for creating text fields
-    private JTextField createTextField(int x, int y, int width, int height, int columns) {
-        JTextField textField = new JTextField();
-        textField.setBounds(x, y, width, height);
-        textField.setColumns(columns);
-        contentPane.add(textField);
-        return textField;
-    }
-    
-    // Helper method for creating buttons
-    private JButton createButton(String text, Font font, int x, int y, int width, int height, ActionListener listener) {
-        JButton button = new JButton(text);
-        button.setFont(font);
-        button.setForeground(Color.WHITE);
-        button.setBackground(Color.BLACK);
-        button.setBounds(x, y, width, height);
-        button.addActionListener(listener);
-        contentPane.add(button);
-        return button;
-    }
-    
     // Navigate to dashboard
     private void navigateToDashboard() {
-        new WarManagement().setVisible(true);
+        new WarManagement().display();
         dispose();
     }
-    
+
     // Helper method to reset text fields
     private void resetTextFields() {
         Personnel_ID_txt.setText("");
         Fname_txt.setText("");
         Unit_ID_txt.setText("");
     }
-    
+
     // Helper method to remove personnel details
     private void removeDetails() {
         String personnelId = Personnel_ID_txt.getText();
@@ -213,7 +158,7 @@ public class Personnel_Remove_Details extends JFrame {
     
     // Navigate to personnel details screen
     private void navigateToPersonnelDetails() {
-        new Personnel_details().setVisible(true);
+        new Personnel_details().display();
         dispose();
     }
 }
