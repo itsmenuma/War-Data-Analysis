@@ -1,10 +1,15 @@
 package DataAnalysis;
 
-import javax.swing.JPanel;
-import javax.swing.border.SoftBevelBorder;
-import javax.swing.border.BevelBorder;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.util.Map;
+
+import javax.swing.JPanel;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.SoftBevelBorder;
 
 public class AbstractBarChart extends JPanel {
     private static final long serialVersionUID = -4175998745125394822L;
@@ -19,7 +24,7 @@ public class AbstractBarChart extends JPanel {
         setBackground(Color.WHITE);
         setLayout(null);
         this.values = data.values().stream().mapToInt(Integer::intValue).toArray();
-        this.labels = data.keySet().toArray(new String[0]);
+        this.labels = data.keySet().toArray(String[]::new);
         this.colors = new Color[]{Color.red, Color.blue, Color.green, Color.yellow, Color.orange};
         this.title = title;
     }

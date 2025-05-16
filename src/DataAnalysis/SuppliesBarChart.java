@@ -1,11 +1,10 @@
 package DataAnalysis;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.Map;
+
+import javax.swing.JFrame;
+
 import util.DBUtil;
-import javax.swing.border.SoftBevelBorder;
-import javax.swing.border.BevelBorder;
 
 public class SuppliesBarChart extends AbstractBarChart {
 
