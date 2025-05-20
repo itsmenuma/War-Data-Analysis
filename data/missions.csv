@@ -1,0 +1,3 @@
+mission_id,name,objective,start_date,end_date,status,location_id
+1,Operation Overlord,Invade Normandy,06/06/1944,06/06/1944,Completed,1
+2,Operation Market Garden,Seize bridges,17/09/1944,25/09/1944,Completed,2
