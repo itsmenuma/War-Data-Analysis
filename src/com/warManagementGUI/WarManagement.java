@@ -33,7 +33,7 @@ public class WarManagement extends AbstractDetailsFrame {
 
     public WarManagement() {
         super("WarAnalyze", 773, 529);
-        // ...existing UI setup code using inherited contentPane and helper methods...
+
         createIconLabel("/pics/PI.jpg", 28, 40, 109, 109);
         createNavButton("Personnel", Login.class, 28, 173, 128, 23);
         createIconLabel("/pics/UI.png", 186, 47, 89, 101);
@@ -45,9 +45,9 @@ public class WarManagement extends AbstractDetailsFrame {
         createIconLabel("/pics/SI.png", 615, 47, 103, 101);
         createNavButton("Supplies", Supply_details.class, 609, 173, 109, 23);
         createTextLabel("War Analysis Dashboard", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 50), Color.WHITE, 55, 195, 651, 101);
+        createIconLabel("/pics/quote1.jpg", 150, 300, 450, 180); // Added quote1.jpg image to dashboard
     }
 
-    // New helper for navigation buttons
     private <T extends AbstractDetailsFrame> void createNavButton(String name, Class<T> cls, int x, int y, int w, int h) {
         createButton(name, new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), Color.WHITE, Color.BLACK, x, y, w, h, e -> {
             try {

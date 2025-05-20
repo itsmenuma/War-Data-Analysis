@@ -5,7 +5,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JOptionPane;
@@ -14,21 +17,26 @@ import javax.swing.JPanel;
 public class DBUtil {
     private static final String URL = "jdbc:mysql://localhost:3306/war";
     private static final String USER = "root";
-    private static final String PASSWORD = "SP1234sp()";
+    private static final String PASSWORD = "your_password";
+    private static final List<String> TABLE_NAMES = new ArrayList<>(Arrays.asList("personnel", "equipment", "missions", "supplies", "units"));
 
     public static Connection getConnection() throws SQLException {
+        if (PASSWORD.equals("your_password")) {
+            throw new SQLException("Database password not set. Please update the DBUtil class.");
+        }
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }    
     
-    // Helper method to validate table names
     private static boolean isValidTableName(String tableName) {
-        // Simple validation - only allow alphanumeric and underscore
-        return tableName != null && tableName.matches("^[a-zA-Z0-9_]+$");
+        if (tableName == null || tableName.isEmpty()) {
+            return false;
+        }
+        return TABLE_NAMES.contains(tableName.toLowerCase());
     }
     
     public static Map<String, Integer> getStatusCount(String tableName) {
         Map<String, Integer> statusCount = new HashMap<>();
-        // Sanitize table name to prevent SQL injection (basic implementation)
+       
         if (!isValidTableName(tableName)) {
             System.err.println("Invalid table name: " + tableName);
             return statusCount;
@@ -55,7 +63,7 @@ public class DBUtil {
     }    public static Map<String, Integer> getGroupCount(String tableName, String columnName) {
         Map<String, Integer> countMap = new HashMap<>();
         
-        // Basic validation
+       
         if (!isValidTableName(tableName) || !columnName.matches("^[a-zA-Z0-9_]+$")) {
             System.err.println("Invalid table or column name: " + tableName + "." + columnName);
             return countMap;
