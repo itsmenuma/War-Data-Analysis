@@ -28,8 +28,8 @@ unit_name VARCHAR(50),
 unit_type ENUM('infantry', 'cavalry', 'artillery'), 
 commander_id INT, 
 location_id INT, 
-FOREIGN KEY (commander_id) REFERENCES Personnel(personnel_id),
-FOREIGN KEY (location_id) REFERENCES Locations(location_id)
+FOREIGN KEY (commander_id) REFERENCES Personnel(personnel_id) ON DELETE SET NULL,
+FOREIGN KEY (location_id) REFERENCES Locations(location_id) ON DELETE CASCADE
 );
 
 
@@ -42,7 +42,7 @@ start_date varchar(20),
 end_date varchar(20),
 status ENUM('planned', 'ongoing', 'completed'),
 location_id INT, 
-FOREIGN KEY (location_id) REFERENCES Locations(location_id)
+FOREIGN KEY (location_id) REFERENCES Locations(location_id) ON DELETE CASCADE
  );
 
 -- Equipment Table: 
@@ -53,8 +53,8 @@ CREATE TABLE Equipment (
     unit_id INT,
     status ENUM('Operational', 'Maintenance', 'Decommissioned'),
     location_id INT,
-    FOREIGN KEY (unit_id) REFERENCES Units(unit_id),
-    FOREIGN KEY (location_id) REFERENCES Locations(location_id)
+    FOREIGN KEY (unit_id) REFERENCES Units(unit_id) ON DELETE CASCADE,
+    FOREIGN KEY (location_id) REFERENCES Locations(location_id) ON DELETE CASCADE
 );
 
 -- Supplies Table
@@ -66,6 +66,6 @@ CREATE TABLE Equipment (
     unit_id INT,
     location_id INT,
     status ENUM('Available', 'In Use', 'Out of Stock') DEFAULT 'Available',
-    FOREIGN KEY (unit_id) REFERENCES Units(unit_id),
-    FOREIGN KEY (location_id) REFERENCES Locations(location_id)
+    FOREIGN KEY (unit_id) REFERENCES Units(unit_id) ON DELETE CASCADE,
+    FOREIGN KEY (location_id) REFERENCES Locations(location_id) ON DELETE CASCADE
 );
