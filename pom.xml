@@ -1,0 +1,68 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.example.warManagement</groupId>
+  <artifactId>warManagement</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <properties>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+  </properties>
+  <dependencies>
+    <!-- MySQL Connector -->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>8.0.33</version>
+    </dependency>
+    <!-- JFreeChart -->
+    <dependency>
+      <groupId>org.jfree</groupId>
+      <artifactId>jfreechart</artifactId>
+      <version>1.0.19</version>
+    </dependency>
+    <!-- JCommon (required by JFreeChart) -->
+    <dependency>
+      <groupId>org.jfree</groupId>
+      <artifactId>jcommon</artifactId>
+      <version>1.0.23</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <!-- use custom source layout -->
+    <sourceDirectory>${project.basedir}/src</sourceDirectory>
+    <!-- copy non-Java resources under src/ into classpath -->
+    <resources>
+      <resource>
+        <directory>${project.basedir}/src</directory>
+        <includes>
+          <include>pics/**</include>
+        </includes>
+      </resource>
+    </resources>
+    <plugins>
+      <!-- compile plugin to honor src dir and Java 21 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.5.0</version>
+        <configuration>
+          <!-- run on classpath instead of module-path -->
+          <classpathScope>compile</classpathScope>
+          <mainClass>com.warManagementGUI.WarManagement</mainClass>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
