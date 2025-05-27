@@ -43,8 +43,8 @@ public class Personnel_Remove_Details extends AbstractDetailsStage {
     // Setup buttons
     private void setupButtons() {
         createNavButton("Back to Dashboard", WarManagement.class, 21, 397, 213, 50);
-        createButton("Reset", FIELD_FONT, TEXT_COLOR, BG_COLOR, 334, 397, 133, 50, e -> resetTextFields());
-        createButton("Remove", FIELD_FONT, TEXT_COLOR, BG_COLOR, 558, 397, 133, 50, e -> removeDetails());
+        createButton("Reset", FIELD_FONT, TEXT_COLOR, BUTTON_COLOR, 334, 397, 133, 50, e -> resetTextFields());
+        createButton("Remove", FIELD_FONT, TEXT_COLOR, BUTTON_COLOR, 558, 397, 133, 50, e -> removeDetails());
     }
 
     // Helper method to reset text fields

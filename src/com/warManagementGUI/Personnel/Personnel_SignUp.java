@@ -52,8 +52,8 @@ public class Personnel_SignUp extends AbstractDetailsStage {
 
     private void setupButtons() {
         createNavButton("Back to Dashboard", WarManagement.class, 10, 380, 228, 47);
-        createButton("Reset", BUTTON_FONT, TEXT_COLOR, BG_COLOR, 313, 380, 145, 47, e -> refreshTextFields());
-        createButton("Sign Up", BUTTON_FONT, TEXT_COLOR, BG_COLOR, 549, 380, 145, 47, e -> insertPersonnel());
+        createButton("Reset", BUTTON_FONT, TEXT_COLOR, BUTTON_COLOR, 313, 380, 145, 47, e -> refreshTextFields());
+        createButton("Sign Up", BUTTON_FONT, TEXT_COLOR, BUTTON_COLOR, 549, 380, 145, 47, e -> insertPersonnel());
     }
     private void refreshTextFields() {
         Personnel_ID_txt.setText("");

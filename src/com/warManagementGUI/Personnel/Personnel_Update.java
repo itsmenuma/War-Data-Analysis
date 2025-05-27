@@ -51,8 +51,8 @@ public class Personnel_Update extends AbstractDetailsStage {
 
     private void setupButtons() {
         createNavButton("Back to Dashboard",WarManagement.class, 10, 358, 207, 58);
-        createButton("Refresh", BUTTON_FONT, TEXT_COLOR, BG_COLOR, 319, 355, 127, 64, e -> refreshTextFields());
-        createButton("Update", BUTTON_FONT, TEXT_COLOR, BG_COLOR, 602, 355, 119, 58, e -> updatePersonnel());
+        createButton("Refresh", BUTTON_FONT, TEXT_COLOR, BUTTON_COLOR, 319, 355, 127, 64, e -> refreshTextFields());
+        createButton("Update", BUTTON_FONT, TEXT_COLOR, BUTTON_COLOR, 602, 355, 119, 58, e -> updatePersonnel());
     }
 
     private void refreshTextFields() {

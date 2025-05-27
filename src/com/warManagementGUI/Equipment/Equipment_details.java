@@ -116,11 +116,11 @@ public class Equipment_details extends AbstractDetailsStage {
 
     private void setupButtons() {
         createNavButton("Back to Dashboard", WarManagement.class, 10, 410, 161, 72);
-        createButton("Refresh", BUTTON_FONT, TEXT_COLOR, BG_COLOR, 192, 410, 96, 72, e -> refreshTextFields());
-        createButton("Delete", BUTTON_FONT, TEXT_COLOR, BG_COLOR, 310, 410, 86, 72, e -> deleteEquipment());
-        createButton("Update", BUTTON_FONT, TEXT_COLOR, BG_COLOR, 425, 411, 86, 70, e -> updateEquipment());
-        createButton("Insert", BUTTON_FONT, TEXT_COLOR, BG_COLOR, 533, 413, 86, 67, e -> insertEquipment());
-        createButton("Analyse", BUTTON_FONT, TEXT_COLOR, BG_COLOR, 647, 410, 102, 72, e -> analyzeEquipment());
+        createButton("Refresh", BUTTON_FONT, TEXT_COLOR, BUTTON_COLOR, 192, 410, 96, 72, e -> refreshTextFields());
+        createButton("Delete", BUTTON_FONT, TEXT_COLOR, BUTTON_COLOR, 310, 410, 86, 72, e -> deleteEquipment());
+        createButton("Update", BUTTON_FONT, TEXT_COLOR, BUTTON_COLOR, 425, 411, 86, 70, e -> updateEquipment());
+        createButton("Insert", BUTTON_FONT, TEXT_COLOR, BUTTON_COLOR, 533, 413, 86, 67, e -> insertEquipment());
+        createButton("Analyse", BUTTON_FONT, TEXT_COLOR, BUTTON_COLOR, 647, 410, 102, 72, e -> analyzeEquipment());
     }
 
     private void refreshTextFields() {
