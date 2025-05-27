@@ -72,4 +72,10 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
+        <classpathentry kind="lib" path="lib/opencsv-5.9.jar"/>
+        <classpathentry kind="lib" path="lib/jfreechart-1.5.4.jar"/>
+        <classpathentry kind="lib" path="lib/gt-shapefile-31.0.jar"/>
+        <classpathentry kind="lib" path="lib/gt-swing-31.0.jar"/> 
+        <classpathentry kind="lib" path="lib/stanford-corenlp-4.5.5.jar"/>
+        <classpathentry kind="lib" path="lib/stanford-corenlp-4.5.5-models.jar"/>
 </classpath>
