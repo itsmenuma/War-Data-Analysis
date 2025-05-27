@@ -1,68 +1,46 @@
 package com.warManagementGUI.Personnel;
 
-
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.event.WindowAdapter;
-import java.io.Serial;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-
-import com.warManagementGUI.DataAnalysis.PersonnelBarChart;
 import com.warManagementGUI.WarManagement;
-import com.warManagementGUI.util.AbstractDetailsFrame;
+import com.warManagementGUI.util.AbstractDetailsStage;
 import com.warManagementGUI.util.DBUtil;
 
-public class Login extends AbstractDetailsFrame {
+import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
-	@Serial
-	private static final long serialVersionUID = 1L;
-	private final JTextField Personnel_ID_txt;
-	private final JTextField FirstName_txt;
-	private final JTextField Role_txt;
+public class Login extends AbstractDetailsStage {
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			new Login().display();
-		} catch (Exception e) {
-			System.err.println("Database error: " + e.getMessage());
-			JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage(),
-                                         "Error", JOptionPane.ERROR_MESSAGE);
-		}
-	}
+	private TextField Personnel_ID_txt;
+	private TextField FirstName_txt;
+	private TextField Role_txt;
 
 	/**
-	 * Create the frame.
+	 * Create the stage.
 	 */
 	public Login() {
 		super("Personnel Login Page", 773, 529);
-		// ...existing UI setup code...
-         
+		
 		createIconLabel("/pics/login.jpeg", 37, 82, 169, 265);
 
-		createLabel("Personnel Login Page", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 50), Color.WHITE, 91, 24, 622, 41);
+		createLabel("Personnel Login Page", TITLE_FONT, Color.WHITE, 91, 24, 622, 41);
 
-		createLabel("Personnel ID", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), Color.WHITE, 272, 137, 128, 53);
+		createLabel("Personnel ID",LABEL_FONT, Color.WHITE, 272, 137, 128, 53);
 
-		createLabel("First  Name", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), Color.WHITE, 272, 201, 128, 53);
+		createLabel("First  Name",LABEL_FONT, Color.WHITE, 272, 201, 128, 53);
 
-		createLabel("Role", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), Color.WHITE, 284, 265, 116, 53);
+		createLabel("Role",LABEL_FONT, Color.WHITE, 284, 265, 116, 53);
 
-		Personnel_ID_txt = createTextField(473, 155, 150, 20, 10);
+		Personnel_ID_txt = createTextField(473, 155, 150, 20);
 
-		FirstName_txt = createTextField(473, 219, 150, 20, 10);
+		FirstName_txt = createTextField(473, 219, 150, 20);
+		Role_txt = createTextField(473, 283, 155, 20);
 
-		Role_txt = createTextField(473, 283, 155, 20, 10);
-
-		createButton("login", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK,
+		createButton("login", BUTTON_FONT, Color.WHITE, Color.BLACK,
 			572, 420, 89, 41,
 			e -> {
 				String personnelId = Personnel_ID_txt.getText();
@@ -72,27 +50,19 @@ public class Login extends AbstractDetailsFrame {
 					new Personnel_details().display();
 					dispose();
 				} else {
-					JOptionPane.showMessageDialog(contentPane, "Invalid credentials. Please try again.");
+					showErrorDialog("Invalid credentials. Please try again.");
 				}
 			});
 
-		createButton("remove", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK,
-			325, 420, 119, 41,
-			e -> { new Personnel_Remove_Details().display(); dispose(); });
+		createNavButton("remove", Personnel_Remove_Details.class ,325, 420, 119, 41);
 
-		createButton("update", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK,
-			454, 420, 108, 41,
-			e -> { new Personnel_Update().display(); dispose(); });
+		createNavButton("update", Personnel_Update.class, 454, 420, 108, 41);
 
-		createButton("Back to Dashboard", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK,
-			10, 420, 177, 41,
-			e -> { new WarManagement().display(); dispose(); });
+		createNavButton("Back to Dashboard", WarManagement.class, 10, 420, 177, 41);
 
-		createButton("Sign Up", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK,
-			197, 420, 118, 41,
-			e -> { new Personnel_SignUp().display(); dispose(); });
+		createNavButton("Sign Up", Personnel_SignUp.class ,197, 420, 118, 41);
 
-		createButton("Analyse", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), Color.WHITE, Color.BLACK,
+		createButton("Analyse", Font.font("Times New Roman", FontWeight.BOLD, 15), Color.WHITE, Color.BLACK,
 			671, 420, 85, 41,
 			e -> showAnalysis());
 	}
@@ -107,22 +77,16 @@ public class Login extends AbstractDetailsFrame {
             return rs.next(); // If there's a result, credentials are valid
 
 		} catch (Exception e) {
-			System.err.println("Database error: " + e.getMessage());
-			JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage(), 
-                                         "Error", JOptionPane.ERROR_MESSAGE);
+			handleDatabaseError(e, "Database error");
 		}
 		return false;
 	}
-
 	private void showAnalysis() {
-	   JFrame chartFrame = PersonnelBarChart.showPersonnelStatusChart();
-	
-	   // Optional: Add a listener to handle the chart window closing
-	   chartFrame.addWindowListener(new WindowAdapter() {
-	    //    @Override
-	    //    public void windowClosing(WindowEvent e) {
-	    //        refreshTableData();
-	    //    }
-	   });
+		try {
+			// Show Personnel by Status chart
+			com.warManagementGUI.DataAnalysis.PersonnelBarChart.showPersonnelStatusChart();
+		} catch (Exception e) {
+			showErrorDialog("Error showing analysis: " + e.getMessage());
+		}
 	}
 }
