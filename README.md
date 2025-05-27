@@ -31,10 +31,10 @@ The War Management System allows you to:
 ## Technologies Used
 
 - **Backend**: Java 21
-- **Frontend**: Java Swing
+- **Frontend**: JavaFX 21
 - **Database**: MySQL 8.0
 - **Build Tool**: Maven
-- **Visualization**: JFreeChart
+- **Visualization**: JavaFX Charts
 - **Analytics**: Python (NumPy, Pandas, Matplotlib)
 - **Machine Learning**: TensorFlow, Scikit-learn
 
@@ -71,7 +71,7 @@ Refer [Setup Guide](docs/setup.md).
 
 ## Usage
 
-- **Java UI**: Use the GUI to browse and manage records.
+- **JavaFX UI**: Use the modern GUI interface to browse and manage records.
 - **Python scripts**: Run analysis scripts in the `scripts/` folder.
 
 ---

@@ -40,7 +40,7 @@ public class Login extends AbstractDetailsStage {
 		FirstName_txt = createTextField(473, 219, 150, 20);
 		Role_txt = createTextField(473, 283, 155, 20);
 
-		createButton("login", BUTTON_FONT, Color.WHITE, Color.BLACK,
+		createButton("login", BUTTON_FONT, TEXT_COLOR, BUTTON_COLOR,
 			572, 420, 89, 41,
 			e -> {
 				String personnelId = Personnel_ID_txt.getText();
@@ -62,7 +62,7 @@ public class Login extends AbstractDetailsStage {
 
 		createNavButton("Sign Up", Personnel_SignUp.class ,197, 420, 118, 41);
 
-		createButton("Analyse", Font.font("Times New Roman", FontWeight.BOLD, 15), Color.WHITE, Color.BLACK,
+		createButton("Analyse", Font.font("Times New Roman", FontWeight.BOLD, 15), TEXT_COLOR, BUTTON_COLOR,
 			671, 420, 85, 41,
 			e -> showAnalysis());
 	}

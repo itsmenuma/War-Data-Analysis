@@ -14,7 +14,8 @@ import java.util.Map;
 public class DBUtil {
     private static final String URL = "jdbc:mysql://localhost:3306/war";
     private static final String USER = "root";
-    private static final String PASSWORD = "SP1234sp()";
+    private static final String PASSWORD = "your_password"; // Update this with your actual password
+    // List of valid table names for validation
     private static final List<String> TABLE_NAMES = new ArrayList<>(Arrays.asList("personnel", "equipment", "missions", "supplies", "units"));
 
     public static Connection getConnection() throws SQLException {
