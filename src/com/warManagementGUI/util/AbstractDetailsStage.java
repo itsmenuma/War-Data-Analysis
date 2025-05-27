@@ -27,6 +27,7 @@ public abstract class AbstractDetailsStage {
     protected static final Font TITLE_FONT = Font.font("Times New Roman", FontWeight.BOLD, 50);
     protected static final Color TEXT_COLOR = Color.WHITE;
     protected static final Color BG_COLOR = Color.rgb(0, 64, 64);
+    protected static final Color BUTTON_COLOR = Color.BLACK;
     
     protected Stage stage;
     protected Pane rootPane;
@@ -120,7 +121,7 @@ public abstract class AbstractDetailsStage {
     }
 
     protected <T extends AbstractDetailsStage> void createNavButton(String name, Class<T> cls, double x, double y, double w, double h) {
-        createButton(name, BUTTON_FONT, Color.WHITE, Color.BLACK, x, y, w, h, e -> {
+        createButton(name, BUTTON_FONT, TEXT_COLOR, BUTTON_COLOR, x, y, w, h, e -> {
             try {
                 T detailsStage = cls.getDeclaredConstructor().newInstance();
                 detailsStage.display();
