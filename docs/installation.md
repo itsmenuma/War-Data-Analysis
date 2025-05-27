@@ -19,14 +19,23 @@ This document provides detailed step-by-step instructions for installing and set
      setx PATH "%PATH%;%JAVA_HOME%\bin"
      ```
 
-2. **MySQL 8.0**:
+2. **JavaFX SDK** (Optional - Maven will download dependencies automatically):
+
+   - Download JavaFX SDK from [Gluon's website](https://gluonhq.com/products/javafx/)
+   - Extract to a directory (e.g., `C:\Program Files\JavaFX`)
+   - Set PATH_TO_FX environment variable (useful for command line execution):
+     ```
+     setx PATH_TO_FX "C:\Program Files\JavaFX\lib"
+     ```
+
+3. **MySQL 8.0**:
 
    - Download MySQL Installer from [MySQL's website](https://dev.mysql.com/downloads/installer/)
    - Run the installer and select "MySQL Server" and "MySQL Workbench"
    - Follow the setup wizard instructions
    - Remember your root password!
 
-3. **Maven**:
+4. **Maven**:
 
    - Download from [Maven's website](https://maven.apache.org/download.cgi)
    - Extract to a directory (e.g., `C:\Program Files\Maven`)
@@ -39,7 +48,7 @@ This document provides detailed step-by-step instructions for installing and set
      setx PATH "%PATH%;%M2_HOME%\bin"
      ```
 
-4. **Python** (optional, for advanced features):
+5. **Python** (optional, for advanced features):
    - Download from [Python's website](https://www.python.org/downloads/)
    - Run the installer and check "Add Python to PATH"
    - Verify installation by running:
@@ -69,7 +78,18 @@ This document provides detailed step-by-step instructions for installing and set
      source ~/.bashrc
      ```
 
-2. **MySQL 8.0**:
+2. **JavaFX SDK** (Optional - Maven will download dependencies automatically):
+
+   - Linux:
+     ```bash
+     sudo apt install openjfx
+     ```
+   - macOS:
+     ```bash
+     brew install openjfx
+     ```
+
+3. **MySQL 8.0**:
 
    - Linux:
      ```bash
@@ -84,7 +104,7 @@ This document provides detailed step-by-step instructions for installing and set
      mysql_secure_installation
      ```
 
-3. **Maven**:
+4. **Maven**:
 
    - Linux:
      ```bash
@@ -95,7 +115,7 @@ This document provides detailed step-by-step instructions for installing and set
      brew install maven
      ```
 
-4. **Python** (optional):
+5. **Python** (optional):
    - Linux:
      ```bash
      sudo apt install python3 python3-pip python3-venv
