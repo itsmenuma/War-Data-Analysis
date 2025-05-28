@@ -1,130 +1,114 @@
 package com.warManagementGUI.Supply;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.Serial;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.table.DefaultTableModel;
-
-import com.warManagementGUI.DataAnalysis.SuppliesBarChart;
 import com.warManagementGUI.WarManagement;
-import com.warManagementGUI.util.AbstractDetailsFrame;
+import com.warManagementGUI.util.AbstractDetailsStage;
 import com.warManagementGUI.util.DBUtil;
 
-public class Supply_details extends AbstractDetailsFrame {
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
-	@Serial
-	private static final long serialVersionUID = 1L;
-    private final JTextField supply_ID_txt;
-	private final JTextField supply_name_txt;
-	private final JTextField Name_txt;
-	private final JTextField Quantity_txt;
-	private final JTextField Unit_ID_txt;
-	private final JTextField loc_ID_txt;
-	private final JTable Supply_table;
-	private final JComboBox<String>Status_txt;
-	
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-        try {
-            new Supply_details().display();
-        } catch (Exception e) {
-            System.err.println("Database error: " + e.getMessage());
-            JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage(),
-                                         "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
+public class Supply_details extends AbstractDetailsStage {
 
-	/**
-	 * Create the frame.
-	 */
+    private final TextField supply_ID_txt;
+	private final TextField supply_name_txt;
+	private final TextField supply_type_txt;
+	private final TextField Quantity_txt;
+	private final TextField Unit_ID_txt;
+	private final TextField loc_ID_txt;
+	private final TableView<SupplyRecord> Supply_table;
+	private final ComboBox<String> Status_txt;
 
 	public Supply_details() {
         super("Supplies", 773, 529);
          
-        // ...existing UI setup code...
-        createLabel("Supply Details", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 35), 10, 11, 222, 51);
-
-		createLabel("Supply ID", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), 10, 72, 112, 44);
-
-		createLabel("Supply type", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), 10, 164, 112, 44);
+        // Create title label
+        createLabel("Supply Details", TITLE_FONT, 10, 11, 222, 51);
+		createLabel("Supply ID", LABEL_FONT, 10, 72, 112, 44);
+		createLabel("Supply Name", LABEL_FONT, 10, 130, 112, 13);
+		createLabel("Supply Type", LABEL_FONT, 10, 164, 112, 44);
 
 		supply_ID_txt = createTextField(152, 87, 96, 19, 10);
-
-		supply_name_txt = createTextField(152, 179, 96, 19, 10);
-
+		supply_name_txt = createTextField(152, 129, 96, 19, 10);
+		supply_type_txt = createTextField(152, 179, 96, 19, 10);
 		Status_txt = createComboBox(new String[]{"Available", "In Use", "Out of Stock"}, 152, 364, 96, 21);
 
-		createButton("Refresh", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), 183, 429, 82, 51, e -> refreshTextFields());
+		createButton("Refresh", BUTTON_FONT, 183, 429, 82, 51, e -> refreshTextFields());
+		createNavButton("Back to Dashboard", WarManagement.class, 10, 429, 202, 51);
 
-		createButton("Back to Dashboard", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), 10, 429, 163, 51, e -> {
-			new WarManagement().setVisible(true);
-			dispose();
-		});
+		createButton("Delete", BUTTON_FONT, 486, 429, 101, 51, e -> deleteSupply());
+		createButton("Insert", BUTTON_FONT, 275, 429, 82, 51, e -> insertSupply());
+		createButton("Update", BUTTON_FONT, 367, 429, 96, 51, e -> updateSupply());
 
-		createButton("Delete", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), 486, 429, 101, 51, e -> deleteSupply());
-
-		createButton("Insert", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), 275, 429, 82, 51, e -> insertSupply());
-
-		createButton("Update", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), 367, 429, 96, 51, e -> updateSupply());
-
-		createLabel("Name", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), 10, 130, 112, 13);
-
-		Name_txt = createTextField(152, 129, 96, 19, 10);
-
-		createLabel("Quantity", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), 10, 218, 82, 31);
-
+		createLabel("Quantity", LABEL_FONT, 10, 218, 82, 31);
 		Quantity_txt = createTextField(152, 226, 96, 19, 10);
 
-		createLabel("Unit ID", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), 10, 259, 89, 33);
-
-		createLabel("Location ID", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), 10, 316, 110, 31);
-
-		createLabel("Status", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), 10, 357, 89, 31);
+		createLabel("Unit ID", LABEL_FONT, 10, 259, 89, 33);
+		createLabel("Location ID", LABEL_FONT, 10, 316, 110, 31);
+		createLabel("Status", LABEL_FONT, 10, 357, 89, 31);
 
 		Unit_ID_txt = createTextField(152, 268, 96, 19, 10);
-
 		loc_ID_txt = createTextField(152, 324, 96, 19, 10);
 
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(278, 23, 471, 379);
-		contentPane.add(scrollPane);
+		// Create table
+		Supply_table = new TableView<>();
+		Supply_table.setLayoutX(278);
+		Supply_table.setLayoutY(23);
+		Supply_table.setPrefWidth(471);
+		Supply_table.setPrefHeight(379);
+		Supply_table.setStyle("-fx-background-color: black; -fx-text-fill: white;");
+		rootPane.getChildren().add(Supply_table);
 		
-		Supply_table = new JTable();
-		scrollPane.setViewportView(Supply_table);
-		Supply_table.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"Supply_ID", "Name", "Type", "Quantity", "Unit_ID", "Location_ID", "Status"
-			}
-		));
-		Supply_table.setForeground(new Color(255, 255, 255));
-		Supply_table.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 10));
-		Supply_table.setBackground(new Color(0, 0, 0));
+		// Setup table columns
+		TableColumn<SupplyRecord, String> supplyIdCol = new TableColumn<>("Supply_ID");
+		supplyIdCol.setCellValueFactory(new PropertyValueFactory<>("supplyId"));
+		supplyIdCol.setPrefWidth(80);
+		
+		TableColumn<SupplyRecord, String> nameCol = new TableColumn<>("Name");
+		nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+		nameCol.setPrefWidth(80);
+		
+		TableColumn<SupplyRecord, String> typeCol = new TableColumn<>("Type");
+ 		typeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
+		typeCol.setPrefWidth(80);
+		
+		TableColumn<SupplyRecord, String> quantityCol = new TableColumn<>("Quantity");
+		quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+		quantityCol.setPrefWidth(80);
+		
+		TableColumn<SupplyRecord, String> unitIdCol = new TableColumn<>("Unit_ID");
+		unitIdCol.setCellValueFactory(new PropertyValueFactory<>("unitId"));
+		unitIdCol.setPrefWidth(70);
+		
+		TableColumn<SupplyRecord, String> locationIdCol = new TableColumn<>("Location_ID");
+		locationIdCol.setCellValueFactory(new PropertyValueFactory<>("locationId"));
+		locationIdCol.setPrefWidth(90);
+		
+		TableColumn<SupplyRecord, String> statusCol = new TableColumn<>("Status");
+		statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
+		statusCol.setPrefWidth(80);
+		
+		Supply_table.getColumns().addAll(supplyIdCol, nameCol, typeCol, quantityCol, unitIdCol, locationIdCol, statusCol);
 
-		createButton("Analyse", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 15), 605, 428, 132, 53, e -> analyseSupply());
+		createButton("Analyse", Font.font("Times New Roman", FontWeight.BOLD, 15), 605, 428, 132, 53, e -> analyseSupply());
 		loadSupplyData();
 	}
-
+	
 	protected void updateSupply() {
 		// Check if supply_ID_txt is empty
 	    if (supply_ID_txt.getText().isEmpty()) {
-	        JOptionPane.showMessageDialog(this, "Please enter a Supply ID to update.", "Error", JOptionPane.ERROR_MESSAGE);
+	        showErrorDialog("Please enter a Supply ID to update.");
 	        return;
 	    }
 
@@ -133,41 +117,37 @@ public class Supply_details extends AbstractDetailsFrame {
 	    try (Connection conn = DBUtil.getConnection();
 	         PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
 
-	        pstmt.setString(1, supply_name_txt.getText());
-	        pstmt.setString(2, Name_txt.getText());
+ 			pstmt.setString(1, supply_name_txt.getText());    // supply "name"
+ 			pstmt.setString(2, supply_type_txt.getText());   // supply "type"
 	        pstmt.setInt(3, Integer.parseInt(Quantity_txt.getText()));
 	        pstmt.setInt(4, Integer.parseInt(Unit_ID_txt.getText()));
 	        pstmt.setInt(5, Integer.parseInt(loc_ID_txt.getText()));
-
 	        // Convert selected item to String explicitly
-	        String status = (String) Status_txt.getSelectedItem();
+	        String status = Status_txt.getValue();
 	        pstmt.setString(6, status);
 
 	        pstmt.setInt(7, Integer.parseInt(supply_ID_txt.getText()));
 
 	        int rowsAffected = pstmt.executeUpdate();
-
 	        if (rowsAffected > 0) {
-	            JOptionPane.showMessageDialog(this, "Supply updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+	            showInformationDialog("Supply updated successfully.");
 	            refreshTextFields();
 	            loadSupplyData(); // Refresh table after update
 	        } else {
-	            JOptionPane.showMessageDialog(this, "Failed to update supply. Supply ID not found.", "Error", JOptionPane.ERROR_MESSAGE);
+	            showErrorDialog("Failed to update supply. Supply ID not found.");
 	        }
 
 	    } catch (SQLException ex) {
-	        System.err.println("Database error: " + ex.getMessage());
-            JOptionPane.showMessageDialog(null, "Database error: " + ex.getMessage(), 
-                                         "Error", JOptionPane.ERROR_MESSAGE);
+	        handleDatabaseError(ex, "Failed to update supply details.");
 	    } catch (NumberFormatException ex) {
-	        JOptionPane.showMessageDialog(this, "Please enter valid numeric values for ID, Quantity, Unit ID, and Location ID.", "Input Error", JOptionPane.ERROR_MESSAGE);
+	        handleDatabaseError(ex, "Please enter valid numeric values for ID, Quantity, Unit ID, and Location ID.");
 	    }
 	}
-
+	
 	protected void deleteSupply() {
 		 // Check if supply_ID_txt is empty
 	    if (supply_ID_txt.getText().isEmpty()) {
-	        JOptionPane.showMessageDialog(this, "Please enter a Supply ID to delete.", "Error", JOptionPane.ERROR_MESSAGE);
+	        showErrorDialog("Please enter a Supply ID to delete.");
 	        return;
 	    }
 
@@ -179,21 +159,19 @@ public class Supply_details extends AbstractDetailsFrame {
 	        pstmt.setInt(1, Integer.parseInt(supply_ID_txt.getText()));
 
 	        int rowsAffected = pstmt.executeUpdate();
-
 	        if (rowsAffected > 0) {
-	            JOptionPane.showMessageDialog(this, "Supply deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+	            showInformationDialog("Supply deleted successfully.");
 	            refreshTextFields();
 	            loadSupplyData(); // Refresh table after deletion
 	        } else {
-	            JOptionPane.showMessageDialog(this, "Failed to delete supply. Supply ID not found.", "Error", JOptionPane.ERROR_MESSAGE);
+	            showErrorDialog("Failed to delete supply. Supply ID not found.");
 	        }
 
 	    } catch (NumberFormatException ex) {
-	        JOptionPane.showMessageDialog(this, "Please enter a valid numeric Supply ID.", "Input Error", JOptionPane.ERROR_MESSAGE);
+	        showErrorDialog("Please enter a valid numeric Supply ID.");
 	    } catch (SQLException ex) {
 	        System.err.println("Database error: " + ex.getMessage());
-			JOptionPane.showMessageDialog(null, "Database error: " + ex.getMessage(), 
-                                         "Error", JOptionPane.ERROR_MESSAGE);
+			showErrorDialog("Database error: " + ex.getMessage());
 	    }
 	}
 
@@ -205,34 +183,31 @@ public class Supply_details extends AbstractDetailsFrame {
 
 		        pstmt.setInt(1, Integer.parseInt(supply_ID_txt.getText()));
 		        pstmt.setString(2, supply_name_txt.getText());
-		        pstmt.setString(3, Name_txt.getText());
+		        pstmt.setString(3, supply_type_txt.getText());
 		        pstmt.setInt(4, Integer.parseInt(Quantity_txt.getText()));
 		        pstmt.setInt(5, Integer.parseInt(Unit_ID_txt.getText()));
 		        pstmt.setInt(6, Integer.parseInt(loc_ID_txt.getText()));
-
-		        // Convert selected item to String explicitly
-		        String status = (String) Status_txt.getSelectedItem();
-		        pstmt.setString(7, status);
+	        // Convert selected item to String explicitly
+	        String status = Status_txt.getValue();
+	        pstmt.setString(7, status);
 
 		        int rowsAffected = pstmt.executeUpdate();
+	        if (rowsAffected > 0) {
+	            showInformationDialog("Supply inserted successfully.");
+	            refreshTextFields();
+	            loadSupplyData(); // Refresh table after insertion
+	        } else {
+	            showErrorDialog("Failed to insert supply.");
+	        }
 
-		        if (rowsAffected > 0) {
-		            JOptionPane.showMessageDialog(this, "Supply inserted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-		            refreshTextFields();
-		            loadSupplyData(); // Refresh table after insertion
-		        } else {
-		            JOptionPane.showMessageDialog(this, "Failed to insert supply.", "Error", JOptionPane.ERROR_MESSAGE);
-		        }
-
-		    } catch (SQLException ex) {
-		        System.err.println("Database error: " + ex.getMessage());
-                		JOptionPane.showMessageDialog(null, "Database error: " + ex.getMessage(), 
-                                         "Error", JOptionPane.ERROR_MESSAGE);
-		    } catch (NumberFormatException ex) {
-		        JOptionPane.showMessageDialog(this, "Please enter valid numeric values for ID, Quantity, Unit ID, and Location ID.", "Input Error", JOptionPane.ERROR_MESSAGE);
-		    }
+	    } catch (SQLException ex) {
+	        System.err.println("Database error: " + ex.getMessage());
+                showErrorDialog("Database error: " + ex.getMessage());
+	    } catch (NumberFormatException ex) {
+	        showErrorDialog("Please enter valid numeric values for ID, Quantity, Unit ID, and Location ID.");
+	    }
 	}
-
+	
 	private void loadSupplyData() {
 		 String query = "SELECT supply_id, name, type, quantity, unit_id, location_id, status FROM Supplies";
 	        
@@ -241,49 +216,46 @@ public class Supply_details extends AbstractDetailsFrame {
 	             ResultSet rs = pstmt.executeQuery()) {
 
 	            // Clear existing table data
-	            DefaultTableModel model = (DefaultTableModel) Supply_table.getModel();
-	            model.setRowCount(0);
+	            ObservableList<SupplyRecord> data = FXCollections.observableArrayList();
 
 	            // Iterate through the result set and populate the table
 	            while (rs.next()) {
-	                int supply_id = rs.getInt("supply_id");
+	                String supply_id = rs.getString("supply_id");
 	                String name = rs.getString("name");
 	                String type = rs.getString("type");
-	                int quantity = rs.getInt("quantity");
-	                int unit_id = rs.getInt("unit_id");
-	                int location_id = rs.getInt("location_id");
+	                String quantity = rs.getString("quantity");
+	                String unit_id = rs.getString("unit_id");
+	                String location_id = rs.getString("location_id");
 	                String status = rs.getString("status");
 
-	                // Add row to table model
-	                Object[] row = { supply_id, name, type, quantity, unit_id, location_id, status };
-	                model.addRow(row);
+	                // Create SupplyRecord and add to data
+	                SupplyRecord record = new SupplyRecord(supply_id, name, type, quantity, unit_id, location_id, status);
+	                data.add(record);
 	            }
+	            
+	            Supply_table.setItems(data);
 
 	        } catch (SQLException ex) {
 	            System.err.println("Database error: " + ex.getMessage());
-                JOptionPane.showMessageDialog(null, "Database error: " + ex.getMessage(), 
-                                         "Error", JOptionPane.ERROR_MESSAGE);
+                showErrorDialog("Database error: " + ex.getMessage());
 	        }
 	}
 
 	protected void refreshTextFields() {
 		supply_ID_txt.setText("");
 		supply_name_txt.setText("");
-		Name_txt.setText("");
+		supply_type_txt.setText("");
 		Quantity_txt.setText("");
 		Unit_ID_txt.setText("");
 		loc_ID_txt.setText("");
 	}
-
-	private void analyseSupply() {
-	   JFrame chartFrame = SuppliesBarChart.showSupplyStatusChart();
 	
-	   // Optional: Add a listener to handle the chart window closing
-	   chartFrame.addWindowListener(new WindowAdapter() {
-	       @Override
-	       public void windowClosing(WindowEvent e) {
-	        //    refreshTableData();
-	       }
-	   });
+	private void analyseSupply() {
+		try {
+			// Show Supply by Status chart
+			com.warManagementGUI.DataAnalysis.SuppliesBarChart.showSupplyStatusChart();
+		} catch (Exception e) {
+			showErrorDialog("Error showing analysis: " + e.getMessage());
+		}
 	}
 }

@@ -11,13 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
 public class DBUtil {
     private static final String URL = "jdbc:mysql://localhost:3306/war";
     private static final String USER = "root";
-    private static final String PASSWORD = "your_password";
+    private static final String PASSWORD = "your_password"; // Update this with your actual password
+    // List of valid table names for validation
     private static final List<String> TABLE_NAMES = new ArrayList<>(Arrays.asList("personnel", "equipment", "missions", "supplies", "units"));
 
     public static Connection getConnection() throws SQLException {
@@ -48,15 +46,12 @@ public class DBUtil {
              PreparedStatement stmt = conn.prepareStatement(query);
              ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()) {
-                String status = rs.getString("status");
-                int count = rs.getInt("count");
-                statusCount.put(status, count);
+            while (rs.next()) {            String status = rs.getString("status");
+                int count = rs.getInt("count");                statusCount.put(status, count);
             }
 
         } catch (SQLException e) {
             System.err.println("SQL Error: " + e.getMessage());
-            JOptionPane.showMessageDialog(new JPanel(), "Database connection error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
 
         return statusCount;
@@ -77,13 +72,10 @@ public class DBUtil {
 
             while (rs.next()) {
                 String label = rs.getString("label");
-                int count = rs.getInt("count");
-                countMap.put(label, count);
-            }
+                int count = rs.getInt("count");                countMap.put(label, count);            }
 
         } catch (SQLException e) {
             System.err.println("SQL Error: " + e.getMessage());
-            JOptionPane.showMessageDialog(new JPanel(), "Database connection error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
 
         return countMap;
@@ -156,9 +148,7 @@ public class DBUtil {
 
     public static Map<String, Integer> getSuppliesStatusCount() {
         return getStatusCount("Supplies");
-    }
-
-    public static Map<String, Integer> getUnitsByTypeCount() {
+    }    public static Map<String, Integer> getUnitsByTypeCount() {
         return getGroupCount("Units", "unit_type");
     }
 }

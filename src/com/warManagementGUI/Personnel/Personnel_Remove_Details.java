@@ -1,37 +1,22 @@
 package com.warManagementGUI.Personnel;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-
 import com.warManagementGUI.WarManagement;
-import com.warManagementGUI.util.AbstractDetailsFrame;
+import com.warManagementGUI.util.AbstractDetailsStage;
 import com.warManagementGUI.util.DBUtil;
 
-public class Personnel_Remove_Details extends AbstractDetailsFrame {
+import javafx.scene.control.Alert;
+import javafx.scene.control.TextField;
 
-    private static final long serialVersionUID = 1L;
-    private JTextField Personnel_ID_txt;
-    private JTextField Fname_txt;
-    private JTextField Unit_ID_txt;
+public class Personnel_Remove_Details extends AbstractDetailsStage {
+    
+    private TextField Personnel_ID_txt;
+    private TextField Fname_txt;
+    private TextField Unit_ID_txt;
 
-    /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        try {
-            new Personnel_Remove_Details().display();
-        } catch (Exception e) {
-            System.err.println("Error launching application: " + e.getMessage());
-            JOptionPane.showMessageDialog(null, "Error launching application: " + e.getMessage(),
-                                        "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
 
     public Personnel_Remove_Details() {
         super("Remove Personnel", 773, 529);
@@ -42,52 +27,24 @@ public class Personnel_Remove_Details extends AbstractDetailsFrame {
 
     // Setup labels
     private void setupLabels() {
-        createLabel("Remove Personnel Details", 
-                   new Font("Times New Roman", Font.BOLD | Font.ITALIC, 50), 
-                   Color.WHITE, 21, 10, 593, 123);
-        
-        createLabel("Personnel ID", 
-                   new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), 
-                   Color.WHITE, 33, 154, 133, 50);
-        
-        createLabel("First Name", 
-                   new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), 
-                   Color.WHITE, 33, 226, 119, 45);
-        
-        createLabel("Unit ID", 
-                   new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), 
-                   Color.WHITE, 33, 310, 77, 45);
+        createLabel("Remove Personnel Details", TITLE_FONT, 21, 10, 593, 123);
+        createLabel("Personnel ID", FIELD_FONT, 33, 154, 133, 50);
+        createLabel("First Name", FIELD_FONT, 33, 226, 119, 45);
+        createLabel("Unit ID", FIELD_FONT, 33, 310, 77, 45);
     }
     
     // Setup text fields
     private void setupTextFields() {
-        Personnel_ID_txt = createTextField(199, 172, 96, 19, 10);
-        Fname_txt = createTextField(199, 241, 96, 19, 10);
-        Unit_ID_txt = createTextField(199, 310, 96, 19, 10);
+        Personnel_ID_txt = createTextField(199, 172, 96, 19);
+        Fname_txt = createTextField(199, 241, 96, 19);
+        Unit_ID_txt = createTextField(199, 310, 96, 19);
     }
     
     // Setup buttons
     private void setupButtons() {
-        createButton("Back to Dashboard", 
-                     new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20),
-                     21, 397, 213, 50,
-                     e -> navigateToDashboard());
-        
-        createButton("Reset", 
-                     new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20),
-                     334, 397, 133, 50,
-                     e -> resetTextFields());
-        
-        createButton("Remove", 
-                     new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20),
-                     558, 397, 133, 50,
-                     e -> removeDetails());
-    }
-
-    // Navigate to dashboard
-    private void navigateToDashboard() {
-        new WarManagement().display();
-        dispose();
+        createNavButton("Back to Dashboard", WarManagement.class, 21, 397, 213, 50);
+        createButton("Reset", FIELD_FONT, TEXT_COLOR, BUTTON_COLOR, 334, 397, 133, 50, e -> resetTextFields());
+        createButton("Remove", FIELD_FONT, TEXT_COLOR, BUTTON_COLOR, 558, 397, 133, 50, e -> removeDetails());
     }
 
     // Helper method to reset text fields
@@ -104,9 +61,11 @@ public class Personnel_Remove_Details extends AbstractDetailsFrame {
         String unitId = Unit_ID_txt.getText();
 
         if (personnelId.isEmpty() && firstName.isEmpty() && unitId.isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Please enter at least one field to identify personnel to remove.", 
-                "Input Required", JOptionPane.WARNING_MESSAGE);
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Input Required");
+            alert.setHeaderText(null);
+            alert.setContentText("Please enter at least one field to identify personnel to remove.");
+            alert.showAndWait();
             return;
         }
         
@@ -114,18 +73,16 @@ public class Personnel_Remove_Details extends AbstractDetailsFrame {
             String sql = buildDeleteQuery(personnelId, firstName, unitId);
             executeDeleteQuery(sql, personnelId, firstName, unitId);
         } catch (SQLException ex) {
-            System.err.println("Database error: " + ex.getMessage());
-            JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(), 
-                                         "Error", JOptionPane.ERROR_MESSAGE);
+            handleDatabaseError(ex, "Failed to remove personnel details.");
         }
     }
     
     // Build SQL delete query based on provided fields
     private String buildDeleteQuery(String personnelId, String firstName, String unitId) {
         StringBuilder sql = new StringBuilder("DELETE FROM Personnel WHERE 1=1");
-        if (!personnelId.isEmpty()) sql.append(" AND Personnel_id = ?");
-        if (!firstName.isEmpty()) sql.append(" AND First_name = ?");
-        if (!unitId.isEmpty()) sql.append(" AND Unit_Id = ?");
+        if (!personnelId.isEmpty()) sql.append(" AND Personnel_ID = ?");
+        if (!firstName.isEmpty()) sql.append(" AND Fname = ?");
+        if (!unitId.isEmpty()) sql.append(" AND Unit_ID = ?");
         return sql.toString();
     }
     
@@ -139,10 +96,18 @@ public class Personnel_Remove_Details extends AbstractDetailsFrame {
             int rowsAffected = pstmt.executeUpdate();
             
             if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(this, "Personnel details removed successfully.");
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Success");
+                alert.setHeaderText(null);
+                alert.setContentText("Personnel details removed successfully.");
+                alert.showAndWait();
                 navigateToPersonnelDetails();
             } else {
-                JOptionPane.showMessageDialog(this, "No matching personnel found.");
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("No Match");
+                alert.setHeaderText(null);
+                alert.setContentText("No matching personnel found.");
+                alert.showAndWait();
             }
         }
     }

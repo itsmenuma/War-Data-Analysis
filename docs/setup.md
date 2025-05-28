@@ -19,15 +19,16 @@ The War Management System is a comprehensive database and visualization tool des
 
 The system consists of:
 
-- A Java GUI application for data management
+- A JavaFX-based modern GUI application for data management
 - MySQL database for data storage
-- JFreeChart for data visualization
+- JavaFX Charts for data visualization
 - Optional Python-based data analysis tools
 - Machine learning mission prediction API
 
 ## Prerequisites
 
 - **Java Development Kit (JDK)**: Version 21 or higher
+- **JavaFX**: Version 21 (included with Maven dependencies)
 - **MySQL**: Version 8.0 or higher
 - **Maven**: For Java dependency management
 - **Python** (optional): Version 3.8 or higher for advanced visualization
@@ -60,7 +61,7 @@ You might need [Installation](./installation.md).
    private static final String PASSWORD = "your_password";
    ```
 
-## Java Application Setup
+## JavaFX Application Setup
 
 1. **Clone or download the project** to your local machine.
 
@@ -71,17 +72,19 @@ You might need [Installation](./installation.md).
    mvn clean package
    ```
 
-3. **Run the application**:
+3. **Run the application using JavaFX Maven Plugin**:
 
    ```bash
-   mvn exec:java
+   mvn javafx:run
    ```
 
-   Alternatively, you can run the main class directly:
+   Alternatively, you can run the JavaFX main class directly with the JavaFX modules:
 
    ```bash
-   java -cp target/classes com.warManagementGUI.WarManagement
+   java --module-path "PATH_TO_JAVAFX_MODULES" --add-modules javafx.controls,javafx.fxml -cp target/classes com.warManagementGUI.WarManagementApp
    ```
+
+   Note: Replace `PATH_TO_JAVAFX_MODULES` with the path to your JavaFX SDK lib directory.
 
 ## Python Visualization Module
 
@@ -152,11 +155,13 @@ The Mission Predictor API uses machine learning to predict mission success proba
 - Check database credentials in `DBUtil.java`
 - Ensure database 'war' exists
 
-### Java Application Issues
+### JavaFX Application Issues
 
 - Verify JDK version (21 or higher required)
 - Check Maven configuration in `pom.xml`
-- Verify all dependencies are resolved
+- Verify all JavaFX modules are properly imported
+- If you see "Error: JavaFX runtime components are missing", make sure JavaFX modules are correctly specified
+- Check that the JavaFX Maven plugin is properly configured
 
 ### Python Module Issues
 
