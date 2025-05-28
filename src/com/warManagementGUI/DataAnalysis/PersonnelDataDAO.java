@@ -1,18 +1,12 @@
 package com.warManagementGUI.DataAnalysis;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import org.jfree.data.category.DefaultCategoryDataset;
-
-import com.warManagementGUI.util.DBUtil;
 
 public class PersonnelDataDAO {
 
-    public DefaultCategoryDataset getPersonnelData() throws SQLException {
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
+    // TODO: Replace DefaultCategoryDataset with JavaFX Chart data model
+    public Object getPersonnelData() throws SQLException {
+        // TODO: Implement JavaFX chart data retrieval
+        /*
         String query = "SELECT status, COUNT(Personnel_ID) AS count " +
                "FROM Personnel GROUP BY status ORDER BY status ASC";
 
@@ -26,6 +20,7 @@ public class PersonnelDataDAO {
                 dataset.addValue(count, "Personnel Count", status);
             }
         }
-        return dataset;
+        */
+        return null; // Temporary placeholder
     }
 }

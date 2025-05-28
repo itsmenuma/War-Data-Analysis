@@ -1,66 +1,82 @@
 package com.warManagementGUI.Personnel;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.SoftBevelBorder;
-import javax.swing.table.DefaultTableModel;
-
 import com.warManagementGUI.WarManagement;
-import com.warManagementGUI.util.AbstractDetailsFrame;
+import com.warManagementGUI.util.AbstractDetailsStage;
 import com.warManagementGUI.util.DBUtil;
 
-public class Personnel_details extends AbstractDetailsFrame {
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 
-    private static final long serialVersionUID = 1L;
-    private final JTable personnelTable;
-    private final DefaultTableModel model;
-
-    public static void main(String[] args) {
-        try {
-            new Personnel_details().display();
-        } catch (Exception e) {
-            System.err.println("Database error: " + e.getMessage());
-            JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage(),
-                                         "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
+public class Personnel_details extends AbstractDetailsStage {
+    private final TableView<PersonnelRecord> personnelTable;
+    private final ObservableList<PersonnelRecord> personnelData;
 
     public Personnel_details() {
         super("Personnel Details", 773, 529);
-        createLabel("Personnel Details", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 50), Color.WHITE, 29, 11, 394, 58);
-        createButton("Back to Dashboard", BUTTON_FONT, TEXT_COLOR, BG_COLOR, 33, 383, 202, 73, e -> { new WarManagement().display(); dispose(); });
-        createButton("Log out", BUTTON_FONT, TEXT_COLOR, BG_COLOR, 590, 385, 134, 64, e -> { new Login().display(); dispose(); });
+        createLabel("Personnel Details", TITLE_FONT, 29, 11, 394, 58);
+        createNavButton("Back to Dashboard",WarManagement.class, 33, 383, 202, 73);
+        createNavButton("Log out", Login.class, 590, 385, 134, 64);
 
-        JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setBounds(39, 79, 697, 274);
-        contentPane.add(scrollPane);
-
-        personnelTable = new JTable();
-        personnelTable.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
-        scrollPane.setViewportView(personnelTable);
-
-        model = new DefaultTableModel(
-            new Object[][] {},
-            new String[] {"Personnel ID","First Name","Last Name","Post","Unit ID","Role","Status","contact_information"}
-        );
-        personnelTable.setModel(model);
-        personnelTable.setForeground(new Color(255, 255, 255));
-        personnelTable.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 10));
-        personnelTable.setBackground(new Color(0, 0, 0));
-
+        // Initialize table data
+        personnelData = FXCollections.observableArrayList();
+        
+        // Create TableView
+        personnelTable = new TableView<>(personnelData);
+        personnelTable.setLayoutX(39);
+        personnelTable.setLayoutY(79);
+        personnelTable.setPrefWidth(697);
+        personnelTable.setPrefHeight(274);
+        
+        setupTableColumns();
+        rootPane.getChildren().add(personnelTable);
+        
         loadPersonnelData();
     }
-
-    private void loadPersonnelData() {
+    
+    private void setupTableColumns() {
+        TableColumn<PersonnelRecord, String> personnelIdCol = new TableColumn<>("Personnel ID");
+        personnelIdCol.setCellValueFactory(new PropertyValueFactory<>("personnelId"));
+        personnelIdCol.setPrefWidth(90);
+        
+        TableColumn<PersonnelRecord, String> firstNameCol = new TableColumn<>("First Name");
+        firstNameCol.setCellValueFactory(new PropertyValueFactory<>("firstName"));
+        firstNameCol.setPrefWidth(90);
+        
+        TableColumn<PersonnelRecord, String> lastNameCol = new TableColumn<>("Last Name");
+        lastNameCol.setCellValueFactory(new PropertyValueFactory<>("lastName"));
+        lastNameCol.setPrefWidth(90);
+        
+        TableColumn<PersonnelRecord, String> postCol = new TableColumn<>("Post");
+        postCol.setCellValueFactory(new PropertyValueFactory<>("post"));
+        postCol.setPrefWidth(80);
+        
+        TableColumn<PersonnelRecord, String> unitIdCol = new TableColumn<>("Unit ID");
+        unitIdCol.setCellValueFactory(new PropertyValueFactory<>("unitId"));
+        unitIdCol.setPrefWidth(70);
+        
+        TableColumn<PersonnelRecord, String> roleCol = new TableColumn<>("Role");
+        roleCol.setCellValueFactory(new PropertyValueFactory<>("role"));
+        roleCol.setPrefWidth(80);
+        
+        TableColumn<PersonnelRecord, String> statusCol = new TableColumn<>("Status");
+        statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
+        statusCol.setPrefWidth(70);
+        
+        TableColumn<PersonnelRecord, String> contactCol = new TableColumn<>("Contact Info");
+        contactCol.setCellValueFactory(new PropertyValueFactory<>("contactInformation"));
+        contactCol.setPrefWidth(117);
+        
+        personnelTable.getColumns().addAll(personnelIdCol, firstNameCol, lastNameCol, postCol, 
+                                          unitIdCol, roleCol, statusCol, contactCol);
+    }    private void loadPersonnelData() {
         try (Connection conn = DBUtil.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM Personnel")) {
@@ -73,15 +89,47 @@ public class Personnel_details extends AbstractDetailsFrame {
                 String unitId = rs.getString("Unit_Id");
                 String role = rs.getString("Role");
                 String status = rs.getString("Status");
-                String contact_information = rs.getString("contact_information");
+                String contactInformation = rs.getString("contact_information");
 
-                model.addRow(new Object[]{personnelId, firstName, lastName, post, unitId, role, status, contact_information});
+                personnelData.add(new PersonnelRecord(personnelId, firstName, lastName, post, 
+                                                    unitId, role, status, contactInformation));
             }
 
         } catch (SQLException e) {
             handleDatabaseError(e, "Database error");
         }
     }
-
-    // use inherited createLabel and createButton
+    
+    // Data model class for TableView
+    public static class PersonnelRecord {
+        private final String personnelId;
+        private final String firstName;
+        private final String lastName;
+        private final String post;
+        private final String unitId;
+        private final String role;
+        private final String status;
+        private final String contactInformation;
+        
+        public PersonnelRecord(String personnelId, String firstName, String lastName, String post,
+                             String unitId, String role, String status, String contactInformation) {
+            this.personnelId = personnelId;
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.post = post;
+            this.unitId = unitId;
+            this.role = role;
+            this.status = status;
+            this.contactInformation = contactInformation;
+        }
+        
+        public String getPersonnelId() { return personnelId; }
+        public String getFirstName() { return firstName; }
+        public String getLastName() { return lastName; }
+        public String getPost() { return post; }
+        public String getUnitId() { return unitId; }
+        public String getRole() { return role; }
+        public String getStatus() { return status; }
+        public String getContactInformation() { return contactInformation; }
+    }
 }

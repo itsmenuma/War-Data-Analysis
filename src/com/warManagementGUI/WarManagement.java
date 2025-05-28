@@ -1,39 +1,20 @@
 package com.warManagementGUI;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.io.Serial;
-import java.lang.reflect.InvocationTargetException;
-
-import javax.swing.JOptionPane;
-
 import com.warManagementGUI.Equipment.Equipment_details;
 import com.warManagementGUI.Mission.Mission_details;
 import com.warManagementGUI.Personnel.Login;
 import com.warManagementGUI.Supply.Supply_details;
 import com.warManagementGUI.Units.Units_Interface;
-import com.warManagementGUI.util.AbstractDetailsFrame;
+import com.warManagementGUI.util.AbstractDetailsStage;
 
-public class WarManagement extends AbstractDetailsFrame {
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        try {
-            new WarManagement().display();
-        } catch (Exception e) {
-            System.err.println("Database error: " + e.getMessage());
-            JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
+public class WarManagement extends AbstractDetailsStage {
+    
     public WarManagement() {
         super("WarAnalyze", 773, 529);
-
         createIconLabel("/pics/PI.jpg", 28, 40, 109, 109);
         createNavButton("Personnel", Login.class, 28, 173, 128, 23);
         createIconLabel("/pics/UI.png", 186, 47, 89, 101);
@@ -44,20 +25,7 @@ public class WarManagement extends AbstractDetailsFrame {
         createNavButton("Equipments", Equipment_details.class, 454, 173, 147, 23);
         createIconLabel("/pics/SI.png", 615, 47, 103, 101);
         createNavButton("Supplies", Supply_details.class, 609, 173, 109, 23);
-        createTextLabel("War Analysis Dashboard", new Font("Times New Roman", Font.BOLD | Font.ITALIC, 50), Color.WHITE, 55, 195, 651, 101);
+        createTextLabel("War Analysis Dashboard", Font.font("Times New Roman", FontWeight.BOLD, 50), Color.WHITE, 55, 195, 651, 101);
         createIconLabel("/pics/quote1.jpg", 150, 300, 450, 180); // Added quote1.jpg image to dashboard
-    }
-
-    private <T extends AbstractDetailsFrame> void createNavButton(String name, Class<T> cls, int x, int y, int w, int h) {
-        createButton(name, new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20), Color.WHITE, Color.BLACK, x, y, w, h, e -> {
-            try {
-                T frame = cls.getDeclaredConstructor().newInstance();
-                frame.display();
-                dispose();
-            } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
-                System.err.println("Database error: " + ex.getMessage());
-                JOptionPane.showMessageDialog(null, "Database error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
     }
 }

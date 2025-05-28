@@ -2,18 +2,18 @@ package com.warManagementGUI.DataAnalysis;
 
 import java.util.Map;
 
-import javax.swing.JFrame;
-
 import com.warManagementGUI.util.DBUtil;
+
+import javafx.stage.Stage;
 
 public class PersonnelBarChart extends AbstractBarChart {
 
-    public static JFrame showPersonnelStatusChart() {
+    public static Stage showPersonnelStatusChart() {
         Map<String, Integer> statusCount = DBUtil.getStatusCount("personnel");
         return showBarChart("Personnel by Status", statusCount);
     }
     
-    public static JFrame showPersonnelPostChart() {
+    public static Stage showPersonnelPostChart() {
         Map<String, Integer> postCount = DBUtil.getGroupCount("personnel", "post");
         return showBarChart("Personnel by Post", postCount);
     }

@@ -9,25 +9,33 @@
   <properties>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
-  </properties>
-  <dependencies>
+  </properties>  <dependencies>
     <!-- MySQL Connector -->
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
       <version>8.0.33</version>
     </dependency>
-    <!-- JFreeChart -->
+    
+    <!-- JavaFX Controls -->
     <dependency>
-      <groupId>org.jfree</groupId>
-      <artifactId>jfreechart</artifactId>
-      <version>1.0.19</version>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <version>21.0.1</version>
     </dependency>
-    <!-- JCommon (required by JFreeChart) -->
+    
+    <!-- JavaFX FXML -->
     <dependency>
-      <groupId>org.jfree</groupId>
-      <artifactId>jcommon</artifactId>
-      <version>1.0.23</version>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-fxml</artifactId>
+      <version>21.0.1</version>
+    </dependency>
+    
+    <!-- JavaFX Charts (replacing JFreeChart) -->
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-swing</artifactId>
+      <version>21.0.1</version>
     </dependency>
   </dependencies>
   <build>
@@ -53,14 +61,13 @@
           <target>${maven.compiler.target}</target>
         </configuration>
       </plugin>
+        <!-- JavaFX Maven Plugin -->
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>3.5.0</version>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-maven-plugin</artifactId>
+        <version>0.0.8</version>
         <configuration>
-          <!-- run on classpath instead of module-path -->
-          <classpathScope>compile</classpathScope>
-          <mainClass>com.warManagementGUI.WarManagement</mainClass>
+          <mainClass>com.warManagementGUI.WarManagementApp</mainClass>
         </configuration>
       </plugin>
     </plugins>

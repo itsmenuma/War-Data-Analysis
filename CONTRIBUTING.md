@@ -64,6 +64,11 @@ If you find a bug or have a feature request, please open an issue in the [Issues
 ## Coding Standards
 
 - Follow the [Java Code Conventions](https://www.oracle.com/java/technologies/javase/codeconventions-introduction.html).
+- For JavaFX:
+  - Use FXML for UI layout when possible
+  - Follow the MVC pattern (separate Model, View, and Controller)
+  - Use CSS for styling instead of inline styles
+  - Keep controllers lightweight
 - Use meaningful variable and method names.
 - Write comments to explain complex logic.
 - Ensure your code is formatted and linted.
