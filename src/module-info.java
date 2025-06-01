@@ -1,15 +1,7 @@
-/**
- * 
- */
-/**
- * 
- */
 module WarAnalysis {
-	requires java.desktop;
-	requires java.sql;
-	
-}
-module WarDataAnalysis {
+    requires java.base;
+    requires java.desktop;
+    requires java.sql;
     requires opencsv;
     requires org.jfree.chart;
     requires org.geotools;
