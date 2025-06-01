@@ -1,7 +1,8 @@
 module WarAnalysis {
-    requires java.base;
     requires java.desktop;
     requires java.sql;
+}
+module WarDataAnalysis {
     requires opencsv;
     requires org.jfree.chart;
     requires org.geotools;
