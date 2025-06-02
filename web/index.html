@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>War Data Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <style>
+        #map { height: 400px; }
+        body { font-family: 'Roboto', sans-serif; }
+        .chart-container { max-width: 600px; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <header class="bg-blue-900 text-white p-4">
+        <h1 class="text-2xl">War Data Analysis</h1>
+    </header>
+    <div class="flex">
+        <nav class="w-1/4 bg-gray-800 text-white p-4">
+            <ul>
+                <li><a href="#time-series" class="hover:underline">Time-Series Analysis</a></li>
+                <li><a href="#geospatial" class="hover:underline">Geospatial Analysis</a></li>
+                <li><a href="#sentiment" class="hover:underline">Sentiment Analysis</a></li>
+            </ul>
+        </nav>
+        <main class="w-3/4 p-4">
+            <section id="time-series" class="mb-8">
+                <h2 class="text-xl mb-4">Time-Series Analysis</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="text-lg">Conflict Frequency</h3>
+                        <img src="pics/conflict_frequency.png" alt="Conflict Frequency Chart" class="w-full">
+                    </div>
+                    <div>
+                        <h3 class="text-lg">Casualty Rates</h3>
+                        <img src="pics/casualty_rates.png" alt="Casualty Rates Chart" class="w-full">
+                    </div>
+                </div>
+            </section>
+            <section id="geospatial" class="mb-8">
+                <h2 class="text-xl mb-4">Geospatial Analysis</h2>
+                <div id="map" class="h-96"></div>
+            </section>
+            <section id="sentiment">
+                <h2 class="text-xl mb-4">Sentiment Analysis</h2>
+                <div class="chart-container">
+                    <h3 class="text-lg">Sentiment Distribution</h3>
+                    <canvas id="sentiment-chart"></canvas>
+                </div>
+            </section>
+        </main>
+    </div>
+    <footer class="bg-gray-900 text-white p-4 text-center">
+        <p>Powered by War-Data-Analysis | <a href="https://github.com/Satyamgupta2365/War-Data-Analysis" class="underline">GitHub</a></p>
+    </footer>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // Initialize Leaflet map
+        const map = L.map('map').setView([0, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Fetch conflict data
+        axios.get('pics/conflict_data.json')
+            .then(response => {
+                response.data.forEach(conflict => {
+                    L.marker([conflict.lat, conflict.lon])
+                        .addTo(map)
+                        .bindPopup(`Year: ${conflict.year}<br>Casualties: ${conflict.casualties}<br>Text: ${conflict.text}`);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading conflict data:', error);
+                // Fallback dummy data
+                const conflictData = [
+                    { year: 2018, lat: 34.5, lon: 69.1, casualties: 50, text: "Heavy fighting reported." },
+                    { year: 2018, lat: 36.2, lon: 68.8, casualties: 30, text: "Peace talks failed." },
+                    { year: 2019, lat: 33.1, lon: 70.2, casualties: 45, text: "Conflict escalates." },
+                    { year: 2019, lat: 35.4, lon: 69.5, casualties: 60, text: "Civilians affected." },
+                    { year: 2020, lat: 32.8, lon: 68.3, casualties: 25, text: "Ceasefire attempt." },
+                    { year: 2020, lat: 34.9, lon: 70.1, casualties: 80, text: "Violent clashes." },
+                    { year: 2021, lat: 36.7, lon: 69.8, casualties: 40, text: "War intensifies." },
+                    { year: 2021, lat: 33.5, lon: 68.9, casualties: 55, text: "Truce proposed." }
+                ];
+                conflictData.forEach(conflict => {
+                    L.marker([conflict.lat, conflict.lon])
+                        .addTo(map)
+                        .bindPopup(`Year: ${conflict.year}<br>Casualties: ${conflict.casualties}<br>Text: ${conflict.text}`);
+                });
+            });
+
+        // Fetch sentiment data
+        axios.get('pics/sentiment_analysis.json')
+            .then(response => {
+                const sentimentData = {
+                    labels: ['Positive', 'Neutral', 'Negative'],
+                    datasets: [{
+                        label: 'Sentiment Distribution',
+                        data: [
+                            response.data.sentiments.Positive,
+                            response.data.sentiments.Neutral,
+                            response.data.sentiments.Negative
+                        ],
+                        backgroundColor: ['#36A2EB', '#FFCE56', '#FF6384'],
+                        borderColor: ['#36A2EB', '#FFCE56', '#FF6384'],
+                        borderWidth: 1
+                    }]
+                };
+                new Chart(document.getElementById('sentiment-chart'), {
+                    type: 'bar',
+                    data: sentimentData,
+                    options: {
+                        scales: {
+                            y: { beginAtZero: true, title: { display: true, text: 'Count' } },
+                            x: { title: { display: true, text: 'Sentiment' } }
+                        },
+                        plugins: { title: { display: true, text: 'Sentiment Distribution' } }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error loading sentiment data:', error);
+                // Fallback dummy data
+                const sentimentData = {
+                    labels: ['Positive', 'Neutral', 'Negative'],
+                    datasets: [{
+                        label: 'Sentiment Distribution',
+                        data: [3, 2, 5],
+                        backgroundColor: ['#36A2EB', '#FFCE56', '#FF6384'],
+                        borderColor: ['#36A2EB', '#FFCE56', '#FF6384'],
+                        borderWidth: 1
+                    }]
+                };
+                new Chart(document.getElementById('sentiment-chart'), {
+                    type: 'bar',
+                    data: sentimentData,
+                    options: {
+                        scales: {
+                            y: { beginAtZero: true, title: { display: true, text: 'Count' } },
+                            x: { title: { display: true, text: 'Sentiment' } }
+                        },
+                        plugins: { title: { display: true, text: 'Sentiment Distribution' } }
+                    }
+                });
+            });
+    </script>
+</body>
+</html>
