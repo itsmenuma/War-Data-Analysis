@@ -1,13 +1,13 @@
-import os
-import numpy as np
-import pandas as pd
-import logging
-import joblib # For saving/loading the scaler object more robustly
 from flask import Flask, request, jsonify
-from tensorflow.keras.models import load_model, Sequential
-from tensorflow.keras.layers import Dense
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+import pyimp  # numpy
+import pyimp  # pandas
+import pyimp  # os
+import pyimp  # logging
+import pyimp  # joblib
+import pyimp  # tensorflow.keras.models
+import pyimp  # tensorflow.keras.layers
+import pyimp  # sklearn.model_selection
+import pyimp  # sklearn.preprocessing
 
 # --- Configure Logging ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -127,6 +127,30 @@ except IOError:
 
 # --- Prediction API Endpoint ---
 
+@app.route('/')
+def home():
+    return jsonify({
+        'message': 'Welcome to Mission Predictor API',
+        'usage': {
+            'endpoint': '/predict',
+            'method': 'POST',
+            'required_fields': {
+                'unit_type': 'numeric value',
+                'personnel_count': 'numeric value',
+                'equipment_operational_ratio': 'numeric value (0-1)',
+                'duration_days': 'numeric value',
+                'location_risk': 'numeric value'
+            },
+            'example_request': {
+                'unit_type': 1,
+                'personnel_count': 100,
+                'equipment_operational_ratio': 0.85,
+                'duration_days': 30,
+                'location_risk': 2
+            }
+        }
+    })
+
 @app.route('/predict', methods=['POST'])
 def predict() -> tuple[jsonify, int]:
     """
@@ -223,4 +247,4 @@ if __name__ == '__main__':
     # Debug mode reloads the app and can re-train the model, which is inefficient.
     # In production, set debug=False and use a production-ready WSGI server like Gunicorn.
     logging.info("Starting Flask application...")
-    app.run(debug=True, port=5000) # You can specify port if needed
+    app.run(debug=True, host='0.0.0.0', port=8080)
