@@ -23,8 +23,8 @@ def train_and_save_model():
     X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
     model = Sequential([
-        Dense(64, activation='relu', input_dim=X_train.shape[1]),
-        Dense(32, activation='relu'),
+        Dense(81, activation='relu', input_dim=X_train.shape[1]),
+        Dense(36, activation='relu'),
         Dense(1, activation='sigmoid')
     ])
 
