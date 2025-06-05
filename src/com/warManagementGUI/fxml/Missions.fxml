@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.warManagementGUI.controllers.MissionsController">
+   <top>
+      <VBox alignment="CENTER" styleClass="header">
+         <children>
+            <Label styleClass="form-title" text="Mission Management" />
+            <Label styleClass="subtitle" text="Plan, monitor, and manage military missions" />
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+      </VBox>
+   </top>   <center>
+      <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+         <content>
+            <HBox spacing="20.0" styleClass="spacing-large">
+               <children>
+                  <!-- Mission Form -->
+            <VBox spacing="15.0" styleClass="form-container">
+               <children>
+                  <Label styleClass="form-title" text="Mission Information" />
+                  <GridPane styleClass="grid-container">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="120.0" prefWidth="120.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="200.0" prefWidth="200.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="60.0" prefHeight="60.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Label styleClass="form-label" text="Mission ID:" />
+                        <TextField fx:id="missionIdField" styleClass="text-field" GridPane.columnIndex="1" />
+                        <Label styleClass="form-label" text="Mission Name:" GridPane.rowIndex="1" />
+                        <TextField fx:id="missionNameField" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <Label styleClass="form-label" text="Objective:" GridPane.rowIndex="2" />
+                        <TextArea fx:id="objectiveField" prefRowCount="3" styleClass="text-area" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Label styleClass="form-label" text="Start Date:" GridPane.rowIndex="3" />
+                        <TextField fx:id="startDateField" promptText="YYYY-MM-DD" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <Label styleClass="form-label" text="End Date:" GridPane.rowIndex="4" />
+                        <TextField fx:id="endDateField" promptText="YYYY-MM-DD" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <Label styleClass="form-label" text="Status:" GridPane.rowIndex="5" />
+                        <ComboBox fx:id="statusComboBox" prefWidth="200.0" styleClass="combo-box" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <Label styleClass="form-label" text="Location ID:" GridPane.rowIndex="6" />
+                        <TextField fx:id="locationIdField" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                     </children>
+                  </GridPane>
+                  <!-- Action Buttons -->
+                  <HBox alignment="CENTER" spacing="10.0" styleClass="spacing-small">
+                     <children>
+                        <Button fx:id="addBtn" mnemonicParsing="false" onAction="#addMission" styleClass="action-button" text="Add" />
+                        <Button fx:id="updateBtn" mnemonicParsing="false" onAction="#updateMission" styleClass="action-button" text="Update" />
+                        <Button fx:id="deleteBtn" mnemonicParsing="false" onAction="#deleteMission" styleClass="danger-button" text="Delete" />
+                        <Button fx:id="clearBtn" mnemonicParsing="false" onAction="#clearFields" styleClass="warning-button" text="Clear" />
+                     </children>
+                  </HBox>
+                  <!-- Analytics Button -->
+                  <Button fx:id="analyticsBtn" mnemonicParsing="false" onAction="#showAnalytics" styleClass="secondary-button" text="📊 Show Mission Analytics" />
+               </children>
+            </VBox>
+            <!-- Mission Table -->
+            <VBox spacing="15.0" styleClass="spacing-medium" VBox.vgrow="ALWAYS">
+               <children>
+                  <Label styleClass="form-title" text="Mission Records" />
+                  <TableView fx:id="missionsTable" styleClass="table-view" VBox.vgrow="ALWAYS">
+                    <columns>
+                      <TableColumn fx:id="missionIdCol" prefWidth="80.0" text="Mission ID" />
+                      <TableColumn fx:id="nameCol" prefWidth="120.0" text="Name" />
+                      <TableColumn fx:id="objectiveCol" prefWidth="150.0" text="Objective" />
+                      <TableColumn fx:id="startDateCol" prefWidth="100.0" text="Start Date" />
+                      <TableColumn fx:id="endDateCol" prefWidth="100.0" text="End Date" />
+                      <TableColumn fx:id="statusCol" prefWidth="90.0" text="Status" />
+                      <TableColumn fx:id="locationIdCol" prefWidth="90.0" text="Location ID" />
+                    </columns>
+                  </TableView>
+               </children>
+            </VBox>
+         </children>         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+      </HBox>
+         </content>
+      </ScrollPane>
+   </center>
+   <bottom>
+      <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="footer">
+         <children>
+            <Button fx:id="backBtn" mnemonicParsing="false" onAction="#goBack" styleClass="secondary-button" text="← Back to Dashboard" />
+            <Button fx:id="refreshBtn" mnemonicParsing="false" onAction="#refreshData" styleClass="primary-button" text="🔄 Refresh" />
+            <Button fx:id="exportBtn" mnemonicParsing="false" onAction="#exportData" styleClass="primary-button" text="📊 Export Data" />
+         </children>
+         <padding>
+            <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+         </padding>
+      </HBox>
+   </bottom>
+</BorderPane>
