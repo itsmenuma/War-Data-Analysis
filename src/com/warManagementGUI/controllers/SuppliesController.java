@@ -83,17 +83,13 @@ public class SuppliesController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Initialize status combo box
         statusComboBox.setItems(FXCollections.observableArrayList("Available", "In Use", "Out of Stock"));
         statusComboBox.setValue("Available");
 
-        // Set up table columns
         setupTableColumns();
 
-        // Load supply data
         loadSupplyData();
 
-        // Set up table selection listener
         setupTableSelectionListener();
     }
 
@@ -151,12 +147,12 @@ public class SuppliesController implements Initializable {
         try (Connection conn = DBUtil.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, Integer.valueOf(supplyIdField.getText().trim()));
+            pstmt.setInt(1, Integer.parseInt(supplyIdField.getText().trim()));
             pstmt.setString(2, supplyNameField.getText().trim());
             pstmt.setString(3, typeField.getText().trim());
-            pstmt.setInt(4, Integer.valueOf(quantityField.getText().trim()));
-            pstmt.setInt(5, Integer.valueOf(unitIdField.getText().trim()));
-            pstmt.setInt(6, Integer.valueOf(locationIdField.getText().trim()));
+            pstmt.setInt(4, Integer.parseInt(quantityField.getText().trim()));
+            pstmt.setInt(5, Integer.parseInt(unitIdField.getText().trim()));
+            pstmt.setInt(6, Integer.parseInt(locationIdField.getText().trim()));
             pstmt.setString(7, statusComboBox.getValue());
 
             int rowsAffected = pstmt.executeUpdate();
@@ -193,11 +189,11 @@ public class SuppliesController implements Initializable {
 
             pstmt.setString(1, supplyNameField.getText().trim());
             pstmt.setString(2, typeField.getText().trim());
-            pstmt.setInt(3, Integer.valueOf(quantityField.getText().trim()));
-            pstmt.setInt(4, Integer.valueOf(unitIdField.getText().trim()));
-            pstmt.setInt(5, Integer.valueOf(locationIdField.getText().trim()));
+            pstmt.setInt(3, Integer.parseInt(quantityField.getText().trim()));
+            pstmt.setInt(4, Integer.parseInt(unitIdField.getText().trim()));
+            pstmt.setInt(5, Integer.parseInt(locationIdField.getText().trim()));
             pstmt.setString(6, statusComboBox.getValue());
-            pstmt.setInt(7, Integer.valueOf(supplyIdField.getText().trim()));
+            pstmt.setInt(7, Integer.parseInt(supplyIdField.getText().trim()));
 
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
@@ -257,7 +253,7 @@ public class SuppliesController implements Initializable {
     @FXML
     private void showAnalytics() {
         try {
-            // Show Supply analytics chart
+
             com.warManagementGUI.DataAnalysis.SuppliesBarChart.showSupplyStatusChart();
         } catch (Exception e) {
             showErrorAlert("Error showing analytics: " + e.getMessage());
@@ -400,7 +396,6 @@ public class SuppliesController implements Initializable {
 
     @FXML
     private void exportData() {
-        // This could be implemented to export data to CSV or other formats
         showInfoAlert("Export functionality will be available soon!");
     }
 

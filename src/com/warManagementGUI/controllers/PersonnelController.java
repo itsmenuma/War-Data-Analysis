@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
+import com.warManagementGUI.DataAnalysis.PersonnelBarChart;
 import com.warManagementGUI.util.DBUtil;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -133,9 +134,8 @@ public class PersonnelController implements Initializable {
     @FXML
     private void addPersonnel() {
         if (validateFields()) {
-            try (Connection conn = DBUtil.getConnection()) {
-                String sql = "INSERT INTO personnel (personnel_id, first_name, last_name, post, unit_id, role, contact_information, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-                PreparedStatement stmt = conn.prepareStatement(sql);
+            String sql = "INSERT INTO personnel (personnel_id, first_name, last_name, post, unit_id, role, contact_information, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            try (Connection conn = DBUtil.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql);) {
 
                 stmt.setString(1, personnelIdField.getText());
                 stmt.setString(2, firstNameField.getText());
@@ -167,9 +167,9 @@ public class PersonnelController implements Initializable {
         }
 
         if (validateFields()) {
-            try (Connection conn = DBUtil.getConnection()) {
-                String sql = "UPDATE personnel SET first_name=?, last_name=?, post=?, unit_id=?, role=?, contact_information=?, status=? WHERE personnel_id=?";
-                PreparedStatement stmt = conn.prepareStatement(sql);
+            String sql = "UPDATE personnel SET first_name=?, last_name=?, post=?, unit_id=?, role=?, contact_information=?, status=? WHERE personnel_id=?";
+            try (Connection conn = DBUtil.getConnection();
+                    PreparedStatement stmt = conn.prepareStatement(sql);) {
 
                 stmt.setString(1, firstNameField.getText());
                 stmt.setString(2, lastNameField.getText());
@@ -238,8 +238,11 @@ public class PersonnelController implements Initializable {
 
     @FXML
     private void showAnalytics() {
-        loadPersonnelData();
-        showSuccess("Data refreshed successfully!");
+        try {
+            PersonnelBarChart.showPersonnelStatusChart();
+        } catch (Exception e) {
+            showError("Error showing analytics: " + e.getMessage());
+        }
     }
 
     @FXML
@@ -265,10 +268,10 @@ public class PersonnelController implements Initializable {
 
     private void loadPersonnelData() {
         personnelData.clear();
-        try (Connection conn = DBUtil.getConnection()) {
-            String sql = "SELECT * FROM personnel";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
+        String sql = "SELECT * FROM personnel";
+        try (Connection conn = DBUtil.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 personnelData.add(new PersonnelRecord(
