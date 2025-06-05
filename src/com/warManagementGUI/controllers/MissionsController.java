@@ -6,6 +6,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ResourceBundle;
 
 import com.warManagementGUI.Mission.MissionRecord;
@@ -25,6 +28,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
@@ -42,9 +46,9 @@ public class MissionsController implements Initializable {
     @FXML
     private TextArea objectiveField;
     @FXML
-    private TextField startDateField;
+    private DatePicker startDatePicker;
     @FXML
-    private TextField endDateField;
+    private DatePicker endDatePicker;
     @FXML
     private ComboBox<String> statusComboBox;
     @FXML
@@ -114,14 +118,35 @@ public class MissionsController implements Initializable {
                         populateFields(newValue);
                     }
                 });
-    }
+    }    // Date formatter for parsing and formatting dates
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private void populateFields(MissionRecord mission) {
         missionIdField.setText(mission.getMissionId());
         missionNameField.setText(mission.getName());
         objectiveField.setText(mission.getObjective());
-        startDateField.setText(mission.getStartDate());
-        endDateField.setText(mission.getEndDate());
+        
+        // Parse date strings to LocalDate objects for DatePicker
+        try {
+            if (mission.getStartDate() != null && !mission.getStartDate().isEmpty()) {
+                LocalDate startDate = LocalDate.parse(mission.getStartDate(), dateFormatter);
+                startDatePicker.setValue(startDate);
+            } else {
+                startDatePicker.setValue(null);
+            }
+            
+            if (mission.getEndDate() != null && !mission.getEndDate().isEmpty()) {
+                LocalDate endDate = LocalDate.parse(mission.getEndDate(), dateFormatter);
+                endDatePicker.setValue(endDate);
+            } else {
+                endDatePicker.setValue(null);
+            }
+        } catch (DateTimeParseException e) {
+            System.err.println("Error parsing date: " + e.getMessage());
+            startDatePicker.setValue(null);
+            endDatePicker.setValue(null);
+        }
+        
         statusComboBox.setValue(mission.getStatus());
         locationIdField.setText(mission.getLocationId());
     }
@@ -131,14 +156,12 @@ public class MissionsController implements Initializable {
         missionIdField.clear();
         missionNameField.clear();
         objectiveField.clear();
-        startDateField.clear();
-        endDateField.clear();
+        startDatePicker.setValue(null);
+        endDatePicker.setValue(null);
         statusComboBox.setValue("planned");
         locationIdField.clear();
         missionsTable.getSelectionModel().clearSelection();
-    }
-
-    @FXML
+    }    @FXML
     private void addMission() {
         if (!validateFields()) {
             return;
@@ -152,8 +175,15 @@ public class MissionsController implements Initializable {
             pstmt.setString(1, missionIdField.getText().trim());
             pstmt.setString(2, missionNameField.getText().trim());
             pstmt.setString(3, objectiveField.getText().trim());
-            pstmt.setString(4, startDateField.getText().trim());
-            pstmt.setString(5, endDateField.getText().trim());
+            
+            // Format dates to strings for database
+            String startDateStr = startDatePicker.getValue() != null ? 
+                    startDatePicker.getValue().format(dateFormatter) : "";
+            String endDateStr = endDatePicker.getValue() != null ? 
+                    endDatePicker.getValue().format(dateFormatter) : "";
+                    
+            pstmt.setString(4, startDateStr);
+            pstmt.setString(5, endDateStr);
             pstmt.setString(6, statusComboBox.getValue());
             pstmt.setString(7, locationIdField.getText().trim());
 
@@ -170,9 +200,7 @@ public class MissionsController implements Initializable {
             showErrorAlert("Database error: " + e.getMessage());
             e.printStackTrace();
         }
-    }
-
-    @FXML
+    }    @FXML
     private void updateMission() {
         if (missionIdField.getText().trim().isEmpty()) {
             showWarningAlert("Please select a mission to update or enter a Mission ID.");
@@ -190,8 +218,15 @@ public class MissionsController implements Initializable {
 
             pstmt.setString(1, missionNameField.getText().trim());
             pstmt.setString(2, objectiveField.getText().trim());
-            pstmt.setString(3, startDateField.getText().trim());
-            pstmt.setString(4, endDateField.getText().trim());
+            
+            // Format dates to strings for database
+            String startDateStr = startDatePicker.getValue() != null ? 
+                    startDatePicker.getValue().format(dateFormatter) : "";
+            String endDateStr = endDatePicker.getValue() != null ? 
+                    endDatePicker.getValue().format(dateFormatter) : "";
+                    
+            pstmt.setString(3, startDateStr);
+            pstmt.setString(4, endDateStr);
             pstmt.setString(5, statusComboBox.getValue());
             pstmt.setString(6, locationIdField.getText().trim());
             pstmt.setString(7, missionIdField.getText().trim());
@@ -302,9 +337,7 @@ public class MissionsController implements Initializable {
             showErrorAlert("Error loading mission data: " + e.getMessage());
             e.printStackTrace();
         }
-    }
-
-    private boolean validateFields() {
+    }    private boolean validateFields() {
         StringBuilder errors = new StringBuilder();
 
         if (missionIdField.getText().trim().isEmpty()) {
@@ -319,7 +352,7 @@ public class MissionsController implements Initializable {
             errors.append("Objective is required.\n");
         }
 
-        if (startDateField.getText().trim().isEmpty()) {
+        if (startDatePicker.getValue() == null) {
             errors.append("Start Date is required.\n");
         }
 

@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -57,11 +58,10 @@
                         <Label styleClass="form-label" text="Mission Name:" GridPane.rowIndex="1" />
                         <TextField fx:id="missionNameField" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <Label styleClass="form-label" text="Objective:" GridPane.rowIndex="2" />
-                        <TextArea fx:id="objectiveField" prefRowCount="3" styleClass="text-area" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <Label styleClass="form-label" text="Start Date:" GridPane.rowIndex="3" />
-                        <TextField fx:id="startDateField" promptText="YYYY-MM-DD" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <TextArea fx:id="objectiveField" prefRowCount="3" styleClass="text-area" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />                        <Label styleClass="form-label" text="Start Date:" GridPane.rowIndex="3" />
+                        <DatePicker fx:id="startDatePicker" styleClass="date-picker" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                         <Label styleClass="form-label" text="End Date:" GridPane.rowIndex="4" />
-                        <TextField fx:id="endDateField" promptText="YYYY-MM-DD" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <DatePicker fx:id="endDatePicker" styleClass="date-picker" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                         <Label styleClass="form-label" text="Status:" GridPane.rowIndex="5" />
                         <ComboBox fx:id="statusComboBox" prefWidth="200.0" styleClass="combo-box" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                         <Label styleClass="form-label" text="Location ID:" GridPane.rowIndex="6" />
