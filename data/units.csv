@@ -1,0 +1,4 @@
+unit_id,name,type,location_id,status
+U001,Alpha Team,Emergency,L001,Active
+U002,Beta Team,Transport,L002,Active
+U003,Gamma Team,Support,L003,Standby
