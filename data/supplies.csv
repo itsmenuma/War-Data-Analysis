@@ -1,0 +1,4 @@
+supply_id,name,quantity,unit_id,status
+S001,Bandages,500,U001,In Stock
+S002,Medication Kit,50,U002,Low Stock
+S003,Oxygen Tanks,20,U003,In Stock

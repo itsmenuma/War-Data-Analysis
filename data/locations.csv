@@ -1,0 +1,4 @@
+location_id,name,address,coordinates,type
+L001,Central Hospital,123 Main St,"40.7128,-74.0060",Hospital
+L002,North Station,456 Oak Ave,"40.7589,-73.9851",Station
+L003,South Base,789 Pine Rd,"40.7549,-73.9840",Base

@@ -1,0 +1,4 @@
+equipment_id,name,type,unit_id,status
+E001,Ambulance 1,Vehicle,U001,Operational
+E002,Defibrillator,Medical,U001,Active
+E003,Stretcher,Medical,U002,Active
