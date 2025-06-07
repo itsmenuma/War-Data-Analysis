@@ -30,7 +30,7 @@ import javafx.stage.Stage;
 /**
  * Controller for Units Management interface
  */
-public class UnitsController implements Initializable {
+public class UnitsController extends BaseController implements Initializable {
 
     @FXML
     private TextField unitIdField;
@@ -77,6 +77,9 @@ public class UnitsController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Initialize theme functionality
+        initializeTheme();
+
         setupUnitTypeComboBox();
         setupTableColumns();
         setupTableSelection();
@@ -233,11 +236,10 @@ public class UnitsController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Dashboard.fxml"));
             Parent root = loader.load();
-
             Stage stage = (Stage) backBtn.getScene().getWindow();
             Scene scene = new Scene(root);
-            scene.getStylesheets()
-                    .add(getClass().getResource("/com/warManagementGUI/css/application.css").toExternalForm());
+            // Apply the current theme instead of always using light theme
+            themeManager.applyThemeToScene(scene);
             stage.setScene(scene);
         } catch (IOException e) {
             showError("Error navigating back: " + e.getMessage());

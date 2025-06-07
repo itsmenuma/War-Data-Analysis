@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import com.warManagementGUI.util.ThemeManager;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
@@ -23,7 +25,7 @@ import javafx.util.Duration;
  * Dashboard Controller for the War Data Analysis System
  * Manages the main navigation and dashboard functionality
  */
-public class DashboardController implements Initializable {
+public class DashboardController extends BaseController implements Initializable {
 
     @FXML
     private Label titleLabel;
@@ -39,7 +41,6 @@ public class DashboardController implements Initializable {
     private Button suppliesBtn;
     @FXML
     private Button analyticsBtn;
-
     @FXML
     private ImageView personnelIcon;
     @FXML
@@ -57,6 +58,7 @@ public class DashboardController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         loadIcons();
         setupAnimations();
+        initializeTheme();
     }
 
     /**
@@ -182,10 +184,10 @@ public class DashboardController implements Initializable {
 
         currentStage.setMinWidth(1200);
         currentStage.setMinHeight(800);
-
         Scene scene = new Scene(root, 1200, 800);
-        scene.getStylesheets()
-                .add(getClass().getResource("/com/warManagementGUI/css/application.css").toExternalForm());
+
+        // Apply the current theme instead of always using light theme
+        ThemeManager.getInstance().applyThemeToScene(scene);
 
         currentStage.setScene(scene);
 

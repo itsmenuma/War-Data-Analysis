@@ -3,6 +3,7 @@ package com.warManagementGUI.controllers;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,6 +11,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
 import com.warManagementGUI.DataAnalysis.EquipmentBarChart;
 import com.warManagementGUI.DataAnalysis.MissionsBarChart;
@@ -21,6 +23,7 @@ import com.warManagementGUI.util.DBUtil;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -28,7 +31,7 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-public class AnalyticsController {
+public class AnalyticsController extends BaseController implements Initializable {
 
     @FXML
     private Button personnelAnalyticsBtn;
@@ -49,9 +52,10 @@ public class AnalyticsController {
     @FXML
     private Button backBtn;
 
-    @FXML
-    private void initialize() {
-
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        // Initialize theme functionality
+        initializeTheme();
         Platform.runLater(() -> {
             refreshData();
         });
@@ -175,12 +179,11 @@ public class AnalyticsController {
     @FXML
     private void goBack() {
         try {
-
             Stage currentStage = (Stage) backBtn.getScene().getWindow();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Dashboard.fxml"));
             Scene scene = new Scene(loader.load());
-            scene.getStylesheets()
-                    .add(getClass().getResource("/com/warManagementGUI/css/application.css").toExternalForm());
+            // Apply the current theme instead of always using light theme
+            themeManager.applyThemeToScene(scene);
             currentStage.setScene(scene);
             currentStage.setTitle("War Management System - Dashboard");
         } catch (IOException e) {
