@@ -837,34 +837,6 @@
   -fx-vgap: 10;
 }
 
-/* ===== UTILITY CLASSES ===== */
-.spacing-small {
-  -fx-spacing: 5;
-}
-
-.spacing-medium {
-  -fx-spacing: 10;
-}
-
-.spacing-large {
-  -fx-spacing: 20;
-}
-
-.padding-small {
-  -fx-padding: 5;
-  padding: 5;
-}
-
-.padding-medium {
-  -fx-padding: 10;
-  padding: 10;
-}
-
-.padding-large {
-  -fx-padding: 20;
-  padding: 20;
-}
-
 .margin-small {
   -fx-margin: 5;
   margin: 5;

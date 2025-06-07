@@ -300,8 +300,8 @@
 }
 
 .primary-button:pressed {
-  -fx-background-color: #004085;
-  background-color: #004085;
+  -fx-background-color: #008528;
+  background-color: #008528;
 }
 
 .secondary-button {
@@ -358,8 +358,8 @@
 }
 
 .action-button {
-  -fx-background-color: #17a2b8;
-  background-color: #17a2b8;
+  -fx-background-color: #17b845;
+  background-color: #17b845;
   -fx-text-fill: white;
   -fx-font-size: 12px;
   font-size: 12px;
