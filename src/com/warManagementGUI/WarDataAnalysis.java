@@ -1,13 +1,17 @@
-package DataAnalysis;
+package com.warManagementGUI;
 
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvValidationException;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtils;
-import org.jfree.chart.JFreeChart;
-import org.jfree.data.time.TimeSeries;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.time.Year;
+import java.awt.Color;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.stream.Collectors;
+
 import org.geotools.data.DataUtilities;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -18,18 +22,25 @@ import org.geotools.map.MapContent;
 import org.geotools.styling.SLD;
 import org.geotools.styling.Style;
 import org.geotools.swing.JMapFrame;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartUtils;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.time.Year;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import edu.stanford.nlp.pipeline.*;
-import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.sentiment.SentimentCoreAnnotations;
 
-import java.io.*;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
+
+import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.sentiment.SentimentCoreAnnotations;
 
 public class WarDataAnalysis {
     static class ConflictRecord {
@@ -72,8 +83,7 @@ public class WarDataAnalysis {
                         Double.parseDouble(line[1]),
                         Double.parseDouble(line[2]),
                         Integer.parseInt(line[3]),
-                        line[4]
-                ));
+                        line[4]));
             }
         }
         return records;
@@ -121,7 +131,7 @@ public class WarDataAnalysis {
 
         MapContent map = new MapContent();
         map.setTitle("Conflict Locations");
-        Style style = SLD.createPointStyle("Circle", null, null, null, 5.0f);
+        Style style = SLD.createPointStyle("Circle", Color.RED, Color.BLACK, 0.5f, 5.0f);
         Layer layer = new FeatureLayer(DataUtilities.collection(features), style);
         map.addLayer(layer);
         JMapFrame.showMap(map);
@@ -173,7 +183,8 @@ public class WarDataAnalysis {
                 ConflictRecord r = records.get(i);
                 writer.print(String.format("{\"year\":%d,\"lat\":%.1f,\"lon\":%.1f,\"casualties\":%d,\"text\":\"%s\"}",
                         r.year, r.latitude, r.longitude, r.casualties, r.text.replace("\"", "\\\"")));
-                if (i < records.size() - 1) writer.print(",");
+                if (i < records.size() - 1)
+                    writer.print(",");
                 writer.println();
             }
             writer.println("]");

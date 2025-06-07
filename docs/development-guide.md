@@ -16,7 +16,7 @@ warManagement/
 │   │       ├── Supply/            # Supply management
 │   │       ├── Units/             # Units management
 │   │       ├── util/              # Utilities and helpers
-│   │       ├── WarManagement.java # Controller class 
+│   │       ├── WarManagement.java # Controller class
 │   │       └── WarManagementApp.java # JavaFX Application main class
 │   └── pics/                      # Images and icons
 ├── mission_predictor/             # Python-based mission prediction
@@ -62,7 +62,7 @@ We recommend using IntelliJ IDEA or Eclipse for JavaFX development.
 
 - Follow standard Java naming conventions:
   - Classes: PascalCase (e.g., `PersonnelDetails`)
-  - Methods and variables: camelCase (e.g., `getPersonnelDetails`) 
+  - Methods and variables: camelCase (e.g., `getPersonnelDetails`)
   - Constants: UPPER_SNAKE_CASE (e.g., `MAX_PERSONNEL_COUNT`)
   - FXML files: PascalCase matching controller class names (e.g., `PersonnelView.fxml`)
 - Include JavaDoc comments for all public methods
