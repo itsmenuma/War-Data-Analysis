@@ -21,7 +21,7 @@ public class ThemeManager {
     private static final Color DARK_CARD_BG = Color.rgb(52, 58, 64);
     private static final Color DARK_BUTTON_BG = Color.rgb(0, 123, 255);
 
-    // Light theme colors (original)
+    // Light theme colors
     private static final Color LIGHT_BG_COLOR = Color.rgb(0, 64, 64);
     private static final Color LIGHT_TEXT_COLOR = Color.WHITE;
     private static final Color LIGHT_CARD_BG = Color.WHITE;
@@ -55,7 +55,6 @@ public class ThemeManager {
         prefs.putBoolean("darkMode", darkMode);
     }
 
-    // Colors for legacy JavaFX components
     public Color getBackgroundColor() {
         return isDarkMode ? DARK_BG_COLOR : LIGHT_BG_COLOR;
     }
@@ -82,7 +81,6 @@ public class ThemeManager {
         pane.setStyle("-fx-background-color: " + bgColorString + ";");
     }
 
-    // Apply theme to modern FXML-based UI
     public void applyThemeToScene(Scene scene) {
         scene.getStylesheets().clear();
         if (isDarkMode) {

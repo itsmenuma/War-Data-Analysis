@@ -83,7 +83,7 @@ public class SuppliesController extends BaseController implements Initializable 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Initialize theme functionality
+
         initializeTheme();
 
         statusComboBox.setItems(FXCollections.observableArrayList("Available", "In Use", "Out of Stock"));
@@ -270,7 +270,7 @@ public class SuppliesController extends BaseController implements Initializable 
             Parent root = loader.load();
             Stage stage = (Stage) backBtn.getScene().getWindow();
             Scene scene = new Scene(root);
-            // Apply the current theme instead of always using light theme
+
             themeManager.applyThemeToScene(scene);
             stage.setScene(scene);
 

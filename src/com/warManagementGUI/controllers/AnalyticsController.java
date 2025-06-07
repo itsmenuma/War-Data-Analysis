@@ -54,7 +54,7 @@ public class AnalyticsController extends BaseController implements Initializable
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Initialize theme functionality
+
         initializeTheme();
         Platform.runLater(() -> {
             refreshData();
@@ -182,7 +182,7 @@ public class AnalyticsController extends BaseController implements Initializable
             Stage currentStage = (Stage) backBtn.getScene().getWindow();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Dashboard.fxml"));
             Scene scene = new Scene(loader.load());
-            // Apply the current theme instead of always using light theme
+
             themeManager.applyThemeToScene(scene);
             currentStage.setScene(scene);
             currentStage.setTitle("War Management System - Dashboard");

@@ -88,7 +88,7 @@ public class MissionsController extends BaseController implements Initializable 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Initialize theme functionality
+
         initializeTheme();
 
         statusComboBox.setItems(FXCollections.observableArrayList("planned", "ongoing", "completed"));
@@ -120,7 +120,7 @@ public class MissionsController extends BaseController implements Initializable 
                         populateFields(newValue);
                     }
                 });
-    } // Date formatter for parsing and formatting dates
+    }
 
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -129,7 +129,6 @@ public class MissionsController extends BaseController implements Initializable 
         missionNameField.setText(mission.getName());
         objectiveField.setText(mission.getObjective());
 
-        // Parse date strings to LocalDate objects for DatePicker
         try {
             if (mission.getStartDate() != null && !mission.getStartDate().isEmpty()) {
                 LocalDate startDate = LocalDate.parse(mission.getStartDate(), dateFormatter);
@@ -181,7 +180,6 @@ public class MissionsController extends BaseController implements Initializable 
             pstmt.setString(2, missionNameField.getText().trim());
             pstmt.setString(3, objectiveField.getText().trim());
 
-            // Format dates to strings for database
             String startDateStr = startDatePicker.getValue() != null ? startDatePicker.getValue().format(dateFormatter)
                     : "";
             String endDateStr = endDatePicker.getValue() != null ? endDatePicker.getValue().format(dateFormatter) : "";
@@ -225,7 +223,6 @@ public class MissionsController extends BaseController implements Initializable 
             pstmt.setString(1, missionNameField.getText().trim());
             pstmt.setString(2, objectiveField.getText().trim());
 
-            // Format dates to strings for database
             String startDateStr = startDatePicker.getValue() != null ? startDatePicker.getValue().format(dateFormatter)
                     : "";
             String endDateStr = endDatePicker.getValue() != null ? endDatePicker.getValue().format(dateFormatter) : "";
@@ -307,7 +304,7 @@ public class MissionsController extends BaseController implements Initializable 
             Parent root = loader.load();
             Stage stage = (Stage) backBtn.getScene().getWindow();
             Scene scene = new Scene(root);
-            // Apply the current theme instead of always using light theme
+
             themeManager.applyThemeToScene(scene);
             stage.setScene(scene);
 
