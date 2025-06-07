@@ -1,9 +1,10 @@
 package com.warManagementGUI.util;
 
+import java.util.prefs.Preferences;
+
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import java.util.prefs.Preferences;
 
 /**
  * ThemeManager handles light and dark mode themes for the War Data Analysis
@@ -12,7 +13,7 @@ import java.util.prefs.Preferences;
 public class ThemeManager {
     private static ThemeManager instance;
     private boolean isDarkMode = false;
-    private Preferences prefs;
+    private final Preferences prefs;
 
     // Dark theme colors
     private static final Color DARK_BG_COLOR = Color.rgb(33, 37, 41);
@@ -32,8 +33,10 @@ public class ThemeManager {
     }
 
     public static ThemeManager getInstance() {
-        if (instance == null) {
-            instance = new ThemeManager();
+        synchronized (ThemeManager.class) {
+            if (instance == null) {
+                instance = new ThemeManager();
+            }
         }
         return instance;
     }
@@ -83,11 +86,15 @@ public class ThemeManager {
     public void applyThemeToScene(Scene scene) {
         scene.getStylesheets().clear();
         if (isDarkMode) {
-            scene.getStylesheets()
-                    .add(getClass().getResource("/com/warManagementGUI/css/dark-theme.css").toExternalForm());
+            var darkThemeUrl = getClass().getResource("/com/warManagementGUI/css/dark-theme.css");
+            if (darkThemeUrl != null) {
+                scene.getStylesheets().add(darkThemeUrl.toExternalForm());
+            }
         } else {
-            scene.getStylesheets()
-                    .add(getClass().getResource("/com/warManagementGUI/css/application.css").toExternalForm());
+            var lightThemeUrl = getClass().getResource("/com/warManagementGUI/css/application.css");
+            if (lightThemeUrl != null) {
+                scene.getStylesheets().add(lightThemeUrl.toExternalForm());
+            }
         }
     }
 
