@@ -186,7 +186,6 @@ public class DashboardController extends BaseController implements Initializable
         currentStage.setMinHeight(800);
         Scene scene = new Scene(root, 1200, 800);
 
-        // Apply the current theme instead of always using light theme
         ThemeManager.getInstance().applyThemeToScene(scene);
 
         currentStage.setScene(scene);

@@ -78,23 +78,19 @@ public class EquipmentController extends BaseController implements Initializable
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Initialize theme functionality
+
         initializeTheme();
 
-        // Initialize combo boxes
         typeComboBox.setItems(FXCollections.observableArrayList("Weapon", "Vehicle", "Electronic", "Other"));
         typeComboBox.setValue("Weapon");
 
         statusComboBox.setItems(FXCollections.observableArrayList("Operational", "Maintenance", "Decommissioned"));
         statusComboBox.setValue("Operational");
 
-        // Set up table columns
         setupTableColumns();
 
-        // Load equipment data
         loadEquipmentData();
 
-        // Set up table selection listener
         setupTableSelectionListener();
     }
 
@@ -253,7 +249,7 @@ public class EquipmentController extends BaseController implements Initializable
     @FXML
     private void showAnalytics() {
         try {
-            // Show Equipment analytics chart
+
             com.warManagementGUI.DataAnalysis.EquipmentBarChart.showEquipmentStatusChart();
         } catch (Exception e) {
             showErrorAlert("Error showing analytics: " + e.getMessage());
@@ -267,7 +263,7 @@ public class EquipmentController extends BaseController implements Initializable
             Parent root = loader.load();
             Stage stage = (Stage) backBtn.getScene().getWindow();
             Scene scene = new Scene(root);
-            // Apply the current theme instead of always using light theme
+
             themeManager.applyThemeToScene(scene);
             stage.setScene(scene);
         } catch (IOException e) {
@@ -283,7 +279,7 @@ public class EquipmentController extends BaseController implements Initializable
 
     @FXML
     private void exportData() {
-        // This could be implemented to export data to CSV or other formats
+
         showInfoAlert("Export functionality will be available soon!");
     }
 
@@ -388,7 +384,6 @@ public class EquipmentController extends BaseController implements Initializable
         alert.showAndWait();
     }
 
-    // Data model class for TableView
     public static class EquipmentRecord {
         private final Integer equipmentId;
         private final String name;
