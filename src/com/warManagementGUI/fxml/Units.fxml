@@ -14,11 +14,10 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.warManagementGUI.controllers.UnitsController">
+<BorderPane fx:id="mainBorderPane" styleClass="border-pane-main" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.warManagementGUI.controllers.UnitsController">
    <top>
       <VBox styleClass="header">
-         <children>
-            <HBox alignment="CENTER_LEFT" spacing="20.0">
+         <children>            <HBox alignment="CENTER_LEFT" spacing="20.0">
                <children>
                   <VBox alignment="CENTER_LEFT">
                      <children>
@@ -26,7 +25,18 @@
                         <Label styleClass="subtitle" text="Manage military units and organizational structure" />
                      </children>
                   </VBox>
-                  <Button fx:id="themeToggleBtn" mnemonicParsing="false" onAction="#toggleTheme" styleClass="theme-toggle-button" text="🌙 Dark Mode" HBox.hgrow="NEVER" />
+                  <HBox alignment="CENTER_RIGHT" spacing="15.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <VBox alignment="CENTER_RIGHT" spacing="5.0">
+                           <children>
+                              <Label fx:id="welcomeLabel" styleClass="user-info" text="Welcome, User" />
+                              <Label fx:id="userRoleLabel" styleClass="user-role" text="Role: Admin" />
+                           </children>
+                        </VBox>
+                        <Button fx:id="logoutBtn" mnemonicParsing="false" onAction="#handleLogout" styleClass="logout-button" text="Logout" />
+                        <Button fx:id="themeToggleBtn" mnemonicParsing="false" onAction="#toggleTheme" styleClass="theme-toggle-button" text="🌙 Dark Mode" />
+                     </children>
+                  </HBox>
                </children>
                <padding>
                   <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
@@ -35,11 +45,13 @@
          </children>
          <padding>
             <Insets bottom="40.0" left="20.0" right="20.0" top="10.0" />
-         </padding>
-      </VBox>
-   </top>
-   <center>
-      <HBox spacing="20.0" styleClass="spacing-large">
+         </padding>      </VBox>
+   </top>   <center>
+      <VBox maxHeight="600" prefHeight="600" VBox.vgrow="NEVER">
+         <children>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
+         <content>
+            <HBox spacing="20.0" styleClass="spacing-large">
          <children>
             <!-- Units Form -->
  <VBox spacing="15.0" styleClass="form-container">
@@ -96,11 +108,13 @@
                   </TableView>
                </children>
             </VBox>
-         </children>
-         <padding>
+         </children>         <padding>
             <Insets bottom="40.0" left="20.0" right="20.0" top="20.0" />
-         </padding>
-      </HBox>
+         </padding>      </HBox>
+         </content>
+      </ScrollPane>
+         </children>
+      </VBox>
    </center>
    <bottom>
       <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="footer">

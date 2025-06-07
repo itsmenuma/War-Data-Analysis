@@ -12,6 +12,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ResourceBundle;
 
 import com.warManagementGUI.Mission.MissionRecord;
+import com.warManagementGUI.models.Permission;
 import com.warManagementGUI.util.DBUtil;
 
 import javafx.collections.FXCollections;
@@ -26,6 +27,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -38,6 +40,14 @@ import javafx.stage.Stage;
  * Handles CRUD operations for mission data with modern UI
  */
 public class MissionsController extends BaseController implements Initializable {
+
+    // User info fields
+    @FXML
+    private Label welcomeLabel;
+    @FXML
+    private Label userRoleLabel;
+    @FXML
+    private Button logoutBtn;
 
     @FXML
     private TextField missionIdField;
@@ -70,8 +80,8 @@ public class MissionsController extends BaseController implements Initializable 
     private TableColumn<MissionRecord, String> statusCol;
     @FXML
     private TableColumn<MissionRecord, String> locationIdCol;
-
     @FXML
+    @SuppressWarnings("unused")
     private Button clearBtn;
     @FXML
     private Button addBtn;
@@ -84,7 +94,7 @@ public class MissionsController extends BaseController implements Initializable 
     @FXML
     private Button backBtn;
 
-    private ObservableList<MissionRecord> missionData = FXCollections.observableArrayList();
+    private final ObservableList<MissionRecord> missionData = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -99,6 +109,46 @@ public class MissionsController extends BaseController implements Initializable 
         loadMissionData();
 
         setupTableSelectionListener();
+
+        configureUIBasedOnPermissions();
+        updateUserInfo();
+    }
+
+    /**
+     * Handle logout button click
+     */
+    @FXML
+    @SuppressWarnings("unused")
+    private void handleLogout() {
+        authService.logout();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Login.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            Stage stage = (Stage) logoutBtn.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load login screen: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Update user information display
+     */
+    private void updateUserInfo() {
+        if (authService.getCurrentUser() != null) {
+            welcomeLabel.setText("Welcome, " + authService.getCurrentUser().getUsername());
+            userRoleLabel.setText("Role: " + authService.getCurrentUser().getRole().toString());
+        }
+    }
+
+    @Override
+    protected void configureUIBasedOnPermissions() {
+        configureButtonVisibility(addBtn, Permission.WRITE_DATA);
+        configureButtonVisibility(updateBtn, Permission.WRITE_DATA);
+        configureButtonVisibility(deleteBtn, Permission.DELETE_DATA);
+        configureButtonVisibility(analyticsBtn, Permission.ANALYZE_DATA);
     }
 
     private void setupTableColumns() {
@@ -166,7 +216,12 @@ public class MissionsController extends BaseController implements Initializable 
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void addMission() {
+        if (!requirePermission(Permission.WRITE_DATA)) {
+            return;
+        }
+
         if (!validateFields()) {
             return;
         }
@@ -200,12 +255,16 @@ public class MissionsController extends BaseController implements Initializable 
 
         } catch (SQLException e) {
             showErrorAlert("Database error: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void updateMission() {
+        if (!requirePermission(Permission.WRITE_DATA)) {
+            return;
+        }
+
         if (missionIdField.getText().trim().isEmpty()) {
             showWarningAlert("Please select a mission to update or enter a Mission ID.");
             return;
@@ -244,12 +303,16 @@ public class MissionsController extends BaseController implements Initializable 
 
         } catch (SQLException e) {
             showErrorAlert("Database error: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void deleteMission() {
+        if (!requirePermission(Permission.DELETE_DATA)) {
+            return;
+        }
+
         if (missionIdField.getText().trim().isEmpty()) {
             showWarningAlert("Please select a mission to delete or enter a Mission ID.");
             return;
@@ -282,39 +345,38 @@ public class MissionsController extends BaseController implements Initializable 
 
         } catch (SQLException e) {
             showErrorAlert("Database error: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void showAnalytics() {
-        try {
+        if (!requirePermission(Permission.ANALYZE_DATA)) {
+            return;
+        }
 
+        try {
             com.warManagementGUI.DataAnalysis.MissionsBarChart.showMissionStatusChart();
         } catch (Exception e) {
             showErrorAlert("Error showing analytics: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void goBack() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Dashboard.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) backBtn.getScene().getWindow();
-            Scene scene = new Scene(root);
-
-            themeManager.applyThemeToScene(scene);
-            stage.setScene(scene);
-
+            navigateToScene("/com/warManagementGUI/fxml/Dashboard.fxml", "War Management System - Dashboard", backBtn);
         } catch (IOException e) {
             showErrorAlert("Error loading dashboard: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
     private void loadMissionData() {
+        if (!requirePermission(Permission.READ_DATA)) {
+            return;
+        }
+
         missionData.clear();
         String sql = "SELECT * FROM missions ORDER BY mission_id";
 
@@ -336,7 +398,6 @@ public class MissionsController extends BaseController implements Initializable 
 
         } catch (SQLException e) {
             showErrorAlert("Error loading mission data: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -396,13 +457,18 @@ public class MissionsController extends BaseController implements Initializable 
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void refreshData() {
         loadMissionData();
         showSuccessAlert("Data refreshed successfully!");
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void exportData() {
+        if (!requirePermission(Permission.EXPORT_DATA)) {
+            return;
+        }
 
         showInfoAlert("Export functionality will be available soon!");
     }

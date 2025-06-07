@@ -7,6 +7,7 @@ C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\DataA
 C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\DataAnalysis\SuppliesBarChart.java
 C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\DataAnalysis\UnitsBarChart.java
 C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\Personnel\Login.java
+C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\controllers\LoginController.java
 C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\Personnel\Personnel_SignUp.java
 C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\Mission\Objects.java
 C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\Personnel\Personnel_details.java
@@ -28,9 +29,13 @@ C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\Units
 C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\controllers\SuppliesController.java
 C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\controllers\MissionsController.java
 C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\DataAnalysis\EquipmentBarChart.java
+C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\models\Permission.java
 C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\Supply\Supply_details.java
 C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\controllers\ModernWarManagementApp.java
 C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\util\DBUtil.java
 C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\WarDataAnalysis.java
 C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\Personnel\Personnel_Update.java
+C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\models\User.java
+C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\services\AuthenticationService.java
+C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\models\Role.java
 C:\Users\jai swrup\Desktop\code\War-Data-Analysis\src\com\warManagementGUI\controllers\AnalyticsController.java

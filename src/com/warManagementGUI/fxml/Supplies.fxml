@@ -16,9 +16,8 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.warManagementGUI.controllers.SuppliesController">   <top>      <VBox styleClass="header">
-         <children>
-            <HBox alignment="CENTER_LEFT" spacing="20.0">
+<BorderPane fx:id="mainBorderPane" styleClass="border-pane-main" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.warManagementGUI.controllers.SuppliesController">   <top>      <VBox styleClass="header">
+         <children>            <HBox alignment="CENTER_LEFT" spacing="20.0">
                <children>
                   <VBox alignment="CENTER_LEFT">
                      <children>
@@ -26,19 +25,31 @@
                         <Label styleClass="subtitle" text="Monitor and manage military supply inventory" />
                      </children>
                   </VBox>
-                  <Button fx:id="themeToggleBtn" mnemonicParsing="false" onAction="#toggleTheme" styleClass="theme-toggle-button" text="🌙 Dark Mode" HBox.hgrow="NEVER" />
+                  <HBox alignment="CENTER_RIGHT" spacing="15.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <VBox alignment="CENTER_RIGHT" styleClass="user-info">
+                           <children>
+                              <Label fx:id="welcomeLabel" styleClass="user-welcome" text="Welcome, User" />
+                              <Label fx:id="userRoleLabel" styleClass="user-role" text="Role: ADMIN" />
+                           </children>
+                        </VBox>
+                        <Button fx:id="themeToggleBtn" mnemonicParsing="false" onAction="#toggleTheme" styleClass="theme-toggle-button" text="🌙" />
+                        <Button fx:id="logoutBtn" mnemonicParsing="false" onAction="#handleLogout" styleClass="logout-button" text="Logout" />
+                     </children>
+                  </HBox>
                </children>
                <padding>
                   <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
                </padding>
             </HBox>
-         </children>
-         <padding>
+         </children>         <padding>
             <Insets bottom="40.0" left="20.0" right="20.0" top="10.0" />
          </padding>
       </VBox>
    </top><center>
-      <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+      <VBox maxHeight="600" prefHeight="600" VBox.vgrow="NEVER">
+         <children>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
          <content>
             <HBox spacing="20.0" styleClass="spacing-large">
                <children>
@@ -106,9 +117,10 @@
          </children>         <padding>
             <Insets bottom="40.0" left="20.0" right="20.0" top="20.0" />
          </padding>
-      </HBox>
-         </content>
+      </HBox>         </content>
       </ScrollPane>
+         </children>
+      </VBox>
    </center>
    <bottom>
       <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="footer">

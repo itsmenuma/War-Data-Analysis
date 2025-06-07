@@ -770,8 +770,12 @@ GridPane {
   padding: 15 20 15 20;
   -fx-min-height: 60;
   min-height: 60;
-  -fx-max-height: 80;
-  max-height: 80;
+  -fx-pref-height: 60;
+  -fx-max-height: 60;
+  max-height: 60;
+  -fx-opacity: 1;
+  opacity: 1;
+  visibility: visible;
 }
 
 /* ===== LAYOUT CONSTRAINTS ===== */
@@ -780,6 +784,19 @@ GridPane {
   min-width: 800;
   -fx-min-height: 600;
   min-height: 600;
+}
+
+/* Ensure ScrollPane doesn't overflow and hide footer */
+.scroll-pane {
+  -fx-fit-to-width: true;
+  -fx-fit-to-height: false;
+  -fx-hbar-policy: never;
+  -fx-vbar-policy: as-needed;
+}
+
+/* Make sure BorderPane respects footer */
+.border-pane .center {
+  -fx-max-height: -1;
 }
 
 .footer-text {

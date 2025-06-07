@@ -17,31 +17,43 @@ public class ModernWarManagementApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-
-            System.out.println("Looking for FXML at: /com/warManagementGUI/fxml/Dashboard.fxml");
-            System.out.println("Looking for CSS at: /com/warManagementGUI/css/application.css");
+            // Start with login screen
+            System.out.println("Looking for Login FXML at: /com/warManagementGUI/fxml/Login.fxml");
 
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/com/warManagementGUI/fxml/Dashboard.fxml"));
+            loader.setLocation(getClass().getResource("/com/warManagementGUI/fxml/Login.fxml"));
 
             if (loader.getLocation() == null) {
-                System.err.println("Could not find Dashboard.fxml");
-                throw new RuntimeException("Dashboard.fxml not found");
-            }
-            Parent root = loader.load();
+                System.err.println("Could not find Login.fxml, falling back to Dashboard.fxml");
+                // Fallback to dashboard for development if login not available
+                loader.setLocation(getClass().getResource("/com/warManagementGUI/fxml/Dashboard.fxml"));
 
-            Scene scene = new Scene(root, 1200, 800);
+                if (loader.getLocation() == null) {
+                    System.err.println("Could not find Dashboard.fxml either");
+                    throw new RuntimeException("Neither Login.fxml nor Dashboard.fxml found");
+                }
+            }
+
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
 
             // Apply initial theme using ThemeManager
             ThemeManager themeManager = ThemeManager.getInstance();
             themeManager.applyThemeToScene(scene);
 
-            primaryStage.setTitle("War Data Analysis System - Modern UI");
-            primaryStage.setScene(scene);
-            primaryStage.setMinWidth(1000);
-            primaryStage.setMinHeight(700);
-            primaryStage.setMaximized(true);
+            // Configure stage based on which FXML was loaded
+            if (loader.getLocation().toString().contains("Login.fxml")) {
+                primaryStage.setTitle("War Data Analysis System - Login");
+                primaryStage.setResizable(false);
+                primaryStage.centerOnScreen();
+            } else {
+                primaryStage.setTitle("War Data Analysis System - Modern UI");
+                primaryStage.setMinWidth(1000);
+                primaryStage.setMinHeight(700);
+                primaryStage.setMaximized(true);
+            }
 
+            primaryStage.setScene(scene);
             primaryStage.show();
 
         } catch (Exception e) {

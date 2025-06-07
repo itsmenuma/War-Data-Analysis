@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
+import com.warManagementGUI.models.Permission;
 import com.warManagementGUI.util.DBUtil;
 
 import javafx.collections.FXCollections;
@@ -21,10 +22,12 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 /**
@@ -32,6 +35,17 @@ import javafx.stage.Stage;
  * Handles CRUD operations for equipment data with modern UI
  */
 public class EquipmentController extends BaseController implements Initializable {
+
+    public BorderPane mainBorderPane;
+    public Button refreshBtn;
+    public Button exportBtn;
+    // User info fields
+    @FXML
+    private Label welcomeLabel;
+    @FXML
+    private Label userRoleLabel;
+    @FXML
+    private Button logoutBtn;
 
     @FXML
     private TextField equipmentIdField;
@@ -60,8 +74,8 @@ public class EquipmentController extends BaseController implements Initializable
     private TableColumn<EquipmentRecord, String> statusCol;
     @FXML
     private TableColumn<EquipmentRecord, Integer> locationIdCol;
-
     @FXML
+    @SuppressWarnings("unused")
     private Button clearBtn;
     @FXML
     private Button addBtn;
@@ -74,7 +88,7 @@ public class EquipmentController extends BaseController implements Initializable
     @FXML
     private Button backBtn;
 
-    private ObservableList<EquipmentRecord> equipmentData = FXCollections.observableArrayList();
+    private final ObservableList<EquipmentRecord> equipmentData = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -92,6 +106,46 @@ public class EquipmentController extends BaseController implements Initializable
         loadEquipmentData();
 
         setupTableSelectionListener();
+
+        configureUIBasedOnPermissions();
+        updateUserInfo();
+    }
+
+    /**
+     * Handle logout button click
+     */
+    @FXML
+    @SuppressWarnings("unused")
+    private void handleLogout() {
+        authService.logout();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Login.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            Stage stage = (Stage) logoutBtn.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load login screen: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Update user information display
+     */
+    private void updateUserInfo() {
+        if (authService.getCurrentUser() != null) {
+            welcomeLabel.setText("Welcome, " + authService.getCurrentUser().getUsername());
+            userRoleLabel.setText("Role: " + authService.getCurrentUser().getRole().toString());
+        }
+    }
+
+    @Override
+    protected void configureUIBasedOnPermissions() {
+        configureButtonVisibility(addBtn, Permission.WRITE_DATA);
+        configureButtonVisibility(updateBtn, Permission.WRITE_DATA);
+        configureButtonVisibility(deleteBtn, Permission.DELETE_DATA);
+        configureButtonVisibility(analyticsBtn, Permission.ANALYZE_DATA);
     }
 
     private void setupTableColumns() {
@@ -115,12 +169,12 @@ public class EquipmentController extends BaseController implements Initializable
     }
 
     private void populateFields(EquipmentRecord equipment) {
-        equipmentIdField.setText(String.valueOf(equipment.getEquipmentId()));
-        equipmentNameField.setText(equipment.getName());
-        typeComboBox.setValue(equipment.getType());
-        unitIdField.setText(String.valueOf(equipment.getUnitId()));
-        statusComboBox.setValue(equipment.getStatus());
-        locationIdField.setText(String.valueOf(equipment.getLocationId()));
+        equipmentIdField.setText(String.valueOf(equipment.equipmentId()));
+        equipmentNameField.setText(equipment.name());
+        typeComboBox.setValue(equipment.type());
+        unitIdField.setText(String.valueOf(equipment.unitId()));
+        statusComboBox.setValue(equipment.status());
+        locationIdField.setText(String.valueOf(equipment.locationId()));
     }
 
     @FXML
@@ -135,8 +189,13 @@ public class EquipmentController extends BaseController implements Initializable
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void addEquipment() {
-        if (!validateFields()) {
+        if (!requirePermission(Permission.WRITE_DATA)) {
+            return;
+        }
+
+        if (validateFields()) {
             return;
         }
 
@@ -169,13 +228,18 @@ public class EquipmentController extends BaseController implements Initializable
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void updateEquipment() {
+        if (!requirePermission(Permission.WRITE_DATA)) {
+            return;
+        }
+
         if (equipmentIdField.getText().trim().isEmpty()) {
             showWarningAlert("Please select equipment to update or enter an Equipment ID.");
             return;
         }
 
-        if (!validateFields()) {
+        if (validateFields()) {
             return;
         }
 
@@ -208,7 +272,12 @@ public class EquipmentController extends BaseController implements Initializable
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void deleteEquipment() {
+        if (!requirePermission(Permission.DELETE_DATA)) {
+            return;
+        }
+
         if (equipmentIdField.getText().trim().isEmpty()) {
             showWarningAlert("Please select equipment to delete or enter an Equipment ID.");
             return;
@@ -247,7 +316,12 @@ public class EquipmentController extends BaseController implements Initializable
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void showAnalytics() {
+        if (!requirePermission(Permission.ANALYZE_DATA)) {
+            return;
+        }
+
         try {
 
             com.warManagementGUI.DataAnalysis.EquipmentBarChart.showEquipmentStatusChart();
@@ -257,28 +331,28 @@ public class EquipmentController extends BaseController implements Initializable
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void goBack() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Dashboard.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) backBtn.getScene().getWindow();
-            Scene scene = new Scene(root);
-
-            themeManager.applyThemeToScene(scene);
-            stage.setScene(scene);
+            navigateToScene("/com/warManagementGUI/fxml/Dashboard.fxml", "War Management System - Dashboard", backBtn);
         } catch (IOException e) {
             showErrorAlert("Error loading dashboard: " + e.getMessage());
         }
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void refreshData() {
         loadEquipmentData();
         showSuccessAlert("Data refreshed successfully!");
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void exportData() {
+        if (!requirePermission(Permission.EXPORT_DATA)) {
+            return;
+        }
 
         showInfoAlert("Export functionality will be available soon!");
     }
@@ -292,6 +366,10 @@ public class EquipmentController extends BaseController implements Initializable
     }
 
     private void loadEquipmentData() {
+        if (!requirePermission(Permission.READ_DATA)) {
+            return;
+        }
+
         equipmentData.clear();
         String sql = "SELECT * FROM Equipment ORDER BY equipment_id";
 
@@ -352,12 +430,12 @@ public class EquipmentController extends BaseController implements Initializable
             }
         }
 
-        if (errors.length() > 0) {
-            showWarningAlert("Please correct the following errors:\n\n" + errors.toString());
-            return false;
+        if (!errors.isEmpty()) {
+            showWarningAlert("Please correct the following errors:\n\n" + errors);
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     private void showSuccessAlert(String message) {
@@ -384,46 +462,7 @@ public class EquipmentController extends BaseController implements Initializable
         alert.showAndWait();
     }
 
-    public static class EquipmentRecord {
-        private final Integer equipmentId;
-        private final String name;
-        private final String type;
-        private final Integer unitId;
-        private final String status;
-        private final Integer locationId;
-
-        public EquipmentRecord(Integer equipmentId, String name, String type, Integer unitId, String status,
-                Integer locationId) {
-            this.equipmentId = equipmentId;
-            this.name = name;
-            this.type = type;
-            this.unitId = unitId;
-            this.status = status;
-            this.locationId = locationId;
-        }
-
-        public Integer getEquipmentId() {
-            return equipmentId;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public Integer getUnitId() {
-            return unitId;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public Integer getLocationId() {
-            return locationId;
-        }
+    public record EquipmentRecord(Integer equipmentId, String name, String type, Integer unitId, String status,
+                                  Integer locationId) {
     }
 }

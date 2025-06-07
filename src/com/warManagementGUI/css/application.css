@@ -507,6 +507,9 @@
   -fx-pref-height: 60;
   -fx-max-height: 60;
   max-height: 60;
+  -fx-opacity: 1;
+  opacity: 1;
+  visibility: visible;
 }
 
 /* ===== LAYOUT CONSTRAINTS ===== */
@@ -521,6 +524,14 @@
   -fx-max-height: 680;
   max-height: 680;
   -fx-pref-height: 680;
+}
+
+/* Ensure ScrollPane doesn't overflow and hide footer */
+.scroll-pane {
+  -fx-fit-to-width: true;
+  -fx-fit-to-height: false;
+  -fx-hbar-policy: never;
+  -fx-vbar-policy: as-needed;
 }
 
 .footer-text {
