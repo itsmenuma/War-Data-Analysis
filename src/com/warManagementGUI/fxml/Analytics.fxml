@@ -12,23 +12,32 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.warManagementGUI.controllers.AnalyticsController">
-   <top>
-      <VBox alignment="CENTER" styleClass="header">
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.warManagementGUI.controllers.AnalyticsController">   <top>      <VBox styleClass="header">
          <children>
-            <Label styleClass="form-title" text="Analytics Dashboard" />
-            <Label styleClass="subtitle" text="Comprehensive data analysis and insights" />
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+               <children>
+                  <VBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label styleClass="form-title" text="Analytics Dashboard" />
+                        <Label styleClass="subtitle" text="Comprehensive data analysis and insights" />
+                     </children>
+                  </VBox>
+                  <Button fx:id="themeToggleBtn" mnemonicParsing="false" onAction="#toggleTheme" styleClass="theme-toggle-button" text="🌙 Dark Mode" HBox.hgrow="NEVER" />
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+               </padding>
+            </HBox>
          </children>
          <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            <Insets bottom="10.0" left="20.0" right="20.0" top="5.0" />
          </padding>
       </VBox>
    </top>   <center>
       <ScrollPane fitToWidth="true" styleClass="scroll-pane">
          <content>
-            <VBox spacing="20.0" styleClass="spacing-large">
+ <VBox spacing="20.0" styleClass="spacing-large">
                <children>
-                  <Label styleClass="form-title" text="Available Analytics" />
                   <GridPane styleClass="analytics-grid">
                      <columnConstraints>
                         <ColumnConstraints maxWidth="300.0" minWidth="250.0" prefWidth="300.0" />
@@ -101,7 +110,7 @@
                </VBox>
                
                <!-- Data Export Card -->
-               <VBox styleClass="analytics-card analytics-card-special" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <VBox styleClass="analytics-card" GridPane.columnIndex="1" GridPane.rowIndex="2">
                   <children>
                      <Label styleClass="card-title" text="Data Export" />
                      <Label styleClass="card-description" text="Export data for external analysis and reporting" wrapText="true" />

@@ -31,7 +31,7 @@ import javafx.stage.Stage;
 /**
  * Controller for Personnel Management interface
  */
-public class PersonnelController implements Initializable {
+public class PersonnelController extends BaseController implements Initializable {
 
     @FXML
     private TextField personnelIdField;
@@ -92,6 +92,7 @@ public class PersonnelController implements Initializable {
         setupTableColumns();
         setupTableSelection();
         loadPersonnelData();
+        initializeTheme();
     }
 
     private void setupStatusComboBox() {
@@ -258,8 +259,10 @@ public class PersonnelController implements Initializable {
 
             Stage stage = (Stage) backBtn.getScene().getWindow();
             Scene scene = new Scene(root);
-            scene.getStylesheets()
-                    .add(getClass().getResource("/com/warManagementGUI/css/application.css").toExternalForm());
+
+            // Apply current theme to the new scene
+            themeManager.applyThemeToScene(scene);
+
             stage.setScene(scene);
         } catch (IOException e) {
             showError("Error navigating back: " + e.getMessage());

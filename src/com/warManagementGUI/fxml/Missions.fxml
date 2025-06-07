@@ -18,15 +18,25 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.warManagementGUI.controllers.MissionsController">
-   <top>
-      <VBox alignment="CENTER" styleClass="header">
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.warManagementGUI.controllers.MissionsController">   <top>      <VBox styleClass="header">
          <children>
-            <Label styleClass="form-title" text="Mission Management" />
-            <Label styleClass="subtitle" text="Plan, monitor, and manage military missions" />
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+               <children>
+                  <VBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label styleClass="form-title" text="Mission Management" />
+                        <Label styleClass="subtitle" text="Plan, monitor, and manage military missions" />
+                     </children>
+                  </VBox>
+                  <Button fx:id="themeToggleBtn" mnemonicParsing="false" onAction="#toggleTheme" styleClass="theme-toggle-button" text="🌙 Dark Mode" HBox.hgrow="NEVER" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+               </padding>
+            </HBox>
          </children>
          <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            <Insets bottom="40.0" left="20.0" right="20.0" top="10.0" />
          </padding>
       </VBox>
    </top>   <center>
@@ -34,10 +44,8 @@
          <content>
             <HBox spacing="20.0" styleClass="spacing-large">
                <children>
-                  <!-- Mission Form -->
-            <VBox spacing="15.0" styleClass="form-container">
+                  <!-- Mission Form -->            <VBox spacing="15.0" styleClass="form-container">
                <children>
-                  <Label styleClass="form-title" text="Mission Information" />
                   <GridPane styleClass="grid-container">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="120.0" prefWidth="120.0" />
@@ -81,10 +89,8 @@
                   <Button fx:id="analyticsBtn" mnemonicParsing="false" onAction="#showAnalytics" styleClass="secondary-button" text="📊 Show Mission Analytics" />
                </children>
             </VBox>
-            <!-- Mission Table -->
-            <VBox spacing="15.0" styleClass="spacing-medium" VBox.vgrow="ALWAYS">
+            <!-- Mission Table -->            <VBox spacing="15.0" styleClass="spacing-medium" VBox.vgrow="ALWAYS">
                <children>
-                  <Label styleClass="form-title" text="Mission Records" />
                   <TableView fx:id="missionsTable" styleClass="table-view" VBox.vgrow="ALWAYS">
                     <columns>
                       <TableColumn fx:id="missionIdCol" prefWidth="80.0" text="Mission ID" />
@@ -99,7 +105,7 @@
                </children>
             </VBox>
          </children>         <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            <Insets bottom="40.0" left="20.0" right="20.0" top="20.0" />
          </padding>
       </HBox>
          </content>

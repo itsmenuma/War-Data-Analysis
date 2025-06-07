@@ -16,13 +16,25 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.warManagementGUI.controllers.UnitsController">
    <top>
-      <VBox alignment="CENTER" styleClass="header">
+      <VBox styleClass="header">
          <children>
-            <Label styleClass="form-title" text="Units Management" />
-            <Label styleClass="subtitle" text="Manage military units and organizational structure" />
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+               <children>
+                  <VBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label styleClass="form-title" text="Units Management" />
+                        <Label styleClass="subtitle" text="Manage military units and organizational structure" />
+                     </children>
+                  </VBox>
+                  <Button fx:id="themeToggleBtn" mnemonicParsing="false" onAction="#toggleTheme" styleClass="theme-toggle-button" text="🌙 Dark Mode" HBox.hgrow="NEVER" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+               </padding>
+            </HBox>
          </children>
          <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            <Insets bottom="40.0" left="20.0" right="20.0" top="10.0" />
          </padding>
       </VBox>
    </top>
@@ -30,9 +42,9 @@
       <HBox spacing="20.0" styleClass="spacing-large">
          <children>
             <!-- Units Form -->
-            <VBox spacing="15.0" styleClass="form-container">
+ <VBox spacing="15.0" styleClass="form-container">
                <children>
-                  <Label styleClass="form-title" text="Unit Information" />                <GridPane styleClass="grid-container">
+                <GridPane styleClass="grid-container">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="120.0" prefWidth="120.0" />
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="200.0" prefWidth="200.0" />
@@ -71,9 +83,8 @@
                </children>
             </VBox>
             <!-- Units Table -->
-            <VBox spacing="15.0" styleClass="spacing-medium" VBox.vgrow="ALWAYS">
+ <VBox spacing="15.0" styleClass="spacing-medium" VBox.vgrow="ALWAYS">
                <children>
-                  <Label styleClass="form-title" text="Units Records" />
                   <TableView fx:id="unitsTable" styleClass="table-view" VBox.vgrow="ALWAYS">
                     <columns>
                       <TableColumn fx:id="unitIdColumn" prefWidth="100.0" text="Unit ID" />
@@ -87,7 +98,7 @@
             </VBox>
          </children>
          <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            <Insets bottom="40.0" left="20.0" right="20.0" top="20.0" />
          </padding>
       </HBox>
    </center>

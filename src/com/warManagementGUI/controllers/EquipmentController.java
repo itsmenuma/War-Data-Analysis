@@ -31,7 +31,7 @@ import javafx.stage.Stage;
  * Controller for the Equipment management FXML interface
  * Handles CRUD operations for equipment data with modern UI
  */
-public class EquipmentController implements Initializable {
+public class EquipmentController extends BaseController implements Initializable {
 
     @FXML
     private TextField equipmentIdField;
@@ -78,6 +78,9 @@ public class EquipmentController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Initialize theme functionality
+        initializeTheme();
+
         // Initialize combo boxes
         typeComboBox.setItems(FXCollections.observableArrayList("Weapon", "Vehicle", "Electronic", "Other"));
         typeComboBox.setValue("Weapon");
@@ -262,11 +265,10 @@ public class EquipmentController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Dashboard.fxml"));
             Parent root = loader.load();
-
             Stage stage = (Stage) backBtn.getScene().getWindow();
             Scene scene = new Scene(root);
-            scene.getStylesheets()
-                    .add(getClass().getResource("/com/warManagementGUI/css/application.css").toExternalForm());
+            // Apply the current theme instead of always using light theme
+            themeManager.applyThemeToScene(scene);
             stage.setScene(scene);
         } catch (IOException e) {
             showErrorAlert("Error loading dashboard: " + e.getMessage());

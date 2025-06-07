@@ -25,10 +25,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
@@ -37,7 +37,7 @@ import javafx.stage.Stage;
  * Controller for the Missions management FXML interface
  * Handles CRUD operations for mission data with modern UI
  */
-public class MissionsController implements Initializable {
+public class MissionsController extends BaseController implements Initializable {
 
     @FXML
     private TextField missionIdField;
@@ -88,6 +88,8 @@ public class MissionsController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Initialize theme functionality
+        initializeTheme();
 
         statusComboBox.setItems(FXCollections.observableArrayList("planned", "ongoing", "completed"));
         statusComboBox.setValue("planned");
@@ -118,14 +120,15 @@ public class MissionsController implements Initializable {
                         populateFields(newValue);
                     }
                 });
-    }    // Date formatter for parsing and formatting dates
+    } // Date formatter for parsing and formatting dates
+
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private void populateFields(MissionRecord mission) {
         missionIdField.setText(mission.getMissionId());
         missionNameField.setText(mission.getName());
         objectiveField.setText(mission.getObjective());
-        
+
         // Parse date strings to LocalDate objects for DatePicker
         try {
             if (mission.getStartDate() != null && !mission.getStartDate().isEmpty()) {
@@ -134,7 +137,7 @@ public class MissionsController implements Initializable {
             } else {
                 startDatePicker.setValue(null);
             }
-            
+
             if (mission.getEndDate() != null && !mission.getEndDate().isEmpty()) {
                 LocalDate endDate = LocalDate.parse(mission.getEndDate(), dateFormatter);
                 endDatePicker.setValue(endDate);
@@ -146,7 +149,7 @@ public class MissionsController implements Initializable {
             startDatePicker.setValue(null);
             endDatePicker.setValue(null);
         }
-        
+
         statusComboBox.setValue(mission.getStatus());
         locationIdField.setText(mission.getLocationId());
     }
@@ -161,7 +164,9 @@ public class MissionsController implements Initializable {
         statusComboBox.setValue("planned");
         locationIdField.clear();
         missionsTable.getSelectionModel().clearSelection();
-    }    @FXML
+    }
+
+    @FXML
     private void addMission() {
         if (!validateFields()) {
             return;
@@ -175,13 +180,12 @@ public class MissionsController implements Initializable {
             pstmt.setString(1, missionIdField.getText().trim());
             pstmt.setString(2, missionNameField.getText().trim());
             pstmt.setString(3, objectiveField.getText().trim());
-            
+
             // Format dates to strings for database
-            String startDateStr = startDatePicker.getValue() != null ? 
-                    startDatePicker.getValue().format(dateFormatter) : "";
-            String endDateStr = endDatePicker.getValue() != null ? 
-                    endDatePicker.getValue().format(dateFormatter) : "";
-                    
+            String startDateStr = startDatePicker.getValue() != null ? startDatePicker.getValue().format(dateFormatter)
+                    : "";
+            String endDateStr = endDatePicker.getValue() != null ? endDatePicker.getValue().format(dateFormatter) : "";
+
             pstmt.setString(4, startDateStr);
             pstmt.setString(5, endDateStr);
             pstmt.setString(6, statusComboBox.getValue());
@@ -200,7 +204,9 @@ public class MissionsController implements Initializable {
             showErrorAlert("Database error: " + e.getMessage());
             e.printStackTrace();
         }
-    }    @FXML
+    }
+
+    @FXML
     private void updateMission() {
         if (missionIdField.getText().trim().isEmpty()) {
             showWarningAlert("Please select a mission to update or enter a Mission ID.");
@@ -218,13 +224,12 @@ public class MissionsController implements Initializable {
 
             pstmt.setString(1, missionNameField.getText().trim());
             pstmt.setString(2, objectiveField.getText().trim());
-            
+
             // Format dates to strings for database
-            String startDateStr = startDatePicker.getValue() != null ? 
-                    startDatePicker.getValue().format(dateFormatter) : "";
-            String endDateStr = endDatePicker.getValue() != null ? 
-                    endDatePicker.getValue().format(dateFormatter) : "";
-                    
+            String startDateStr = startDatePicker.getValue() != null ? startDatePicker.getValue().format(dateFormatter)
+                    : "";
+            String endDateStr = endDatePicker.getValue() != null ? endDatePicker.getValue().format(dateFormatter) : "";
+
             pstmt.setString(3, startDateStr);
             pstmt.setString(4, endDateStr);
             pstmt.setString(5, statusComboBox.getValue());
@@ -300,11 +305,10 @@ public class MissionsController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Dashboard.fxml"));
             Parent root = loader.load();
-
             Stage stage = (Stage) backBtn.getScene().getWindow();
             Scene scene = new Scene(root);
-            scene.getStylesheets()
-                    .add(getClass().getResource("/com/warManagementGUI/css/application.css").toExternalForm());
+            // Apply the current theme instead of always using light theme
+            themeManager.applyThemeToScene(scene);
             stage.setScene(scene);
 
         } catch (IOException e) {
@@ -337,7 +341,9 @@ public class MissionsController implements Initializable {
             showErrorAlert("Error loading mission data: " + e.getMessage());
             e.printStackTrace();
         }
-    }    private boolean validateFields() {
+    }
+
+    private boolean validateFields() {
         StringBuilder errors = new StringBuilder();
 
         if (missionIdField.getText().trim().isEmpty()) {

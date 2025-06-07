@@ -32,7 +32,7 @@ import javafx.stage.Stage;
  * Controller for the Supplies management FXML interface
  * Handles CRUD operations for supply data with modern UI
  */
-public class SuppliesController implements Initializable {
+public class SuppliesController extends BaseController implements Initializable {
 
     @FXML
     private TextField supplyIdField;
@@ -83,6 +83,9 @@ public class SuppliesController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Initialize theme functionality
+        initializeTheme();
+
         statusComboBox.setItems(FXCollections.observableArrayList("Available", "In Use", "Out of Stock"));
         statusComboBox.setValue("Available");
 
@@ -265,11 +268,10 @@ public class SuppliesController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Dashboard.fxml"));
             Parent root = loader.load();
-
             Stage stage = (Stage) backBtn.getScene().getWindow();
             Scene scene = new Scene(root);
-            scene.getStylesheets()
-                    .add(getClass().getResource("/com/warManagementGUI/css/application.css").toExternalForm());
+            // Apply the current theme instead of always using light theme
+            themeManager.applyThemeToScene(scene);
             stage.setScene(scene);
 
         } catch (IOException e) {
