@@ -37,16 +37,68 @@
       <artifactId>javafx-swing</artifactId>
       <version>21.0.1</version>
     </dependency>
+        <dependency>
+        <groupId>com.opencsv</groupId>
+        <artifactId>opencsv</artifactId>
+        <version>5.7.1</version>
+    </dependency>
+    
+    <!-- JFreeChart -->
+    <dependency>
+        <groupId>org.jfree</groupId>
+        <artifactId>jfreechart</artifactId>
+        <version>1.5.4</version>
+    </dependency>
+    
+    <!-- GeoTools -->
+    <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-main</artifactId>
+        <version>28.1</version>
+    </dependency>
+    <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-shapefile</artifactId>
+        <version>28.1</version>
+    </dependency>
+    <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-swing</artifactId>
+        <version>28.1</version>
+    </dependency>
+    
+    <!-- Stanford NLP -->
+    <dependency>
+        <groupId>edu.stanford.nlp</groupId>
+        <artifactId>stanford-corenlp</artifactId>
+        <version>4.5.2</version>
+    </dependency>
+    <dependency>
+        <groupId>edu.stanford.nlp</groupId>
+        <artifactId>stanford-corenlp</artifactId>
+        <version>4.5.2</version>
+        <classifier>models</classifier>
+    </dependency>
   </dependencies>
+  <repositories>
+    <repository>
+        <id>osgeo</id>
+        <name>OSGeo Release Repository</name>
+        <url>https://repo.osgeo.org/repository/release/</url>
+        <snapshots><enabled>false</enabled></snapshots>
+        <releases><enabled>true</enabled></releases>
+    </repository>
+</repositories>
   <build>
     <!-- use custom source layout -->
     <sourceDirectory>${project.basedir}/src</sourceDirectory>
-    <!-- copy non-Java resources under src/ into classpath -->
-    <resources>
+    <!-- copy non-Java resources under src/ into classpath -->    <resources>
       <resource>
         <directory>${project.basedir}/src</directory>
         <includes>
           <include>pics/**</include>
+          <include>com/warManagementGUI/fxml/**</include>
+          <include>com/warManagementGUI/css/**</include>
         </includes>
       </resource>
     </resources>
@@ -67,7 +119,7 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
         <configuration>
-          <mainClass>com.warManagementGUI.WarManagementApp</mainClass>
+          <mainClass>com.warManagementGUI.controllers.ModernWarManagementApp</mainClass>
         </configuration>
       </plugin>
     </plugins>
