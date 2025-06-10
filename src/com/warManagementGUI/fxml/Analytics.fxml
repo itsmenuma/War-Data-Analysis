@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.warManagementGUI.controllers.AnalyticsController">   <top>      <VBox styleClass="header">
+         <children>
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+               <children>
+                  <VBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label styleClass="form-title" text="Analytics Dashboard" />
+                        <Label styleClass="subtitle" text="Comprehensive data analysis and insights" />
+                     </children>
+                  </VBox>
+                  <Button fx:id="themeToggleBtn" mnemonicParsing="false" onAction="#toggleTheme" styleClass="theme-toggle-button" text="🌙 Dark Mode" HBox.hgrow="NEVER" />
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+               </padding>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="20.0" right="20.0" top="5.0" />
+         </padding>
+      </VBox>
+   </top>   <center>
+      <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+         <content>
+ <VBox spacing="20.0" styleClass="spacing-large">
+               <children>
+                  <GridPane styleClass="analytics-grid">
+                     <columnConstraints>
+                        <ColumnConstraints maxWidth="300.0" minWidth="250.0" prefWidth="300.0" />
+                        <ColumnConstraints maxWidth="300.0" minWidth="250.0" prefWidth="300.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="150.0" prefHeight="150.0" />
+                        <RowConstraints minHeight="150.0" prefHeight="150.0" />
+                        <RowConstraints minHeight="150.0" prefHeight="150.0" />
+                     </rowConstraints>
+               
+               <!-- Personnel Analytics Card -->
+               <VBox styleClass="analytics-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                  <children>
+                     <Label styleClass="card-title" text="Personnel Analytics" />
+                     <Label styleClass="card-description" text="View personnel distribution by status, roles, and units" wrapText="true" />
+                     <Button fx:id="personnelAnalyticsBtn" mnemonicParsing="false" onAction="#showPersonnelAnalytics" styleClass="primary-button" text="View Personnel Charts" />
+                  </children>
+                  <padding>
+                     <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                  </padding>
+               </VBox>
+               
+               <!-- Units Analytics Card -->
+               <VBox styleClass="analytics-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                  <children>
+                     <Label styleClass="card-title" text="Units Analytics" />
+                     <Label styleClass="card-description" text="Analyze unit types, locations, and operational status" wrapText="true" />
+                     <Button fx:id="unitsAnalyticsBtn" mnemonicParsing="false" onAction="#showUnitsAnalytics" styleClass="primary-button" text="View Units Charts" />
+                  </children>
+                  <padding>
+                     <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                  </padding>
+               </VBox>
+               
+               <!-- Equipment Analytics Card -->
+               <VBox styleClass="analytics-card" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                  <children>
+                     <Label styleClass="card-title" text="Equipment Analytics" />
+                     <Label styleClass="card-description" text="Track equipment status, types, and maintenance schedules" wrapText="true" />
+                     <Button fx:id="equipmentAnalyticsBtn" mnemonicParsing="false" onAction="#showEquipmentAnalytics" styleClass="primary-button" text="View Equipment Charts" />
+                  </children>
+                  <padding>
+                     <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                  </padding>
+               </VBox>
+               
+               <!-- Supplies Analytics Card -->
+               <VBox styleClass="analytics-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                  <children>
+                     <Label styleClass="card-title" text="Supplies Analytics" />
+                     <Label styleClass="card-description" text="Monitor supply levels, availability, and distribution" wrapText="true" />
+                     <Button fx:id="suppliesAnalyticsBtn" mnemonicParsing="false" onAction="#showSuppliesAnalytics" styleClass="primary-button" text="View Supplies Charts" />
+                  </children>
+                  <padding>
+                     <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                  </padding>
+               </VBox>
+               
+               <!-- Missions Analytics Card -->
+               <VBox styleClass="analytics-card" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                  <children>
+                     <Label styleClass="card-title" text="Missions Analytics" />
+                     <Label styleClass="card-description" text="Analyze mission status, success rates, and timelines" wrapText="true" />
+                     <Button fx:id="missionsAnalyticsBtn" mnemonicParsing="false" onAction="#showMissionsAnalytics" styleClass="primary-button" text="View Missions Charts" />
+                  </children>
+                  <padding>
+                     <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                  </padding>
+               </VBox>
+               
+               <!-- Data Export Card -->
+               <VBox styleClass="analytics-card" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                  <children>
+                     <Label styleClass="card-title" text="Data Export" />
+                     <Label styleClass="card-description" text="Export data for external analysis and reporting" wrapText="true" />
+                     <HBox spacing="10.0">
+                        <children>
+                           <Button fx:id="exportCsvBtn" mnemonicParsing="false" onAction="#exportToCSV" styleClass="secondary-button" text="Export CSV" />
+                           <Button fx:id="exportReportBtn" mnemonicParsing="false" onAction="#generateReport" styleClass="primary-button" text="Generate Report" />
+                        </children>
+                     </HBox>
+                  </children>
+                  <padding>
+                     <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                  </padding>
+               </VBox>                  </GridPane>
+               </children>
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </center>
+   <bottom>
+      <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="footer">
+         <children>
+            <Button fx:id="backBtn" mnemonicParsing="false" onAction="#goBack" styleClass="secondary-button" text="← Back to Dashboard" />
+            <Button fx:id="refreshBtn" mnemonicParsing="false" onAction="#refreshData" styleClass="primary-button" text="🔄 Refresh Data" />
+         </children>
+         <padding>
+            <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+         </padding>
+      </HBox>
+   </bottom>
+</BorderPane>
