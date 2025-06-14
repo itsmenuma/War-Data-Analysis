@@ -6,3 +6,4 @@ plotly==6.0.1         # For interactive plotting and dynamic visualizations
 statsmodels==0.14.4   # For statistical modeling and hypothesis testing
 pmdarima==2.0.4       # For ARIMA-based time series forecasting (auto ARIMA)
 scikit-learn==1.6.1   # For machine learning models and preprocessing utilities
+reportlab==3.0.0        # For generating reports and summaries from data analysis
