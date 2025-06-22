@@ -42,7 +42,8 @@ def create_sample_data():
     # Create and write to CSV files
     for filename, rows in data.items():
         filepath = os.path.join(data_dir, filename)
-        with open(filepath, 'w', newline='') as f:
+        # with encoding, Supports all characters
+        with open(filepath, 'w', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
             writer.writerows(rows)
         print(f"Generated {filename}")
