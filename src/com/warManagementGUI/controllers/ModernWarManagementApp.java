@@ -1,5 +1,7 @@
 package com.warManagementGUI.controllers;
 
+import java.io.IOException;
+
 import com.warManagementGUI.util.ThemeManager;
 
 import javafx.application.Application;
@@ -32,14 +34,21 @@ public class ModernWarManagementApp extends Application {
                     System.err.println("Could not find Dashboard.fxml either");
                     throw new RuntimeException("Neither Login.fxml nor Dashboard.fxml found");
                 }
-            }
-
-            Parent root = loader.load();
+            }            Parent root = loader.load();
             Scene scene = new Scene(root);
 
             // Apply initial theme using ThemeManager
             ThemeManager themeManager = ThemeManager.getInstance();
+            
+            // Clear any existing stylesheets first
+            scene.getStylesheets().clear();
+            
+            // Apply the theme and force a refresh
             themeManager.applyThemeToScene(scene);
+            
+            // Ensure the root has proper styling
+            root.applyCss();
+            root.autosize();
 
             // Configure stage based on which FXML was loaded
             if (loader.getLocation().toString().contains("Login.fxml")) {
@@ -56,23 +65,14 @@ public class ModernWarManagementApp extends Application {
             primaryStage.setScene(scene);
             primaryStage.show();
 
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             System.err.println("Application startup error: " + e.getMessage());
-            e.printStackTrace();
 
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Application Error");
             alert.setHeaderText("Failed to start application");
             alert.setContentText("Error: " + e.getMessage() + "\n\nFalling back to legacy interface...");
             alert.showAndWait();
-
-            try {
-                com.warManagementGUI.WarManagement warManagement = new com.warManagementGUI.WarManagement();
-                warManagement.display();
-            } catch (Exception ex) {
-                System.err.println("Legacy fallback also failed: " + ex.getMessage());
-                System.exit(1);
-            }
         }
     }
 

@@ -4,9 +4,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="mainBorderPane" styleClass="border-pane-main" stylesheets="@../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.warManagementGUI.controllers.EquipmentController">
+<BorderPane fx:id="mainBorderPane" styleClass="border-pane-main" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.warManagementGUI.controllers.EquipmentController">
     <top>
-        <VBox alignment="CENTER" styleClass="header" stylesheets="@../css/application.css">
+        <VBox alignment="CENTER" styleClass="header">
             <padding>
                 <Insets bottom="40.0" left="20.0" right="20.0" top="10.0" />
             </padding>
@@ -29,7 +29,7 @@
             </HBox>
         </VBox>
     </top>
-    <center>
+ <center>
         <VBox maxHeight="600" prefHeight="600" VBox.vgrow="NEVER">
             <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="scroll-pane" VBox.vgrow="NEVER">
                 <HBox spacing="20.0" styleClass="spacing-large">
@@ -88,7 +88,7 @@
                         </TableView>
                     </VBox>
                 </HBox>
-            </ScrollPane>
+ </ScrollPane>
         </VBox>
    </center>
    <bottom>

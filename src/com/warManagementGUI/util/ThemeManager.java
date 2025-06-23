@@ -79,21 +79,26 @@ public class ThemeManager {
                 (int) (bgColor.getGreen() * 255),
                 (int) (bgColor.getBlue() * 255));
         pane.setStyle("-fx-background-color: " + bgColorString + ";");
-    }
-
-    public void applyThemeToScene(Scene scene) {
+    }    public void applyThemeToScene(Scene scene) {
         scene.getStylesheets().clear();
+        
+        // Set the scene's background fill based on the theme
         if (isDarkMode) {
+            scene.setFill(DARK_BG_COLOR);
             var darkThemeUrl = getClass().getResource("/com/warManagementGUI/css/dark-theme.css");
             if (darkThemeUrl != null) {
                 scene.getStylesheets().add(darkThemeUrl.toExternalForm());
             }
         } else {
+            scene.setFill(LIGHT_BG_COLOR);
             var lightThemeUrl = getClass().getResource("/com/warManagementGUI/css/application.css");
             if (lightThemeUrl != null) {
                 scene.getStylesheets().add(lightThemeUrl.toExternalForm());
             }
         }
+        
+        // Force a style refresh
+        scene.getRoot().applyCss();
     }
 
     // Get RGB string for CSS

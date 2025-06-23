@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import com.warManagementGUI.util.ThemeManager;
 import com.warManagementGUI.models.Permission;
+import com.warManagementGUI.util.ThemeManager;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -201,12 +201,11 @@ public class DashboardController extends BaseController implements Initializable
             currentStage.setMaximized(false);
         }
 
-        currentStage.setTitle(title);
-
-        currentStage.setMinWidth(1200);
+        currentStage.setTitle(title);        currentStage.setMinWidth(1200);
         currentStage.setMinHeight(800);
         Scene scene = new Scene(root, 1200, 800);
 
+        // Apply current theme to the new scene
         ThemeManager.getInstance().applyThemeToScene(scene);
 
         currentStage.setScene(scene);
@@ -215,9 +214,20 @@ public class DashboardController extends BaseController implements Initializable
 
         javafx.application.Platform.runLater(() -> {
             try {
-
+                // Force layout and style application
                 root.applyCss();
                 root.layout();
+                
+                // Ensure the controller's theme is initialized
+                if (controller != null) {
+                    try {
+                        java.lang.reflect.Method initTheme = controller.getClass().getMethod("initializeTheme");
+                        initTheme.invoke(controller);
+                    } catch (Exception e) {
+                        // initializeTheme may not be accessible, that's okay
+                        System.out.println("DEBUG: Could not call initializeTheme on controller: " + e.getMessage());
+                    }
+                }
 
                 javafx.geometry.Bounds contentBounds = root.getLayoutBounds();
 

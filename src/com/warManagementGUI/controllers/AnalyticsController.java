@@ -75,7 +75,6 @@ public class AnalyticsController extends BaseController implements Initializable
      * Handle logout button click
      */
     @FXML
-    @SuppressWarnings("unused")
     private void handleLogout() {
         authService.logout();
         try {
@@ -101,7 +100,6 @@ public class AnalyticsController extends BaseController implements Initializable
     }
 
     @FXML
-    @SuppressWarnings("unused")
     private void showPersonnelAnalytics() {
         try {
 
@@ -114,7 +112,6 @@ public class AnalyticsController extends BaseController implements Initializable
     }
 
     @FXML
-    @SuppressWarnings("unused")
     private void showUnitsAnalytics() {
         try {
             UnitsBarChart.showUnitTypeChart();
@@ -124,7 +121,6 @@ public class AnalyticsController extends BaseController implements Initializable
     }
 
     @FXML
-    @SuppressWarnings("unused")
     private void showEquipmentAnalytics() {
         try {
 
@@ -137,7 +133,6 @@ public class AnalyticsController extends BaseController implements Initializable
     }
 
     @FXML
-    @SuppressWarnings("unused")
     private void showSuppliesAnalytics() {
         try {
 
@@ -150,7 +145,6 @@ public class AnalyticsController extends BaseController implements Initializable
     }
 
     @FXML
-    @SuppressWarnings("unused")
     private void showMissionsAnalytics() {
         try {
 
@@ -162,7 +156,6 @@ public class AnalyticsController extends BaseController implements Initializable
     }
 
     @FXML
-    @SuppressWarnings("unused")
     private void exportToCSV() {
         try {
             FileChooser fileChooser = new FileChooser();
@@ -186,7 +179,6 @@ public class AnalyticsController extends BaseController implements Initializable
     }
 
     @FXML
-    @SuppressWarnings("unused")
     private void generateReport() {
         try {
             FileChooser fileChooser = new FileChooser();
@@ -210,7 +202,6 @@ public class AnalyticsController extends BaseController implements Initializable
     }
 
     @FXML
-    @SuppressWarnings("unused")
     private void refreshData() {
         try {
 
@@ -224,7 +215,6 @@ public class AnalyticsController extends BaseController implements Initializable
     }
 
     @FXML
-    @SuppressWarnings("unused")
     private void goBack() {
         try {
             navigateToScene("/com/warManagementGUI/fxml/Dashboard.fxml", "War Management System - Dashboard", backBtn);

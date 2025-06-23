@@ -123,9 +123,7 @@ public abstract class BaseController {
                 themeToggleBtn.setText("🌙 Dark Mode");
             }
         }
-    }
-
-    /**
+    }    /**
      * Apply the current theme to the scene
      */
     protected void applyTheme() {
@@ -133,6 +131,11 @@ public abstract class BaseController {
             Scene scene = themeToggleBtn.getScene();
             if (scene != null) {
                 themeManager.applyThemeToScene(scene);
+                // Force a layout update to ensure styles are applied
+                javafx.application.Platform.runLater(() -> {
+                    scene.getRoot().applyCss();
+                    scene.getRoot().autosize();
+                });
             }
         }
     }

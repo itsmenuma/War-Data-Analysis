@@ -1,6 +1,7 @@
 package com.warManagementGUI.controllers;
 
 import com.warManagementGUI.services.AuthenticationService;
+import com.warManagementGUI.util.ThemeManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -28,10 +29,10 @@ public class LoginController implements Initializable {
     private Label errorLabel;
     @FXML
     private Label statusLabel;
-
-    private AuthenticationService authService = AuthenticationService.getInstance();
-
-    @Override
+    @FXML
+    private Button themeToggleButton;
+    private final AuthenticationService authService = AuthenticationService.getInstance();
+    private final ThemeManager themeManager = ThemeManager.getInstance();    @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Clear any existing error messages
         if (errorLabel != null) {
@@ -49,6 +50,44 @@ public class LoginController implements Initializable {
         }
         if (passwordField != null) {
             passwordField.setOnAction(e -> handleLogin());
+        }
+        // Initialize theme toggle button
+        updateThemeButtonText();
+
+        // Apply theme to the scene when the component is ready
+        if (loginButton != null) {
+            loginButton.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) {
+                    applyCurrentTheme(newScene);
+                }
+            });
+        }
+    }
+    
+    private void applyCurrentTheme(Scene scene) {
+        // Clear existing stylesheets first
+        scene.getStylesheets().clear();
+        
+        // Apply the appropriate theme
+        themeManager.applyThemeToScene(scene);
+        
+        // Force a layout update to ensure all styles are applied
+        scene.getRoot().applyCss();
+        scene.getRoot().autosize();
+    }    @FXML
+    private void toggleTheme() {
+        themeManager.toggleTheme();
+        updateThemeButtonText();
+        // Reapply theme to current scene
+        Scene scene = loginButton.getScene();
+        if (scene != null) {
+            applyCurrentTheme(scene);
+        }
+    }
+
+    private void updateThemeButtonText() {
+        if (themeToggleButton != null) {
+            themeToggleButton.setText(themeManager.isDarkMode() ? "☀️ Light" : "🌙 Dark");
         }
     }
 
@@ -71,9 +110,11 @@ public class LoginController implements Initializable {
             try {
                 // Load main dashboard
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Dashboard.fxml"));
-                Parent root = loader.load();
+                Parent root = loader.load();                Scene scene = new Scene(root, 1200, 800);
 
-                Scene scene = new Scene(root, 1200, 800);
+                // Apply current theme to the new scene
+                applyCurrentTheme(scene);
+
                 Stage stage = (Stage) loginButton.getScene().getWindow();
                 stage.setScene(scene);
                 stage.setTitle("War Data Analysis System - " + authService.getCurrentUser().getRole().getDisplayName());
