@@ -1,5 +1,7 @@
 package com.warManagementGUI.controllers;
 
+import java.io.IOException;
+
 import com.warManagementGUI.util.ThemeManager;
 
 import javafx.application.Application;
@@ -18,49 +20,55 @@ public class ModernWarManagementApp extends Application {
     public void start(Stage primaryStage) {
         try {
 
-            System.out.println("Looking for FXML at: /com/warManagementGUI/fxml/Dashboard.fxml");
-            System.out.println("Looking for CSS at: /com/warManagementGUI/css/application.css");
+            System.out.println("Looking for Login FXML at: /com/warManagementGUI/fxml/Login.fxml");
 
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/com/warManagementGUI/fxml/Dashboard.fxml"));
+            loader.setLocation(getClass().getResource("/com/warManagementGUI/fxml/Login.fxml"));
 
             if (loader.getLocation() == null) {
-                System.err.println("Could not find Dashboard.fxml");
-                throw new RuntimeException("Dashboard.fxml not found");
+                System.err.println("Could not find Login.fxml, falling back to Dashboard.fxml");
+
+                loader.setLocation(getClass().getResource("/com/warManagementGUI/fxml/Dashboard.fxml"));
+
+                if (loader.getLocation() == null) {
+                    System.err.println("Could not find Dashboard.fxml either");
+                    throw new RuntimeException("Neither Login.fxml nor Dashboard.fxml found");
+                }
             }
             Parent root = loader.load();
+            Scene scene = new Scene(root);
 
-            Scene scene = new Scene(root, 1200, 800);
-
-            // Apply initial theme using ThemeManager
             ThemeManager themeManager = ThemeManager.getInstance();
+
+            scene.getStylesheets().clear();
+
             themeManager.applyThemeToScene(scene);
 
-            primaryStage.setTitle("War Data Analysis System - Modern UI");
-            primaryStage.setScene(scene);
-            primaryStage.setMinWidth(1000);
-            primaryStage.setMinHeight(700);
-            primaryStage.setMaximized(true);
+            root.applyCss();
+            root.autosize();
 
+            if (loader.getLocation().toString().contains("Login.fxml")) {
+                primaryStage.setTitle("War Data Analysis System - Login");
+                primaryStage.setResizable(false);
+                primaryStage.centerOnScreen();
+            } else {
+                primaryStage.setTitle("War Data Analysis System - Modern UI");
+                primaryStage.setMinWidth(1000);
+                primaryStage.setMinHeight(700);
+                primaryStage.setMaximized(true);
+            }
+
+            primaryStage.setScene(scene);
             primaryStage.show();
 
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             System.err.println("Application startup error: " + e.getMessage());
-            e.printStackTrace();
 
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Application Error");
             alert.setHeaderText("Failed to start application");
             alert.setContentText("Error: " + e.getMessage() + "\n\nFalling back to legacy interface...");
             alert.showAndWait();
-
-            try {
-                com.warManagementGUI.WarManagement warManagement = new com.warManagementGUI.WarManagement();
-                warManagement.display();
-            } catch (Exception ex) {
-                System.err.println("Legacy fallback also failed: " + ex.getMessage());
-                System.exit(1);
-            }
         }
     }
 

@@ -1,4 +1,4 @@
-package com.warManagementGUI.Units;
+package com.warManagementGUI.records;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -18,11 +18,11 @@ public class UnitRecord {
     /**
      * Constructor to create a UnitRecord with all fields.
      *
-     * @param unitId Unit identification number
-     * @param unitName Name of the unit
-     * @param unitType Type/category of the unit (Infantry, Cavalry, etc.)
+     * @param unitId      Unit identification number
+     * @param unitName    Name of the unit
+     * @param unitType    Type/category of the unit (Infantry, Cavalry, etc.)
      * @param commanderId ID of the commanding officer
-     * @param locationId ID of the unit's location
+     * @param locationId  ID of the unit's location
      */
     public UnitRecord(String unitId, String unitName, String unitType, String commanderId, String locationId) {
         this.unitId = new SimpleStringProperty(unitId != null ? unitId : "");
