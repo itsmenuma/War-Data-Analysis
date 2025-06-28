@@ -14,6 +14,8 @@ C:\Users\jai swrup\Desktop\code\war2\src\com\warManagementGUI\records\EquipmentR
 C:\Users\jai swrup\Desktop\code\war2\src\com\warManagementGUI\DataAnalysis\EquipmentBarChart.java
 C:\Users\jai swrup\Desktop\code\war2\src\com\warManagementGUI\records\MissionRecord.java
 C:\Users\jai swrup\Desktop\code\war2\src\com\warManagementGUI\models\Role.java
+C:\Users\jai swrup\Desktop\code\war2\src\com\warManagementGUI\util\FilterHelper.java
+C:\Users\jai swrup\Desktop\code\war2\src\com\warManagementGUI\components\FilterControls.java
 C:\Users\jai swrup\Desktop\code\war2\src\com\warManagementGUI\controllers\ModernWarManagementApp.java
 C:\Users\jai swrup\Desktop\code\war2\src\com\warManagementGUI\DataAnalysis\UnitsBarChart.java
 C:\Users\jai swrup\Desktop\code\war2\src\com\warManagementGUI\records\UnitRecord.java
@@ -25,6 +27,7 @@ C:\Users\jai swrup\Desktop\code\war2\src\com\warManagementGUI\controllers\LoginC
 C:\Users\jai swrup\Desktop\code\war2\src\test\java\AnalyticsTest.java
 C:\Users\jai swrup\Desktop\code\war2\src\com\warManagementGUI\controllers\AnalyticsController.java
 C:\Users\jai swrup\Desktop\code\war2\src\com\warManagementGUI\controllers\BaseController.java
+C:\Users\jai swrup\Desktop\code\war2\src\com\warManagementGUI\util\TableFilterUtil.java
 C:\Users\jai swrup\Desktop\code\war2\src\com\warManagementGUI\models\Permission.java
 C:\Users\jai swrup\Desktop\code\war2\src\com\warManagementGUI\controllers\SuppliesController.java
 C:\Users\jai swrup\Desktop\code\war2\src\com\warManagementGUI\DataAnalysis\MissionsBarChart.java

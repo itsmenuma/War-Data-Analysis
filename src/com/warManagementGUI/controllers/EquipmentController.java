@@ -7,10 +7,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
+import java.util.Set;
 
+import com.warManagementGUI.components.FilterControls;
 import com.warManagementGUI.models.Permission;
 import com.warManagementGUI.records.EquipmentRecord;
 import com.warManagementGUI.util.DBUtil;
+import com.warManagementGUI.util.TableFilterUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,6 +32,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
@@ -47,6 +51,12 @@ public class EquipmentController extends BaseController implements Initializable
     private Label userRoleLabel;
     @FXML
     private Button logoutBtn;
+    @FXML
+    private VBox mainContainer; // Container for filter controls
+
+    // Filter components
+    private FilterControls filterControls;
+    private TableFilterUtil<EquipmentRecord> filterUtil;
 
     @FXML
     private TextField equipmentIdField;
@@ -103,6 +113,8 @@ public class EquipmentController extends BaseController implements Initializable
         statusComboBox.setValue("Operational");
 
         setupTableColumns();
+        setupFilterControls();
+        setupFilterListeners();
 
         loadEquipmentData();
 
@@ -157,7 +169,97 @@ public class EquipmentController extends BaseController implements Initializable
         statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
         locationIdCol.setCellValueFactory(new PropertyValueFactory<>("locationId"));
 
-        equipmentTable.setItems(equipmentData);
+        // Initialize filter utility
+        filterUtil = new TableFilterUtil<>(equipmentData);
+        equipmentTable.setItems(filterUtil.getFilteredData());
+    }
+
+    private void setupFilterControls() {
+        // Create filter controls with custom labels
+        filterControls = new FilterControls("Type", "Search equipment by name, ID, or unit...");
+
+        // Setup filter options
+        setupTypeFilter();
+        setupStatusFilterOptions();
+        setupLocationFilterOptions();
+
+        // Insert filter controls at the top of the main container
+        if (mainContainer != null) {
+            // Insert filter controls after the header (index 1), not at the beginning
+            mainContainer.getChildren().add(1, filterControls);
+        }
+    }
+
+    private void setupTypeFilter() {
+        Set<String> types = TableFilterUtil.extractUniqueValues(equipmentData,
+                equipment -> equipment.getType());
+        TableFilterUtil.setupComboBoxFilter(filterControls.getPrimaryFilter(), types);
+    }
+
+    private void setupStatusFilterOptions() {
+        Set<String> statuses = TableFilterUtil.extractUniqueValues(equipmentData,
+                equipment -> equipment.getStatus());
+        TableFilterUtil.setupComboBoxFilter(filterControls.getStatusFilter(), statuses);
+    }
+
+    private void setupLocationFilterOptions() {
+        Set<String> locations = TableFilterUtil.extractUniqueValues(equipmentData,
+                equipment -> String.valueOf(equipment.getLocationId()));
+        TableFilterUtil.setupComboBoxFilter(filterControls.getLocationFilter(), locations);
+    }
+
+    private void setupFilterListeners() {
+        // Keyword search
+        filterControls.getSearchField().textProperty().addListener((obs, oldVal, newVal) -> {
+            filterUtil.setKeywordFilter(equipment -> TableFilterUtil.matchesKeyword(newVal,
+                    String.valueOf(equipment.getEquipmentId()),
+                    equipment.getName(),
+                    equipment.getType(),
+                    String.valueOf(equipment.getUnitId())));
+            updateResultsLabel();
+        });
+
+        // Type filter
+        filterControls.getPrimaryFilter().valueProperty().addListener((obs, oldVal, newVal) -> {
+            filterUtil.setCategoryFilter(equipment -> TableFilterUtil.matchesFilter(newVal, equipment.getType()));
+            updateResultsLabel();
+        });
+
+        // Status filter
+        filterControls.getStatusFilter().valueProperty().addListener((obs, oldVal, newVal) -> {
+            filterUtil.setStatusFilter(equipment -> TableFilterUtil.matchesFilter(newVal, equipment.getStatus()));
+            updateResultsLabel();
+        });
+
+        // Location filter
+        filterControls.getLocationFilter().valueProperty().addListener((obs, oldVal, newVal) -> {
+            filterUtil.setLocationFilter(
+                    equipment -> TableFilterUtil.matchesFilter(newVal, String.valueOf(equipment.getLocationId())));
+            updateResultsLabel();
+        });
+
+        // Clear filters button
+        filterControls.getClearFiltersButton().setOnAction(e -> {
+            filterControls.getSearchField().clear();
+            filterControls.getPrimaryFilter().setValue("All");
+            filterControls.getStatusFilter().setValue("All");
+            filterControls.getLocationFilter().setValue("All");
+            filterUtil.clearAllFilters();
+            updateResultsLabel();
+        });
+    }
+
+    private void updateResultsLabel() {
+        if (filterControls != null) {
+            filterControls.updateResultsLabel(filterUtil.getFilteredCount(), filterUtil.getTotalCount());
+        }
+    }
+
+    private void refreshFilterOptions() {
+        setupTypeFilter();
+        setupStatusFilterOptions();
+        setupLocationFilterOptions();
+        updateResultsLabel();
     }
 
     private void setupTableSelectionListener() {
@@ -387,6 +489,11 @@ public class EquipmentController extends BaseController implements Initializable
                         rs.getString("status"),
                         rs.getInt("location_id"));
                 equipmentData.add(equipment);
+            }
+
+            // Refresh filter options after loading data
+            if (filterControls != null) {
+                refreshFilterOptions();
             }
 
         } catch (SQLException e) {

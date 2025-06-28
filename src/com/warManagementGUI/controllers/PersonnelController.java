@@ -7,11 +7,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import com.warManagementGUI.DataAnalysis.PersonnelBarChart;
+import com.warManagementGUI.components.FilterControls;
 import com.warManagementGUI.models.Permission;
 import com.warManagementGUI.records.PersonnelRecord;
 import com.warManagementGUI.util.DBUtil;
+import com.warManagementGUI.util.TableFilterUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -28,6 +31,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
@@ -41,6 +45,12 @@ public class PersonnelController extends BaseController implements Initializable
     private Label userRoleLabel;
     @FXML
     private Button logoutBtn;
+    @FXML
+    private VBox mainContainer; // Container for filter controls
+
+    // Filter components
+    private FilterControls filterControls;
+    private TableFilterUtil<PersonnelRecord> filterUtil;
 
     @FXML
     private TextField personnelIdField;
@@ -103,6 +113,8 @@ public class PersonnelController extends BaseController implements Initializable
         setupTableColumns();
         setupTableSelection();
         loadPersonnelData();
+        setupFilterControls();
+        setupFilterListeners();
         initializeTheme();
         configureUIBasedOnPermissions();
         updateUserInfo();
@@ -133,7 +145,85 @@ public class PersonnelController extends BaseController implements Initializable
         roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
         contactColumn.setCellValueFactory(new PropertyValueFactory<>("contact"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
-        personnelTable.setItems(personnelData);
+
+        // Initialize filter utility
+        filterUtil = new TableFilterUtil<>(personnelData);
+        personnelTable.setItems(filterUtil.getFilteredData());
+    }
+
+    private void setupFilterControls() {
+        // Create filter controls with custom labels
+        filterControls = new FilterControls("Role", "Search personnel by name, ID, post, or contact...");
+
+        // Hide location filter as it's not relevant for personnel
+        filterControls.hideLocationFilter();
+
+        // Setup filter options
+        setupRoleFilter();
+        setupStatusFilterOptions();
+
+        // Insert filter controls at the top of the main container
+        if (mainContainer != null) {
+            // Insert filter controls after the header (index 1), not at the beginning
+            mainContainer.getChildren().add(1, filterControls);
+        }
+    }
+
+    private void setupRoleFilter() {
+        Set<String> roles = TableFilterUtil.extractUniqueValues(personnelData,
+                personnel -> personnel.getRole());
+        TableFilterUtil.setupComboBoxFilter(filterControls.getPrimaryFilter(), roles);
+    }
+
+    private void setupStatusFilterOptions() {
+        Set<String> statuses = TableFilterUtil.extractUniqueValues(personnelData,
+                personnel -> personnel.getStatus());
+        TableFilterUtil.setupComboBoxFilter(filterControls.getStatusFilter(), statuses);
+    }
+
+    private void setupFilterListeners() {
+        // Keyword search
+        filterControls.getSearchField().textProperty().addListener((obs, oldVal, newVal) -> {
+            filterUtil.setKeywordFilter(personnel -> TableFilterUtil.matchesKeyword(newVal,
+                    personnel.getPersonnelId(),
+                    personnel.getFirstName(),
+                    personnel.getLastName(),
+                    personnel.getPost(),
+                    personnel.getContact(),
+                    personnel.getUnitId()));
+            updateResultsLabel();
+        });
+
+        // Role filter
+        filterControls.getPrimaryFilter().valueProperty().addListener((obs, oldVal, newVal) -> {
+            filterUtil.setCategoryFilter(personnel -> TableFilterUtil.matchesFilter(newVal, personnel.getRole()));
+            updateResultsLabel();
+        });
+
+        // Status filter
+        filterControls.getStatusFilter().valueProperty().addListener((obs, oldVal, newVal) -> {
+            filterUtil.setStatusFilter(personnel -> TableFilterUtil.matchesFilter(newVal, personnel.getStatus()));
+            updateResultsLabel();
+        });
+
+        // Clear filters button
+        filterControls.getClearFiltersButton().setOnAction(e -> {
+            filterControls.getSearchField().clear();
+            filterControls.getPrimaryFilter().setValue("All");
+            filterControls.getStatusFilter().setValue("All");
+            filterUtil.clearAllFilters();
+            updateResultsLabel();
+        });
+    }
+
+    private void updateResultsLabel() {
+        filterControls.updateResultsLabel(filterUtil.getFilteredCount(), filterUtil.getTotalCount());
+    }
+
+    private void refreshFilterOptions() {
+        setupRoleFilter();
+        setupStatusFilterOptions();
+        updateResultsLabel();
     }
 
     @Override
@@ -378,6 +468,11 @@ public class PersonnelController extends BaseController implements Initializable
                         rs.getString("role"),
                         rs.getString("contact_information"),
                         rs.getString("status")));
+            }
+
+            // Refresh filter options after loading data
+            if (filterControls != null) {
+                refreshFilterOptions();
             }
         } catch (SQLException e) {
             showError("Error loading personnel data: " + e.getMessage());
