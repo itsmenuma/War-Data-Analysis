@@ -7,10 +7,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
+import java.util.Set;
 
+import com.warManagementGUI.components.FilterControls;
 import com.warManagementGUI.models.Permission;
 import com.warManagementGUI.records.SupplyRecord;
 import com.warManagementGUI.util.DBUtil;
+import com.warManagementGUI.util.TableFilterUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -28,6 +31,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
@@ -42,6 +46,12 @@ public class SuppliesController extends BaseController implements Initializable 
     private Label userRoleLabel;
     @FXML
     private Button logoutBtn;
+    @FXML
+    private VBox mainContainer; // Container for filter controls
+
+    // Filter components
+    private FilterControls filterControls;
+    private TableFilterUtil<SupplyRecord> filterUtil;
 
     @FXML
     private TextField supplyIdField;
@@ -101,6 +111,7 @@ public class SuppliesController extends BaseController implements Initializable 
         setupTableColumns();
 
         loadSupplyData();
+        setupFilterControls();
 
         setupTableSelectionListener();
 
@@ -366,6 +377,9 @@ public class SuppliesController extends BaseController implements Initializable 
                 supplyData.add(supply);
             }
 
+            // Update filter results after loading data
+            updateFilterResults();
+
         } catch (SQLException e) {
             showErrorAlert("Error loading supply data: " + e.getMessage());
         }
@@ -480,5 +494,93 @@ public class SuppliesController extends BaseController implements Initializable 
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    /**
+     * Sets up the filter controls for the supplies table
+     */
+    private void setupFilterControls() {
+        // Create filter controls
+        filterControls = new FilterControls("Supply Type", "Search supplies by ID, name, unit, or location...");
+
+        // Hide date filter as it's not relevant for supplies
+        filterControls.hideDateFilter();
+
+        // Create filter utility
+        filterUtil = new TableFilterUtil<>(supplyData);
+
+        // Set the table to use filtered data
+        suppliesTable.setItems(filterUtil.getFilteredData());
+
+        // Insert filter controls after the header (index 1), not at the beginning
+        if (mainContainer != null) {
+            mainContainer.getChildren().add(1, filterControls);
+        }
+
+        // Set up filter data
+        Set<String> types = supplyData.stream().map(SupplyRecord::getType).collect(java.util.stream.Collectors.toSet());
+        types.add("All");
+        TableFilterUtil.setupComboBoxFilter(filterControls.getPrimaryFilter(), types);
+
+        // Set up location filter
+        Set<String> locations = supplyData.stream().map(SupplyRecord::getLocationId)
+                .collect(java.util.stream.Collectors.toSet());
+        locations.add("All");
+        TableFilterUtil.setupComboBoxFilter(filterControls.getLocationFilter(), locations);
+
+        // Set up status filter
+        Set<String> statuses = supplyData.stream().map(SupplyRecord::getStatus)
+                .collect(java.util.stream.Collectors.toSet());
+        statuses.add("All");
+        TableFilterUtil.setupComboBoxFilter(filterControls.getStatusFilter(), statuses);
+
+        // Set up search filter
+        filterControls.getSearchField().textProperty().addListener((obs, oldVal, newVal) -> {
+            filterUtil.setKeywordFilter(supply -> {
+                if (newVal == null || newVal.isEmpty())
+                    return true;
+                String searchLower = newVal.toLowerCase();
+                return supply.getSupplyId().toLowerCase().contains(searchLower) ||
+                        supply.getName().toLowerCase().contains(searchLower) ||
+                        supply.getUnitId().toLowerCase().contains(searchLower) ||
+                        supply.getLocationId().toLowerCase().contains(searchLower);
+            });
+            updateFilterResults();
+        });
+
+        // Set up primary filter (Supply Type)
+        filterControls.getPrimaryFilter().valueProperty().addListener((obs, oldVal, newVal) -> {
+            filterUtil.setCategoryFilter(supply -> TableFilterUtil.matchesFilter(newVal, supply.getType()));
+            updateFilterResults();
+        });
+
+        // Set up location filter
+        filterControls.getLocationFilter().valueProperty().addListener((obs, oldVal, newVal) -> {
+            filterUtil.setLocationFilter(supply -> TableFilterUtil.matchesFilter(newVal, supply.getLocationId()));
+            updateFilterResults();
+        });
+
+        // Set up status filter
+        filterControls.getStatusFilter().valueProperty().addListener((obs, oldVal, newVal) -> {
+            filterUtil.setStatusFilter(supply -> TableFilterUtil.matchesFilter(newVal, supply.getStatus()));
+            updateFilterResults();
+        });
+
+        // Set up clear filters button
+        filterControls.getClearFiltersButton().setOnAction(e -> {
+            filterControls.getSearchField().clear();
+            filterControls.getPrimaryFilter().setValue("All");
+            filterControls.getLocationFilter().setValue("All");
+            filterControls.getStatusFilter().setValue("All");
+        });
+    }
+
+    /**
+     * Updates the filter results label
+     */
+    private void updateFilterResults() {
+        if (filterControls != null && filterUtil != null) {
+            filterControls.updateResultsLabel(filterUtil.getFilteredCount(), filterUtil.getTotalCount());
+        }
     }
 }

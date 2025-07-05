@@ -9,7 +9,6 @@ com\warManagementGUI\DataAnalysis\AbstractBarChart.class
 com\warManagementGUI\util\AbstractDetailsStage.class
 com\warManagementGUI\DataAnalysis\MissionsBarChart.class
 com\warManagementGUI\util\DBUtil.class
-com\warManagementGUI\controllers\PersonnelController.class
 com\warManagementGUI\controllers\UnitsController.class
 com\warManagementGUI\controllers\MissionsController.class
 com\warManagementGUI\util\DBUtil$Query.class

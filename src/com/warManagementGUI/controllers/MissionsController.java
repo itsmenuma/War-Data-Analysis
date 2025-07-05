@@ -10,10 +10,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ResourceBundle;
+import java.util.Set;
 
+import com.warManagementGUI.components.FilterControls;
 import com.warManagementGUI.models.Permission;
 import com.warManagementGUI.records.MissionRecord;
 import com.warManagementGUI.util.DBUtil;
+import com.warManagementGUI.util.TableFilterUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -33,6 +36,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
@@ -47,6 +51,12 @@ public class MissionsController extends BaseController implements Initializable 
     private Label userRoleLabel;
     @FXML
     private Button logoutBtn;
+    @FXML
+    private VBox mainContainer; // Container for filter controls
+
+    // Filter components
+    private FilterControls filterControls;
+    private TableFilterUtil<MissionRecord> filterUtil;
 
     @FXML
     private TextField missionIdField;
@@ -104,6 +114,8 @@ public class MissionsController extends BaseController implements Initializable 
         statusComboBox.setValue("planned");
 
         setupTableColumns();
+        setupFilterControls();
+        setupFilterListeners();
 
         loadMissionData();
 
@@ -153,7 +165,121 @@ public class MissionsController extends BaseController implements Initializable 
         statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
         locationIdCol.setCellValueFactory(new PropertyValueFactory<>("locationId"));
 
-        missionsTable.setItems(missionData);
+        // Initialize filter utility
+        filterUtil = new TableFilterUtil<>(missionData);
+        missionsTable.setItems(filterUtil.getFilteredData());
+    }
+
+    private void setupFilterControls() {
+        // Create filter controls with custom labels
+        filterControls = new FilterControls("Status", "Search missions by name, ID, or objective...");
+
+        // Setup filter options
+        setupStatusFilterOptions();
+        setupLocationFilterOptions();
+
+        // Insert filter controls at the top of the main container
+        if (mainContainer != null) {
+            // Insert filter controls after the header (index 1), not at the beginning
+            mainContainer.getChildren().add(1, filterControls);
+        }
+    }
+
+    private void setupStatusFilterOptions() {
+        Set<String> statuses = TableFilterUtil.extractUniqueValues(missionData,
+                mission -> mission.getStatus());
+        TableFilterUtil.setupComboBoxFilter(filterControls.getPrimaryFilter(), statuses);
+        TableFilterUtil.setupComboBoxFilter(filterControls.getStatusFilter(), statuses);
+    }
+
+    private void setupLocationFilterOptions() {
+        Set<String> locations = TableFilterUtil.extractUniqueValues(missionData,
+                mission -> mission.getLocationId());
+        TableFilterUtil.setupComboBoxFilter(filterControls.getLocationFilter(), locations);
+    }
+
+    private void setupFilterListeners() {
+        // Keyword search
+        filterControls.getSearchField().textProperty().addListener((obs, oldVal, newVal) -> {
+            filterUtil.setKeywordFilter(mission -> TableFilterUtil.matchesKeyword(newVal,
+                    mission.getMissionId(),
+                    mission.getName(),
+                    mission.getObjective(),
+                    mission.getLocationId()));
+            updateResultsLabel();
+        });
+
+        // Status filter
+        filterControls.getPrimaryFilter().valueProperty().addListener((obs, oldVal, newVal) -> {
+            filterUtil.setStatusFilter(mission -> TableFilterUtil.matchesFilter(newVal, mission.getStatus()));
+            updateResultsLabel();
+        });
+
+        // Location filter
+        filterControls.getLocationFilter().valueProperty().addListener((obs, oldVal, newVal) -> {
+            filterUtil.setLocationFilter(mission -> TableFilterUtil.matchesFilter(newVal, mission.getLocationId()));
+            updateResultsLabel();
+        });
+
+        // Date range filter
+        filterControls.getStartDatePicker().valueProperty().addListener((obs, oldVal, newVal) -> {
+            updateDateFilter();
+        });
+
+        filterControls.getEndDatePicker().valueProperty().addListener((obs, oldVal, newVal) -> {
+            updateDateFilter();
+        });
+
+        // Clear filters button
+        filterControls.getClearFiltersButton().setOnAction(e -> {
+            filterControls.getSearchField().clear();
+            filterControls.getPrimaryFilter().setValue("All");
+            filterControls.getStatusFilter().setValue("All");
+            filterControls.getLocationFilter().setValue("All");
+            filterControls.getStartDatePicker().setValue(null);
+            filterControls.getEndDatePicker().setValue(null);
+            filterUtil.clearAllFilters();
+            updateResultsLabel();
+        });
+    }
+
+    private void updateDateFilter() {
+        LocalDate startDate = filterControls.getStartDatePicker().getValue();
+        LocalDate endDate = filterControls.getEndDatePicker().getValue();
+
+        filterUtil.setDateFilter(mission -> {
+            if (startDate == null && endDate == null)
+                return true;
+
+            try {
+                LocalDate missionStartDate = LocalDate.parse(mission.getStartDate(), dateFormatter);
+                LocalDate missionEndDate = mission.getEndDate() != null && !mission.getEndDate().isEmpty()
+                        ? LocalDate.parse(mission.getEndDate(), dateFormatter)
+                        : null;
+
+                if (startDate != null && missionEndDate != null && missionEndDate.isBefore(startDate))
+                    return false;
+                if (endDate != null && missionStartDate.isAfter(endDate))
+                    return false;
+
+                return true;
+            } catch (DateTimeParseException e) {
+                return true; // Include items with invalid dates in results
+            }
+        });
+        updateResultsLabel();
+    }
+
+    private void updateResultsLabel() {
+        if (filterControls != null) {
+            filterControls.updateResultsLabel(filterUtil.getFilteredCount(), filterUtil.getTotalCount());
+        }
+    }
+
+    private void refreshFilterOptions() {
+        setupStatusFilterOptions();
+        setupLocationFilterOptions();
+        updateResultsLabel();
     }
 
     private void setupTableSelectionListener() {
@@ -387,6 +513,11 @@ public class MissionsController extends BaseController implements Initializable 
                         rs.getString("status"),
                         rs.getString("location_id"));
                 missionData.add(mission);
+            }
+
+            // Refresh filter options after loading data
+            if (filterControls != null) {
+                refreshFilterOptions();
             }
 
         } catch (SQLException e) {

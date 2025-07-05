@@ -7,10 +7,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
+import java.util.Set;
 
+import com.warManagementGUI.components.FilterControls;
 import com.warManagementGUI.models.Permission;
 import com.warManagementGUI.records.UnitRecord;
 import com.warManagementGUI.util.DBUtil;
+import com.warManagementGUI.util.TableFilterUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,6 +30,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
@@ -40,6 +44,12 @@ public class UnitsController extends BaseController implements Initializable {
     private Label userRoleLabel;
     @FXML
     private Button logoutBtn;
+    @FXML
+    private VBox mainContainer; // Container for filter controls
+
+    // Filter components
+    private FilterControls filterControls;
+    private TableFilterUtil<UnitRecord> filterUtil;
 
     @FXML
     private TextField unitIdField;
@@ -95,6 +105,7 @@ public class UnitsController extends BaseController implements Initializable {
         setupTableColumns();
         setupTableSelection();
         loadUnitsData();
+        setupFilterControls();
         configureUIBasedOnPermissions();
         updateUserInfo();
     }
@@ -338,6 +349,9 @@ public class UnitsController extends BaseController implements Initializable {
                         rs.getString("commander_id"),
                         rs.getString("location_id")));
             }
+
+            // Update filter results after loading data
+            updateFilterResults();
         } catch (SQLException e) {
             showError("Error loading units data: " + e.getMessage());
         }
@@ -389,5 +403,86 @@ public class UnitsController extends BaseController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         return alert.showAndWait().orElse(null) == javafx.scene.control.ButtonType.OK;
+    }
+
+    /**
+     * Sets up the filter controls for the units table
+     */
+    private void setupFilterControls() {
+        // Create filter controls
+        filterControls = new FilterControls("Unit Type", "Search units by ID, name, commander, or location...");
+
+        // Hide date filter as it's not relevant for units
+        filterControls.hideDateFilter();
+
+        // Create filter utility
+        filterUtil = new TableFilterUtil<>(unitsData);
+
+        // Set the table to use filtered data
+        unitsTable.setItems(filterUtil.getFilteredData());
+
+        // Insert filter controls after the header (index 1), not at the beginning
+        if (mainContainer != null) {
+            mainContainer.getChildren().add(1, filterControls);
+        }
+
+        // Set up filter data
+        Set<String> types = unitsData.stream().map(UnitRecord::getUnitType)
+                .collect(java.util.stream.Collectors.toSet());
+        types.add("All");
+        TableFilterUtil.setupComboBoxFilter(filterControls.getPrimaryFilter(), types);
+
+        // Set up location filter
+        Set<String> locations = unitsData.stream().map(UnitRecord::getLocationId)
+                .collect(java.util.stream.Collectors.toSet());
+        locations.add("All");
+        TableFilterUtil.setupComboBoxFilter(filterControls.getLocationFilter(), locations);
+
+        // Set up status filter (not applicable for units, use generic values)
+        Set<String> statuses = Set.of("All", "Active", "Inactive");
+        TableFilterUtil.setupComboBoxFilter(filterControls.getStatusFilter(), statuses);
+
+        // Set up search filter
+        filterControls.getSearchField().textProperty().addListener((obs, oldVal, newVal) -> {
+            filterUtil.setKeywordFilter(unit -> {
+                if (newVal == null || newVal.isEmpty())
+                    return true;
+                String searchLower = newVal.toLowerCase();
+                return unit.getUnitId().toLowerCase().contains(searchLower) ||
+                        unit.getUnitName().toLowerCase().contains(searchLower) ||
+                        unit.getCommanderId().toLowerCase().contains(searchLower) ||
+                        unit.getLocationId().toLowerCase().contains(searchLower);
+            });
+            updateFilterResults();
+        });
+
+        // Set up primary filter (Unit Type)
+        filterControls.getPrimaryFilter().valueProperty().addListener((obs, oldVal, newVal) -> {
+            filterUtil.setCategoryFilter(unit -> TableFilterUtil.matchesFilter(newVal, unit.getUnitType()));
+            updateFilterResults();
+        });
+
+        // Set up location filter
+        filterControls.getLocationFilter().valueProperty().addListener((obs, oldVal, newVal) -> {
+            filterUtil.setLocationFilter(unit -> TableFilterUtil.matchesFilter(newVal, unit.getLocationId()));
+            updateFilterResults();
+        });
+
+        // Set up clear filters button
+        filterControls.getClearFiltersButton().setOnAction(e -> {
+            filterControls.getSearchField().clear();
+            filterControls.getPrimaryFilter().setValue("All");
+            filterControls.getLocationFilter().setValue("All");
+            filterControls.getStatusFilter().setValue("All");
+        });
+    }
+
+    /**
+     * Updates the filter results label
+     */
+    private void updateFilterResults() {
+        if (filterControls != null && filterUtil != null) {
+            filterControls.updateResultsLabel(filterUtil.getFilteredCount(), filterUtil.getTotalCount());
+        }
     }
 }
