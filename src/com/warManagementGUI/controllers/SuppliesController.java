@@ -8,7 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-import com.warManagementGUI.Supply.SupplyRecord;
+import com.warManagementGUI.models.Permission;
+import com.warManagementGUI.records.SupplyRecord;
 import com.warManagementGUI.util.DBUtil;
 
 import javafx.collections.FXCollections;
@@ -22,6 +23,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -33,6 +35,13 @@ import javafx.stage.Stage;
  * Handles CRUD operations for supply data with modern UI
  */
 public class SuppliesController extends BaseController implements Initializable {
+
+    @FXML
+    private Label welcomeLabel;
+    @FXML
+    private Label userRoleLabel;
+    @FXML
+    private Button logoutBtn;
 
     @FXML
     private TextField supplyIdField;
@@ -65,8 +74,8 @@ public class SuppliesController extends BaseController implements Initializable 
     private TableColumn<SupplyRecord, String> locationIdCol;
     @FXML
     private TableColumn<SupplyRecord, String> statusCol;
-
     @FXML
+    @SuppressWarnings("unused")
     private Button clearBtn;
     @FXML
     private Button addBtn;
@@ -79,7 +88,7 @@ public class SuppliesController extends BaseController implements Initializable 
     @FXML
     private Button backBtn;
 
-    private ObservableList<SupplyRecord> supplyData = FXCollections.observableArrayList();
+    private final ObservableList<SupplyRecord> supplyData = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -94,6 +103,46 @@ public class SuppliesController extends BaseController implements Initializable 
         loadSupplyData();
 
         setupTableSelectionListener();
+
+        configureUIBasedOnPermissions();
+        updateUserInfo();
+    }
+
+    /**
+     * Handle logout button click
+     */
+    @FXML
+    @SuppressWarnings("unused")
+    private void handleLogout() {
+        authService.logout();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Login.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            Stage stage = (Stage) logoutBtn.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load login screen: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Update user information display
+     */
+    private void updateUserInfo() {
+        if (authService.getCurrentUser() != null) {
+            welcomeLabel.setText("Welcome, " + authService.getCurrentUser().getUsername());
+            userRoleLabel.setText("Role: " + authService.getCurrentUser().getRole().toString());
+        }
+    }
+
+    @Override
+    protected void configureUIBasedOnPermissions() {
+        configureButtonVisibility(addBtn, Permission.WRITE_DATA);
+        configureButtonVisibility(updateBtn, Permission.WRITE_DATA);
+        configureButtonVisibility(deleteBtn, Permission.DELETE_DATA);
+        configureButtonVisibility(analyticsBtn, Permission.ANALYZE_DATA);
     }
 
     private void setupTableColumns() {
@@ -140,7 +189,12 @@ public class SuppliesController extends BaseController implements Initializable 
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void addSupply() {
+        if (!requirePermission(Permission.WRITE_DATA)) {
+            return;
+        }
+
         if (!validateFields()) {
             return;
         }
@@ -175,7 +229,12 @@ public class SuppliesController extends BaseController implements Initializable 
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void updateSupply() {
+        if (!requirePermission(Permission.WRITE_DATA)) {
+            return;
+        }
+
         if (supplyIdField.getText().trim().isEmpty()) {
             showWarningAlert("Please select a supply to update or enter a Supply ID.");
             return;
@@ -215,7 +274,12 @@ public class SuppliesController extends BaseController implements Initializable 
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void deleteSupply() {
+        if (!requirePermission(Permission.DELETE_DATA)) {
+            return;
+        }
+
         if (supplyIdField.getText().trim().isEmpty()) {
             showWarningAlert("Please select a supply to delete or enter a Supply ID.");
             return;
@@ -235,7 +299,7 @@ public class SuppliesController extends BaseController implements Initializable 
         try (Connection conn = DBUtil.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, Integer.valueOf(supplyIdField.getText().trim()));
+            pstmt.setInt(1, Integer.parseInt(supplyIdField.getText().trim()));
 
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
@@ -254,7 +318,12 @@ public class SuppliesController extends BaseController implements Initializable 
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void showAnalytics() {
+        if (!requirePermission(Permission.ANALYZE_DATA)) {
+            return;
+        }
+
         try {
 
             com.warManagementGUI.DataAnalysis.SuppliesBarChart.showSupplyStatusChart();
@@ -264,22 +333,20 @@ public class SuppliesController extends BaseController implements Initializable 
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void goBack() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Dashboard.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) backBtn.getScene().getWindow();
-            Scene scene = new Scene(root);
-
-            themeManager.applyThemeToScene(scene);
-            stage.setScene(scene);
-
+            navigateToScene("/com/warManagementGUI/fxml/Dashboard.fxml", "War Management System - Dashboard", backBtn);
         } catch (IOException e) {
             showErrorAlert("Error loading dashboard: " + e.getMessage());
         }
     }
 
     private void loadSupplyData() {
+        if (!requirePermission(Permission.READ_DATA)) {
+            return;
+        }
+
         supplyData.clear();
         String sql = "SELECT supply_id, name, type, quantity, unit_id, location_id, status FROM Supplies ORDER BY supply_id";
 
@@ -391,13 +458,19 @@ public class SuppliesController extends BaseController implements Initializable 
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void refreshData() {
         loadSupplyData();
         showSuccessAlert("Data refreshed successfully!");
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void exportData() {
+        if (!requirePermission(Permission.EXPORT_DATA)) {
+            return;
+        }
+
         showInfoAlert("Export functionality will be available soon!");
     }
 

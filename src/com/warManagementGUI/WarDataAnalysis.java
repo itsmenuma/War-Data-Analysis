@@ -66,8 +66,8 @@ public class WarDataAnalysis {
             performTimeSeriesAnalysis(records);
             performGeospatialAnalysis(records);
             performSentimentAnalysis(records);
-            saveConflictDataAsJson(records); // New method call
-        } catch (Exception e) {
+            saveConflictDataAsJson(records);
+        } catch (CsvValidationException | IOException | SchemaException e) {
             e.printStackTrace();
         }
     }
@@ -75,7 +75,7 @@ public class WarDataAnalysis {
     private static List<ConflictRecord> readCsv(String filePath) throws IOException, CsvValidationException {
         List<ConflictRecord> records = new ArrayList<>();
         try (CSVReader reader = new CSVReader(new FileReader(filePath))) {
-            reader.readNext(); // Skip header
+            reader.readNext();
             String[] line;
             while ((line = reader.readNext()) != null) {
                 records.add(new ConflictRecord(
@@ -156,7 +156,6 @@ public class WarDataAnalysis {
             sentimentCounts.put(sentiment, sentimentCounts.getOrDefault(sentiment, 0) + 1);
         }
 
-        // Save as JSON
         try (PrintWriter writer = new PrintWriter("pics/sentiment_analysis.json")) {
             writer.println("{ \"sentiments\": {");
             writer.println("\"Positive\": " + sentimentCounts.get("Positive") + ",");
@@ -165,7 +164,6 @@ public class WarDataAnalysis {
             writer.println("} }");
         }
 
-        // Create bar chart for sentiment counts
         TimeSeries sentimentSeries = new TimeSeries("Sentiment Distribution");
         sentimentCounts.forEach((sentiment, count) -> sentimentSeries.add(new Year(count), count));
         TimeSeriesCollection dataset = new TimeSeriesCollection(sentimentSeries);
@@ -175,7 +173,6 @@ public class WarDataAnalysis {
         ChartUtils.saveChartAsPNG(new File("pics/sentiment_distribution.png"), chart, 800, 600);
     }
 
-    // New method to save conflict data as JSON
     private static void saveConflictDataAsJson(List<ConflictRecord> records) throws IOException {
         try (PrintWriter writer = new PrintWriter("pics/conflict_data.json")) {
             writer.println("[");

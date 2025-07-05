@@ -8,7 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-import com.warManagementGUI.Units.UnitRecord;
+import com.warManagementGUI.models.Permission;
+import com.warManagementGUI.records.UnitRecord;
 import com.warManagementGUI.util.DBUtil;
 
 import javafx.collections.FXCollections;
@@ -21,6 +22,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -31,6 +33,13 @@ import javafx.stage.Stage;
  * Controller for Units Management interface
  */
 public class UnitsController extends BaseController implements Initializable {
+
+    @FXML
+    private Label welcomeLabel;
+    @FXML
+    private Label userRoleLabel;
+    @FXML
+    private Button logoutBtn;
 
     @FXML
     private TextField unitIdField;
@@ -63,17 +72,19 @@ public class UnitsController extends BaseController implements Initializable {
     @FXML
     private Button deleteBtn;
     @FXML
+    @SuppressWarnings("unused")
     private Button clearBtn;
     @FXML
     private Button analyticsBtn;
     @FXML
     private Button backBtn;
     @FXML
+    @SuppressWarnings("unused")
     private Button refreshBtn;
     @FXML
     private Button exportBtn;
 
-    private ObservableList<UnitRecord> unitsData = FXCollections.observableArrayList();
+    private final ObservableList<UnitRecord> unitsData = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -84,6 +95,37 @@ public class UnitsController extends BaseController implements Initializable {
         setupTableColumns();
         setupTableSelection();
         loadUnitsData();
+        configureUIBasedOnPermissions();
+        updateUserInfo();
+    }
+
+    /**
+     * Handle logout button click
+     */
+    @FXML
+    @SuppressWarnings("unused")
+    private void handleLogout() {
+        authService.logout();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Login.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            Stage stage = (Stage) logoutBtn.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            showError("Failed to load login screen: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Update user information display
+     */
+    private void updateUserInfo() {
+        if (authService.getCurrentUser() != null) {
+            welcomeLabel.setText("Welcome, " + authService.getCurrentUser().getUsername());
+            userRoleLabel.setText("Role: " + authService.getCurrentUser().getRole().toString());
+        }
     }
 
     private void setupUnitTypeComboBox() {
@@ -100,6 +142,15 @@ public class UnitsController extends BaseController implements Initializable {
         locationColumn.setCellValueFactory(new PropertyValueFactory<>("locationId"));
 
         unitsTable.setItems(unitsData);
+    }
+
+    @Override
+    protected void configureUIBasedOnPermissions() {
+        configureButtonVisibility(addBtn, Permission.WRITE_DATA);
+        configureButtonVisibility(updateBtn, Permission.WRITE_DATA);
+        configureButtonVisibility(deleteBtn, Permission.DELETE_DATA);
+        configureButtonVisibility(exportBtn, Permission.EXPORT_DATA);
+        configureButtonVisibility(analyticsBtn, Permission.ANALYZE_DATA);
     }
 
     private void setupTableSelection() {
@@ -119,7 +170,12 @@ public class UnitsController extends BaseController implements Initializable {
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void addUnit() {
+        if (!requirePermission(Permission.WRITE_DATA)) {
+            return;
+        }
+
         if (validateFields()) {
             try (Connection conn = DBUtil.getConnection()) {
                 String sql = "INSERT INTO units (unit_id, unit_name, unit_type, commander_id, location_id) VALUES (?, ?, ?, ?, ?)";
@@ -144,7 +200,12 @@ public class UnitsController extends BaseController implements Initializable {
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void updateUnit() {
+        if (!requirePermission(Permission.WRITE_DATA)) {
+            return;
+        }
+
         UnitRecord selected = unitsTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showError("Please select a unit record to update.");
@@ -174,7 +235,12 @@ public class UnitsController extends BaseController implements Initializable {
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void deleteUnit() {
+        if (!requirePermission(Permission.DELETE_DATA)) {
+            return;
+        }
+
         UnitRecord selected = unitsTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showError("Please select a unit record to delete.");
@@ -200,6 +266,7 @@ public class UnitsController extends BaseController implements Initializable {
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void clearFields() {
         unitIdField.clear();
         unitNameField.clear();
@@ -210,7 +277,12 @@ public class UnitsController extends BaseController implements Initializable {
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void showAnalytics() {
+        if (!requirePermission(Permission.ANALYZE_DATA)) {
+            return;
+        }
+
         try {
 
             com.warManagementGUI.DataAnalysis.UnitsBarChart.showUnitTypeChart();
@@ -221,32 +293,37 @@ public class UnitsController extends BaseController implements Initializable {
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void refreshData() {
         loadUnitsData();
         showSuccess("Data refreshed successfully!");
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void exportData() {
+        if (!requirePermission(Permission.EXPORT_DATA)) {
+            return;
+        }
+
         showInfo("Export functionality will be available soon!");
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void goBack() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Dashboard.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) backBtn.getScene().getWindow();
-            Scene scene = new Scene(root);
-
-            themeManager.applyThemeToScene(scene);
-            stage.setScene(scene);
+            navigateToScene("/com/warManagementGUI/fxml/Dashboard.fxml", "War Management System - Dashboard", backBtn);
         } catch (IOException e) {
             showError("Error navigating back: " + e.getMessage());
         }
     }
 
     private void loadUnitsData() {
+        if (!requirePermission(Permission.READ_DATA)) {
+            return;
+        }
+
         unitsData.clear();
         try (Connection conn = DBUtil.getConnection()) {
             String sql = "SELECT * FROM units";

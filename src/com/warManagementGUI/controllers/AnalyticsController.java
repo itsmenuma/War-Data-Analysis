@@ -24,14 +24,23 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class AnalyticsController extends BaseController implements Initializable {
+
+    @FXML
+    private Label welcomeLabel;
+    @FXML
+    private Label userRoleLabel;
+    @FXML
+    private Button logoutBtn;
 
     @FXML
     private Button personnelAnalyticsBtn;
@@ -54,11 +63,39 @@ public class AnalyticsController extends BaseController implements Initializable
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         initializeTheme();
         Platform.runLater(() -> {
+            updateUserInfo();
             refreshData();
         });
+    }
+
+    /**
+     * Handle logout button click
+     */
+    @FXML
+    private void handleLogout() {
+        authService.logout();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Login.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            Stage stage = (Stage) logoutBtn.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            showErrorAlert("Failed to load login screen: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Update user information display
+     */
+    private void updateUserInfo() {
+        if (authService.getCurrentUser() != null) {
+            welcomeLabel.setText("Welcome, " + authService.getCurrentUser().getUsername());
+            userRoleLabel.setText("Role: " + authService.getCurrentUser().getRole().toString());
+        }
     }
 
     @FXML
@@ -68,7 +105,7 @@ public class AnalyticsController extends BaseController implements Initializable
             PersonnelBarChart.showPersonnelStatusChart();
             PersonnelBarChart.showPersonnelPostChart();
 
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | UnsupportedOperationException e) {
             showErrorAlert("Error displaying personnel analytics: " + e.getMessage());
         }
     }
@@ -77,7 +114,7 @@ public class AnalyticsController extends BaseController implements Initializable
     private void showUnitsAnalytics() {
         try {
             UnitsBarChart.showUnitTypeChart();
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | UnsupportedOperationException e) {
             showErrorAlert("Error displaying units analytics: " + e.getMessage());
         }
     }
@@ -89,7 +126,7 @@ public class AnalyticsController extends BaseController implements Initializable
             EquipmentBarChart.showEquipmentStatusChart();
             EquipmentBarChart.showEquipmentTypeChart();
 
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | UnsupportedOperationException e) {
             showErrorAlert("Error displaying equipment analytics: " + e.getMessage());
         }
     }
@@ -101,7 +138,7 @@ public class AnalyticsController extends BaseController implements Initializable
             SuppliesBarChart.showSupplyStatusChart();
             SuppliesBarChart.showSupplyTypeChart();
 
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | UnsupportedOperationException e) {
             showErrorAlert("Error displaying supplies analytics: " + e.getMessage());
         }
     }
@@ -112,7 +149,7 @@ public class AnalyticsController extends BaseController implements Initializable
 
             MissionsBarChart.showMissionStatusChart();
 
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | UnsupportedOperationException e) {
             showErrorAlert("Error displaying missions analytics: " + e.getMessage());
         }
     }
@@ -135,7 +172,7 @@ public class AnalyticsController extends BaseController implements Initializable
                 showInfoAlert("Export Successful",
                         "Data has been successfully exported to:\n" + file.getAbsolutePath());
             }
-        } catch (Exception e) {
+        } catch (IOException | SQLException e) {
             showErrorAlert("Error exporting to CSV: " + e.getMessage());
         }
     }
@@ -158,7 +195,7 @@ public class AnalyticsController extends BaseController implements Initializable
                 showInfoAlert("Report Generated",
                         "Comprehensive report has been generated:\n" + file.getAbsolutePath());
             }
-        } catch (Exception e) {
+        } catch (IOException | SQLException e) {
             showErrorAlert("Error generating report: " + e.getMessage());
         }
     }
@@ -171,7 +208,7 @@ public class AnalyticsController extends BaseController implements Initializable
 
                 showInfoAlert("Data Refreshed", "Analytics data has been refreshed successfully.");
             });
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | UnsupportedOperationException e) {
             showErrorAlert("Error refreshing data: " + e.getMessage());
         }
     }
@@ -179,13 +216,7 @@ public class AnalyticsController extends BaseController implements Initializable
     @FXML
     private void goBack() {
         try {
-            Stage currentStage = (Stage) backBtn.getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Dashboard.fxml"));
-            Scene scene = new Scene(loader.load());
-
-            themeManager.applyThemeToScene(scene);
-            currentStage.setScene(scene);
-            currentStage.setTitle("War Management System - Dashboard");
+            navigateToScene("/com/warManagementGUI/fxml/Dashboard.fxml", "War Management System - Dashboard", backBtn);
         } catch (IOException e) {
             showErrorAlert("Error navigating to dashboard: " + e.getMessage());
         }

@@ -92,13 +92,15 @@
   <build>
     <!-- use custom source layout -->
     <sourceDirectory>${project.basedir}/src</sourceDirectory>
-    <!-- copy non-Java resources under src/ into classpath -->    <resources>
+    <!-- copy non-Java resources under src/ into classpath -->
+    <resources>
       <resource>
         <directory>${project.basedir}/src</directory>
         <includes>
           <include>pics/**</include>
           <include>com/warManagementGUI/fxml/**</include>
           <include>com/warManagementGUI/css/**</include>
+          <include>com/warManagementGUI/config/**</include>
         </includes>
       </resource>
     </resources>

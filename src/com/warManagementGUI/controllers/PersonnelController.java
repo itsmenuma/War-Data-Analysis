@@ -9,9 +9,10 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 import com.warManagementGUI.DataAnalysis.PersonnelBarChart;
+import com.warManagementGUI.models.Permission;
+import com.warManagementGUI.records.PersonnelRecord;
 import com.warManagementGUI.util.DBUtil;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -22,6 +23,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -32,6 +34,13 @@ import javafx.stage.Stage;
  * Controller for Personnel Management interface
  */
 public class PersonnelController extends BaseController implements Initializable {
+
+    @FXML
+    private Label welcomeLabel;
+    @FXML
+    private Label userRoleLabel;
+    @FXML
+    private Button logoutBtn;
 
     @FXML
     private TextField personnelIdField;
@@ -68,7 +77,6 @@ public class PersonnelController extends BaseController implements Initializable
     private TableColumn<PersonnelRecord, String> contactColumn;
     @FXML
     private TableColumn<PersonnelRecord, String> statusColumn;
-
     @FXML
     private Button addBtn;
     @FXML
@@ -76,15 +84,18 @@ public class PersonnelController extends BaseController implements Initializable
     @FXML
     private Button deleteBtn;
     @FXML
+    @SuppressWarnings("unused")
     private Button clearBtn;
     @FXML
+    @SuppressWarnings("unused")
     private Button backBtn;
     @FXML
+    @SuppressWarnings("unused")
     private Button refreshBtn;
     @FXML
     private Button exportBtn;
 
-    private ObservableList<PersonnelRecord> personnelData = FXCollections.observableArrayList();
+    private final ObservableList<PersonnelRecord> personnelData = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -93,6 +104,19 @@ public class PersonnelController extends BaseController implements Initializable
         setupTableSelection();
         loadPersonnelData();
         initializeTheme();
+        configureUIBasedOnPermissions();
+        updateUserInfo();
+    }
+
+    private void updateUserInfo() {
+        if (authService.isLoggedIn()) {
+            if (welcomeLabel != null) {
+                welcomeLabel.setText("Welcome, " + authService.getCurrentUserFullName());
+            }
+            if (userRoleLabel != null) {
+                userRoleLabel.setText("Role: " + authService.getCurrentUser().getRole().getDisplayName());
+            }
+        }
     }
 
     private void setupStatusComboBox() {
@@ -109,8 +133,25 @@ public class PersonnelController extends BaseController implements Initializable
         roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
         contactColumn.setCellValueFactory(new PropertyValueFactory<>("contact"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
-
         personnelTable.setItems(personnelData);
+    }
+
+    @Override
+    protected void configureUIBasedOnPermissions() {
+        configureButtonVisibility(addBtn, Permission.WRITE_DATA);
+        configureButtonVisibility(updateBtn, Permission.WRITE_DATA);
+        configureButtonVisibility(deleteBtn, Permission.DELETE_DATA);
+        configureButtonVisibility(exportBtn, Permission.EXPORT_DATA);
+
+        if (!hasPermission(Permission.ANALYZE_DATA)) {
+            if (personnelTable.getParent() != null) {
+
+                javafx.scene.Node analyticsBtn = personnelTable.getParent().lookup("#analyticsBtn");
+                if (analyticsBtn != null) {
+                    analyticsBtn.setVisible(false);
+                }
+            }
+        }
     }
 
     private void setupTableSelection() {
@@ -125,7 +166,7 @@ public class PersonnelController extends BaseController implements Initializable
         personnelIdField.setText(record.getPersonnelId());
         firstNameField.setText(record.getFirstName());
         lastNameField.setText(record.getLastName());
-        postField.setText(record.getpost());
+        postField.setText(record.getPost());
         unitIdField.setText(record.getUnitId());
         roleField.setText(record.getRole());
         contactField.setText(record.getContact());
@@ -133,7 +174,12 @@ public class PersonnelController extends BaseController implements Initializable
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void addPersonnel() {
+        if (!requirePermission(Permission.WRITE_DATA)) {
+            return;
+        }
+
         if (validateFields()) {
             String sql = "INSERT INTO personnel (personnel_id, first_name, last_name, post, unit_id, role, contact_information, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             try (Connection conn = DBUtil.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql);) {
@@ -160,7 +206,12 @@ public class PersonnelController extends BaseController implements Initializable
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void updatePersonnel() {
+        if (!requirePermission(Permission.WRITE_DATA)) {
+            return;
+        }
+
         PersonnelRecord selected = personnelTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showError("Please select a personnel record to update.");
@@ -193,7 +244,12 @@ public class PersonnelController extends BaseController implements Initializable
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void deletePersonnel() {
+        if (!requirePermission(Permission.DELETE_DATA)) {
+            return;
+        }
+
         PersonnelRecord selected = personnelTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showError("Please select a personnel record to delete.");
@@ -232,13 +288,19 @@ public class PersonnelController extends BaseController implements Initializable
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void refreshData() {
         loadPersonnelData();
         showSuccess("Data refreshed successfully!");
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void showAnalytics() {
+        if (!requirePermission(Permission.ANALYZE_DATA)) {
+            return;
+        }
+
         try {
             PersonnelBarChart.showPersonnelStatusChart();
         } catch (Exception e) {
@@ -247,29 +309,59 @@ public class PersonnelController extends BaseController implements Initializable
     }
 
     @FXML
+    @SuppressWarnings("unused")
     private void exportData() {
+        if (!requirePermission(Permission.EXPORT_DATA)) {
+            return;
+        }
+
         showInfo("Export functionality will be available soon!");
     }
 
+    /**
+     * Navigate back to dashboard
+     */
     @FXML
+    @SuppressWarnings("unused")
     private void goBack() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Dashboard.fxml"));
+            navigateToScene("/com/warManagementGUI/fxml/Dashboard.fxml", "War Management System - Dashboard", backBtn);
+        } catch (IOException e) {
+            showError("Error loading dashboard: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Handle logout - return to login screen
+     */
+    @FXML
+    @SuppressWarnings("unused")
+    private void handleLogout() {
+        try {
+
+            authService.logout();
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/warManagementGUI/fxml/Login.fxml"));
             Parent root = loader.load();
 
-            Stage stage = (Stage) backBtn.getScene().getWindow();
-            Scene scene = new Scene(root);
-
-            // Apply current theme to the new scene
-            themeManager.applyThemeToScene(scene);
-
+            Scene scene = new Scene(root, 400, 600);
+            Stage stage = (Stage) logoutBtn.getScene().getWindow();
             stage.setScene(scene);
+            stage.setTitle("War Data Analysis System - Login");
+            stage.setResizable(false);
+            stage.centerOnScreen();
+
         } catch (IOException e) {
-            showError("Error navigating back: " + e.getMessage());
+            showError("Failed to load login screen: " + e.getMessage());
         }
     }
 
     private void loadPersonnelData() {
+        if (!hasPermission(Permission.READ_DATA)) {
+            showError("You don't have permission to view personnel data.");
+            return;
+        }
+
         personnelData.clear();
         String sql = "SELECT * FROM personnel";
         try (Connection conn = DBUtil.getConnection();
@@ -338,95 +430,5 @@ public class PersonnelController extends BaseController implements Initializable
         alert.setHeaderText(null);
         alert.setContentText(message);
         return alert.showAndWait().orElse(null) == javafx.scene.control.ButtonType.OK;
-    }
-
-    /**
-     * Data model class for Personnel records
-     */
-    public static class PersonnelRecord {
-        private final SimpleStringProperty personnelId;
-        private final SimpleStringProperty firstName;
-        private final SimpleStringProperty lastName;
-        private final SimpleStringProperty post;
-        private final SimpleStringProperty unitId;
-        private final SimpleStringProperty role;
-        private final SimpleStringProperty contact;
-        private final SimpleStringProperty status;
-
-        public PersonnelRecord(String personnelId, String firstName, String lastName,
-                String post, String unitId, String role, String contact, String status) {
-            this.personnelId = new SimpleStringProperty(personnelId);
-            this.firstName = new SimpleStringProperty(firstName);
-            this.lastName = new SimpleStringProperty(lastName);
-            this.post = new SimpleStringProperty(post);
-            this.unitId = new SimpleStringProperty(unitId);
-            this.role = new SimpleStringProperty(role);
-            this.contact = new SimpleStringProperty(contact);
-            this.status = new SimpleStringProperty(status);
-        }
-
-        public String getPersonnelId() {
-            return personnelId.get();
-        }
-
-        public String getFirstName() {
-            return firstName.get();
-        }
-
-        public String getLastName() {
-            return lastName.get();
-        }
-
-        public String getpost() {
-            return post.get();
-        }
-
-        public String getUnitId() {
-            return unitId.get();
-        }
-
-        public String getRole() {
-            return role.get();
-        }
-
-        public String getContact() {
-            return contact.get();
-        }
-
-        public String getStatus() {
-            return status.get();
-        }
-
-        public SimpleStringProperty personnelIdProperty() {
-            return personnelId;
-        }
-
-        public SimpleStringProperty firstNameProperty() {
-            return firstName;
-        }
-
-        public SimpleStringProperty lastNameProperty() {
-            return lastName;
-        }
-
-        public SimpleStringProperty postProperty() {
-            return post;
-        }
-
-        public SimpleStringProperty unitIdProperty() {
-            return unitId;
-        }
-
-        public SimpleStringProperty roleProperty() {
-            return role;
-        }
-
-        public SimpleStringProperty contactProperty() {
-            return contact;
-        }
-
-        public SimpleStringProperty statusProperty() {
-            return status;
-        }
     }
 }
